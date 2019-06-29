@@ -5,7 +5,7 @@
 [![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC//blob/master/LICENSE)
 
 # Concurrency
-Collection of data structures used inside [HELICS](https://github.com/GMLC-TDC/HELICS-src) and supporting repos to support thread synchronization and concurrency.
+Collection of data structures used inside [HELICS](https://github.com/GMLC-TDC/HELICS) and supporting repos to support thread synchronization and concurrency.
 
 ## General Structures
 
