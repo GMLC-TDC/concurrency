@@ -13,7 +13,7 @@ project (GMLC_CONCURRENCY VERSION 0.1)
 # GMLC concurrency library Version number
 #-----------------------------------------------------------------------------
 set (GMLC_CONCURRENCY_VERSION_BUILD )
-set (GMLC_CONCURRENCY_DATE "06-29-19")
+set (GMLC_CONCURRENCY_DATE "06-30-19")
 
 set(GMLC_CONCURRENCY_VERSION_STRING "${GMLC_CONCURRENCY_VERSION} (${GMLC_CONCURRENCY_DATE})")
 
@@ -82,7 +82,7 @@ target_include_directories(concurrency_base INTERFACE ThirdParty)
 add_subdirectory(gmlc)
 
 option(GMLC_CONCURRENCY_TEST "Enable tests for the concurrency library" ON)
-option(GMLC_CONCURRENCY_BENCHMARK "Enable benchmarks for the concurrency library" ON)
+#option(GMLC_CONCURRENCY_BENCHMARK "Enable benchmarks for the concurrency library" ON)
 
 if (GMLC_CONCURRENCY_TEST)
 	enable_testing()

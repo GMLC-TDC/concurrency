@@ -1,20 +1,20 @@
 /***********************************************************************
-*
-* Copyright (c) 2015-2018 Ansel Sermersheim
-* All rights reserved.
-*
-* This file is part of libguarded
-*
-* libguarded is free software, released under the BSD 2-Clause license.
-* For license details refer to LICENSE provided with this project.
-*
-***********************************************************************/
-
-#ifndef LIBGUARDED_RCU_GUARDED_HPP
-#define LIBGUARDED_RCU_GUARDED_HPP
+ *
+ * Copyright (c) 2015-2018 Ansel Sermersheim
+ * All rights reserved.
+ *
+ * This file is part of libguarded
+ *
+ * libguarded is free software, released under the BSD 2-Clause license.
+ * For license details refer to LICENSE provided with this project.
+ *
+ ***********************************************************************/
+#pragma once
 
 #include <memory>
 
+namespace gmlc
+{
 namespace libguarded
 {
 /**
@@ -45,14 +45,15 @@ class rcu_guarded
     class write_handle
     {
       public:
-        using pointer      = T *;
+        using pointer = T *;
         using element_type = T;
 
         write_handle(T *ptr);
 
         ~write_handle()
         {
-            if (m_accessed) {
+            if (m_accessed)
+            {
                 m_guard.rcu_write_unlock(*m_ptr);
             }
         }
@@ -72,7 +73,8 @@ class rcu_guarded
       private:
         void access() const
         {
-            if (!m_accessed) {
+            if (!m_accessed)
+            {
                 m_guard.rcu_write_lock(*m_ptr);
                 m_accessed = true;
             }
@@ -86,16 +88,15 @@ class rcu_guarded
     class read_handle
     {
       public:
-        using pointer      = const T *;
+        using pointer = const T *;
         using element_type = const T;
 
-        read_handle(const T *ptr) : m_ptr(ptr), m_accessed(false)
-        {
-        }
+        read_handle(const T *ptr) : m_ptr(ptr), m_accessed(false) {}
 
         ~read_handle()
         {
-            if (m_accessed) {
+            if (m_accessed)
+            {
                 m_guard.rcu_read_unlock(*m_ptr);
             }
         }
@@ -115,7 +116,8 @@ class rcu_guarded
       private:
         void access() const
         {
-            if (!m_accessed) {
+            if (!m_accessed)
+            {
                 m_guard.rcu_read_lock(*m_ptr);
                 m_accessed = true;
             }
@@ -132,8 +134,7 @@ class rcu_guarded
 
 template <typename T>
 template <typename... Us>
-rcu_guarded<T>::rcu_guarded(Us &&... data)
-    : m_obj(std::forward<Us>(data)...)
+rcu_guarded<T>::rcu_guarded(Us &&... data) : m_obj(std::forward<Us>(data)...)
 {
 }
 
@@ -154,6 +155,6 @@ rcu_guarded<T>::write_handle::write_handle(T *ptr)
     : m_ptr(ptr), m_accessed(false)
 {
 }
-}
+}  // namespace libguarded
 
-#endif
+}  // namespace gmlc

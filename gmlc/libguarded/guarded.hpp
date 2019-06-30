@@ -1,34 +1,35 @@
 /***********************************************************************
-*
-* Copyright (c) 2015-2018 Ansel Sermersheim
-* All rights reserved.
-*
-* This file is part of libguarded
-*
-* libguarded is free software, released under the BSD 2-Clause license.
-* For license details refer to LICENSE provided with this project.
-*
-***********************************************************************/
+ *
+ * Copyright (c) 2015-2018 Ansel Sermersheim
+ * All rights reserved.
+ *
+ * This file is part of libguarded
+ *
+ * libguarded is free software, released under the BSD 2-Clause license.
+ * For license details refer to LICENSE provided with this project.
+ *
+ ***********************************************************************/
 
 /*
 Copyright © 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER
+for more details.
 */
 /*
 additions include load store operations and operator= functions
 */
-#ifndef LIBGUARDED_GUARDED_HPP
-#define LIBGUARDED_GUARDED_HPP
+#pragma once
 
+#include "handles.hpp"
 #include <memory>
 #include <mutex>
 #include <type_traits>
-#include "handles.hpp"
 
+namespace gmlc
+{
 namespace libguarded
 {
-
 /**
    \headerfile guarded.hpp <libguarded/guarded.hpp>
 
@@ -46,8 +47,9 @@ namespace libguarded
 template <typename T, typename M = std::mutex>
 class guarded
 {
-private:
+  private:
     using handle = lock_handle<T, M>;
+
   public:
     /**
      Construct a guarded object. This constructor will accept any
@@ -108,19 +110,19 @@ private:
     handle try_lock_until(const TimePoint &timepoint);
 
     /** generate a copy of the protected object
-    */
-    std::conditional_t<std::is_copy_assignable<T>::value,T,void> load()
+     */
+    std::conditional_t<std::is_copy_assignable<T>::value, T, void> load()
     {
         std::lock_guard<M> glock(m_mutex);
-        auto retObj= std::conditional_t<std::is_copy_assignable<T>::value, T, void>(m_obj);
+        auto retObj =
+          std::conditional_t<std::is_copy_assignable<T>::value, T, void>(m_obj);
         return retObj;
-
     }
 
     /** store an updated value into the object*/
     template <typename objType>
-     void store(objType &&newObj)
-    { //uses a forwarding reference
+    void store(objType &&newObj)
+    {  // uses a forwarding reference
         std::lock_guard<M> glock(m_mutex);
         m_obj = std::forward<objType>(newObj);
     }
@@ -128,7 +130,7 @@ private:
     /** store an updated value into the object*/
     template <typename objType>
     void operator=(objType &&newObj)
-    { //uses a forwarding reference
+    {  // uses a forwarding reference
         std::lock_guard<M> glock(m_mutex);
         m_obj = std::forward<objType>(newObj);
     }
@@ -158,18 +160,18 @@ auto guarded<T, M>::try_lock() -> handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto guarded<T, M>::try_lock_for(const Duration &d) ->handle
+auto guarded<T, M>::try_lock_for(const Duration &d) -> handle
 {
-    return try_lock_handle_for(&m_obj, m_mutex,d);
+    return try_lock_handle_for(&m_obj, m_mutex, d);
 }
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto guarded<T, M>::try_lock_until(const TimePoint &tp) ->handle
+auto guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
 {
-    return try_lock_handle_until(&m_obj, m_mutex,tp);
+    return try_lock_handle_until(&m_obj, m_mutex, tp);
 }
 
-}
+}  // namespace libguarded
 
-#endif
+}  // namespace gmlc

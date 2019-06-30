@@ -1,26 +1,25 @@
 /***********************************************************************
-*
-* Copyright (c) 2015-2018 Ansel Sermersheim
-* All rights reserved.
-*
-* This file is part of libguarded
-*
-* libguarded is free software, released under the BSD 2-Clause license.
-* For license details refer to LICENSE provided with this project.
-*
-***********************************************************************/
-
-#ifndef LIBGUARDED_LR_GUARDED_HPP
-#define LIBGUARDED_LR_GUARDED_HPP
+ *
+ * Copyright (c) 2015-2018 Ansel Sermersheim
+ * All rights reserved.
+ *
+ * This file is part of libguarded
+ *
+ * libguarded is free software, released under the BSD 2-Clause license.
+ * For license details refer to LICENSE provided with this project.
+ *
+ ***********************************************************************/
+#pragma once
 
 #include <atomic>
 #include <memory>
 #include <mutex>
 #include <thread>
 
+namespace gmlc
+{
 namespace libguarded
 {
-
 /**
    \headerfile lr_guarded.hpp <libguarded/lr_guarded.hpp>
 
@@ -73,7 +72,7 @@ class lr_guarded
      state.
     */
     template <typename Func>
-    void modify(Func && f);
+    void modify(Func &&f);
 
     /**
      Acquire a shared_handle to the protected object. Always succeeds without
@@ -92,14 +91,14 @@ class lr_guarded
      blocking.
     */
     template <class Duration>
-    shared_handle try_lock_shared_for(const Duration & duration) const;
+    shared_handle try_lock_shared_for(const Duration &duration) const;
 
     /**
      Acquire a shared_handle to the protected object. Always succeeds without
      blocking.
     */
     template <class TimePoint>
-    shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
+    shared_handle try_lock_shared_until(const TimePoint &timepoint) const;
 
   private:
     class shared_deleter
@@ -108,64 +107,72 @@ class lr_guarded
         using pointer = const T *;
 
         shared_deleter(const shared_deleter &) = delete;
-        shared_deleter(shared_deleter &&)      = default;
+        shared_deleter(shared_deleter &&) = default;
 
-        shared_deleter(std::atomic<int> & readingCount) : m_readingCount(readingCount)
+        shared_deleter(std::atomic<int> &readingCount)
+            : m_readingCount(readingCount)
         {
         }
 
-        void operator()(const T * ptr)
+        void operator()(const T *ptr)
         {
-            if (ptr) {
+            if (ptr)
+            {
                 m_readingCount--;
             }
         }
 
       private:
-        std::atomic<int> & m_readingCount;
+        std::atomic<int> &m_readingCount;
     };
 
-    T                        m_left;
-    T                        m_right;
-    std::atomic<bool>        m_readingLeft;
-    std::atomic<bool>        m_countingLeft;
+    T m_left;
+    T m_right;
+    std::atomic<bool> m_readingLeft;
+    std::atomic<bool> m_countingLeft;
     mutable std::atomic<int> m_leftReadCount;
     mutable std::atomic<int> m_rightReadCount;
-    mutable Mutex            m_writeMutex;
+    mutable Mutex m_writeMutex;
 };
 
 template <typename T, typename M>
 template <typename... Us>
 lr_guarded<T, M>::lr_guarded(Us &&... data)
-    : m_left(std::forward<Us>(data)...), m_right(m_left), m_readingLeft(true), m_countingLeft(true),
-      m_leftReadCount(0), m_rightReadCount(0)
+    : m_left(std::forward<Us>(data)...), m_right(m_left), m_readingLeft(true),
+      m_countingLeft(true), m_leftReadCount(0), m_rightReadCount(0)
 {
 }
 
 template <typename T, typename M>
 template <typename Func>
-void lr_guarded<T, M>::modify(Func && func)
+void lr_guarded<T, M>::modify(Func &&func)
 {
     // consider looser memory ordering
 
     std::lock_guard<M> lock(m_writeMutex);
 
-    T * firstWriteLocation;
-    T * secondWriteLocation;
+    T *firstWriteLocation;
+    T *secondWriteLocation;
 
     bool local_readingLeft = m_readingLeft.load();
 
-    if (local_readingLeft) {
-        firstWriteLocation  = &m_right;
+    if (local_readingLeft)
+    {
+        firstWriteLocation = &m_right;
         secondWriteLocation = &m_left;
-    } else {
-        firstWriteLocation  = &m_left;
+    }
+    else
+    {
+        firstWriteLocation = &m_left;
         secondWriteLocation = &m_right;
     }
 
-    try {
+    try
+    {
         func(*firstWriteLocation);
-    } catch (...) {
+    }
+    catch (...)
+    {
         *firstWriteLocation = *secondWriteLocation;
         throw;
     }
@@ -174,31 +181,44 @@ void lr_guarded<T, M>::modify(Func && func)
 
     bool local_countingLeft = m_countingLeft.load();
 
-    if (local_countingLeft) {
-        while (m_rightReadCount.load() != 0) {
+    if (local_countingLeft)
+    {
+        while (m_rightReadCount.load() != 0)
+        {
             std::this_thread::yield();
         }
-    } else {
-        while (m_leftReadCount.load() != 0) {
+    }
+    else
+    {
+        while (m_leftReadCount.load() != 0)
+        {
             std::this_thread::yield();
         }
     }
 
     m_countingLeft.store(!local_countingLeft);
 
-    if (local_countingLeft) {
-        while (m_leftReadCount.load() != 0) {
+    if (local_countingLeft)
+    {
+        while (m_leftReadCount.load() != 0)
+        {
             std::this_thread::yield();
         }
-    } else {
-        while (m_rightReadCount.load() != 0) {
+    }
+    else
+    {
+        while (m_rightReadCount.load() != 0)
+        {
             std::this_thread::yield();
         }
     }
 
-    try {
+    try
+    {
         func(*secondWriteLocation);
-    } catch (...) {
+    }
+    catch (...)
+    {
         *secondWriteLocation = *firstWriteLocation;
         throw;
     }
@@ -207,18 +227,27 @@ void lr_guarded<T, M>::modify(Func && func)
 template <typename T, typename M>
 auto lr_guarded<T, M>::lock_shared() const -> shared_handle
 {
-    if (m_countingLeft) {
+    if (m_countingLeft)
+    {
         m_leftReadCount++;
-        if (m_readingLeft) {
+        if (m_readingLeft)
+        {
             return shared_handle(&m_left, shared_deleter(m_leftReadCount));
-        } else {
+        }
+        else
+        {
             return shared_handle(&m_right, shared_deleter(m_leftReadCount));
         }
-    } else {
+    }
+    else
+    {
         m_rightReadCount++;
-        if (m_readingLeft) {
+        if (m_readingLeft)
+        {
             return shared_handle(&m_left, shared_deleter(m_rightReadCount));
-        } else {
+        }
+        else
+        {
             return shared_handle(&m_right, shared_deleter(m_rightReadCount));
         }
     }
@@ -232,16 +261,18 @@ auto lr_guarded<T, M>::try_lock_shared() const -> shared_handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto lr_guarded<T, M>::try_lock_shared_for(const Duration & duration) const -> shared_handle
+auto lr_guarded<T, M>::try_lock_shared_for(const Duration &duration) const
+  -> shared_handle
 {
     return lock_shared();
 }
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto lr_guarded<T, M>::try_lock_shared_until(const TimePoint & timepoint) const -> shared_handle
+auto lr_guarded<T, M>::try_lock_shared_until(const TimePoint &timepoint) const
+  -> shared_handle
 {
     return lock_shared();
 }
-}
-#endif
+}  // namespace libguarded
+}  // namespace gmlc

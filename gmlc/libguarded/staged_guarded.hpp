@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER
+for more details.
 */
 
 /***********************************************************************
@@ -15,23 +16,24 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
  * For license details refer to LICENSE provided with this project.
  *
  ***********************************************************************/
+#pragma once
 
-#ifndef STAGED_GUARDED_HPP
-#define STAGED_GUARDED_HPP
-
+#include "handles.hpp"
 #include <atomic>
 #include <memory>
 #include <mutex>
 #include <type_traits>
-#include "handles.hpp"
 
+namespace gmlc
+{
 namespace libguarded
 {
 /**
    \headerfile staged_guarded.hpp <libguarded/staged_guarded.hpp>
 
    This templated class wraps an object and allows only one thread at a
-   time to access the protected object until it is locked as a constant after which the structure is const
+   time to access the protected object until it is locked as a constant after
+   which the structure is const
 
    This class will use std::mutex for the internal locking mechanism by
    default. Other classes which are useful for the mutex type are
@@ -44,14 +46,14 @@ namespace libguarded
 template <typename T, typename M = std::mutex>
 class staged_guarded
 {
-public:
+  public:
     /**
      Construct a guarded object. This constructor will accept any
      number of parameters, all of which are forwarded to the
      constructor of T.
     */
     template <typename... Us>
-    staged_guarded (Us &&... data);
+    staged_guarded(Us &&... data);
 
     /**
      Acquire a handle to the protected object. As a side effect, the
@@ -59,7 +61,7 @@ public:
      thread. The lock will be automatically released when the handle
      is destroyed.
     */
-    handle lock ();
+    handle lock();
     shared_handle lock() const;
 
     /**
@@ -69,7 +71,7 @@ public:
      thread. The lock will be automatically released when the handle
      is destroyed.
     */
-    handle try_lock ();
+    handle try_lock();
 
     /**
      Attempt to acquire a handle to the protected object. As a side
@@ -86,7 +88,7 @@ public:
      default std::mutex.
     */
     template <class Duration>
-    handle try_lock_for (const Duration &duration);
+    handle try_lock_for(const Duration &duration);
 
     /**
      Attempt to acquire a handle to the protected object.  As a side
@@ -102,27 +104,26 @@ public:
      default std::mutex.
     */
     template <class TimePoint>
-    handle try_lock_until (const TimePoint &timepoint);
+    handle try_lock_until(const TimePoint &timepoint);
 
     // shared access, note "shared" in method names
     shared_handle lock_shared() const;
     shared_handle try_lock_shared() const;
 
     template <class Duration>
-    shared_handle try_lock_shared_for(const Duration & duration) const;
+    shared_handle try_lock_shared_for(const Duration &duration) const;
 
     template <class TimePoint>
-    shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
+    shared_handle try_lock_shared_until(const TimePoint &timepoint) const;
 
-    void transition ()
+    void transition()
     {
         if (!constant)
         {
-            //acquire the lock then alter the constant variable
+            // acquire the lock then alter the constant variable
             std::lock_guard<M> lock(m_mutex);
             constant = true;
         }
-       
     }
 
   private:
@@ -133,23 +134,26 @@ public:
 
 template <typename T, typename M>
 template <typename... Us>
-staged_guarded<T, M>::staged_guarded (Us &&... data) : m_obj (std::forward<Us> (data)...)
+staged_guarded<T, M>::staged_guarded(Us &&... data)
+    : m_obj(std::forward<Us>(data)...)
 {
 }
 
 template <typename T, typename M>
-auto staged_guarded<T, M>::lock () -> handle
+auto staged_guarded<T, M>::lock() -> handle
 {
-    std::unique_lock<M> lock =
-      (constant) ? std::unique_lock<M> (m_mutex, std::defer_lock) : std::unique_lock<M> (m_mutex);
-    return handle (&m_obj, std::move (lock));
+    std::unique_lock<M> lock = (constant) ?
+                                 std::unique_lock<M>(m_mutex, std::defer_lock) :
+                                 std::unique_lock<M>(m_mutex);
+    return handle(&m_obj, std::move(lock));
 }
 
 template <typename T, typename M>
 auto staged_guarded<T, M>::lock() const -> shared_handle
 {
-    std::unique_lock<M> lock =
-        (constant) ? std::unique_lock<M>(m_mutex, std::defer_lock) : std::unique_lock<M>(m_mutex);
+    std::unique_lock<M> lock = (constant) ?
+                                 std::unique_lock<M>(m_mutex, std::defer_lock) :
+                                 std::unique_lock<M>(m_mutex);
     return shared_handle(&m_obj, std::move(lock));
 }
 
@@ -157,12 +161,13 @@ template <typename T, typename M>
 auto staged_guarded<T, M>::lock_shared() const -> shared_handle
 {
     using locktype = typename shared_lock_handle<T, M>::locker_type;
-     auto lock =(constant) ? locktype(m_mutex, std::defer_lock) : locktype(m_mutex);
-    return shared_handle(&m_obj,std::move(lock));
+    auto lock =
+      (constant) ? locktype(m_mutex, std::defer_lock) : locktype(m_mutex);
+    return shared_handle(&m_obj, std::move(lock));
 }
 
 template <typename T, typename M>
-auto staged_guarded<T, M>::try_lock () -> handle
+auto staged_guarded<T, M>::try_lock() -> handle
 {
     if (!constant)
     {
@@ -170,10 +175,9 @@ auto staged_guarded<T, M>::try_lock () -> handle
     }
     else
     {
-        return handle (&m_obj,std::unique_lock<M> (m_mutex, std::defer_lock));
+        return handle(&m_obj, std::unique_lock<M>(m_mutex, std::defer_lock));
     }
 }
-
 
 template <typename T, typename M>
 auto staged_guarded<T, M>::try_lock_shared() const -> shared_handle
@@ -191,7 +195,7 @@ auto staged_guarded<T, M>::try_lock_shared() const -> shared_handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto staged_guarded<T, M>::try_lock_for (const Duration &d) -> handle
+auto staged_guarded<T, M>::try_lock_for(const Duration &d) -> handle
 {
     if (!constant)
     {
@@ -199,13 +203,13 @@ auto staged_guarded<T, M>::try_lock_for (const Duration &d) -> handle
     }
     else
     {
-        return handle (&m_obj, std::unique_lock<M> (m_mutex, std::defer_lock));
+        return handle(&m_obj, std::unique_lock<M>(m_mutex, std::defer_lock));
     }
 }
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto staged_guarded<T, M>::try_lock_until (const TimePoint &tp) -> handle
+auto staged_guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
 {
     if (!constant)
     {
@@ -213,13 +217,14 @@ auto staged_guarded<T, M>::try_lock_until (const TimePoint &tp) -> handle
     }
     else
     {
-        return handle (&m_obj, std::unique_lock<M> (m_mutex, std::defer_lock));
+        return handle(&m_obj, std::unique_lock<M>(m_mutex, std::defer_lock));
     }
 }
 
 template <typename T, typename M>
 template <typename Duration>
-auto staged_guarded<T, M>::try_lock_shared_for(const Duration & d) const -> shared_handle
+auto staged_guarded<T, M>::try_lock_shared_for(const Duration &d) const
+  -> shared_handle
 {
     if (!constant)
     {
@@ -234,7 +239,8 @@ auto staged_guarded<T, M>::try_lock_shared_for(const Duration & d) const -> shar
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto staged_guarded<T, M>::try_lock_shared_until(const TimePoint & tp) const -> shared_handle
+auto staged_guarded<T, M>::try_lock_shared_until(const TimePoint &tp) const
+  -> shared_handle
 {
     if (!constant)
     {
@@ -247,6 +253,6 @@ auto staged_guarded<T, M>::try_lock_shared_until(const TimePoint & tp) const -> 
     }
 }
 
-}
+}  // namespace libguarded
 
-#endif /*STAGED_GUARDED_HPP*/
+}  // namespace gmlc

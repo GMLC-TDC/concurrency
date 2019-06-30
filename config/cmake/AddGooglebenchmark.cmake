@@ -8,7 +8,7 @@ set(BUILD_SHARED_LIBS OFF)
 
 set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "")
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Suppressing benchmark's tests" FORCE)
-add_subdirectory("${CMAKE_SOURCE_DIR}/extern/benchmark" "${CMAKE_BINARY_DIR}/extern/benchmark" EXCLUDE_FROM_ALL)
+add_subdirectory("${PROJECT_SOURCE_DIR}/extern/benchmark" "${PROJECT_BINARY_DIR}/extern/benchmark" EXCLUDE_FROM_ALL)
 
 
 # Target must already exist

@@ -1,27 +1,25 @@
 /***********************************************************************
-*
-* Copyright (c) 2015-2018 Ansel Sermersheim
-* All rights reserved.
-*
-* This file is part of libguarded
-*
-* libguarded is free software, released under the BSD 2-Clause license.
-* For license details refer to LICENSE provided with this project.
-*
-***********************************************************************/
-
-#ifndef LIBGUARDED_COW_GUARDED_HPP
-#define LIBGUARDED_COW_GUARDED_HPP
+ *
+ * Copyright (c) 2015-2018 Ansel Sermersheim
+ * All rights reserved.
+ *
+ * This file is part of libguarded
+ *
+ * libguarded is free software, released under the BSD 2-Clause license.
+ * For license details refer to LICENSE provided with this project.
+ *
+ ***********************************************************************/
+#pragma once
 
 #include <atomic>
 #include <memory>
 #include <mutex>
 
-#include <libguarded/lr_guarded.hpp>
-
+#include "lr_guarded.hpp"
+namespace gmlc
+{
 namespace libguarded
 {
-
 /**
  \headerfile cow_guarded.hpp <libguarded/cow_guarded.hpp>
 
@@ -159,22 +157,28 @@ class cow_guarded
         {
             m_cancelled = true;
 
-            if (m_lock.owns_lock()) {
+            if (m_lock.owns_lock())
+            {
                 m_lock.unlock();
             }
         }
 
         void operator()(T *ptr)
         {
-            if (m_cancelled) {
+            if (m_cancelled)
+            {
                 delete ptr;
-            } else if (ptr) {
+            }
+            else if (ptr)
+            {
                 std::shared_ptr<const T> newPtr(ptr);
 
-                m_guarded.m_data.modify([newPtr](std::shared_ptr<const T> &ptr) { ptr = newPtr; });
+                m_guarded.m_data.modify(
+                  [newPtr](std::shared_ptr<const T> &ptr) { ptr = newPtr; });
             }
 
-            if (m_lock.owns_lock()) {
+            if (m_lock.owns_lock())
+            {
                 m_lock.unlock();
             }
         }
@@ -236,7 +240,8 @@ auto cow_guarded<T, M>::try_lock() -> handle
 
     auto data(m_data.try_lock_shared());
 
-    if (!data) {
+    if (!data)
+    {
         return handle();
     }
 
@@ -253,7 +258,8 @@ auto cow_guarded<T, M>::try_lock_for(const Duration &duration) -> handle
     std::unique_lock<M> guard(m_writeMutex);
     auto data = m_data.try_lock_shared_for(duration);
 
-    if (!data) {
+    if (!data)
+    {
         return handle();
     }
 
@@ -271,7 +277,8 @@ auto cow_guarded<T, M>::try_lock_until(const TimePoint &timepoint) -> handle
 
     auto data(m_data.try_lock_shared_until(timepoint));
 
-    if (!data) {
+    if (!data)
+    {
         return handle();
     }
 
@@ -294,7 +301,8 @@ auto cow_guarded<T, M>::try_lock_shared() const -> shared_handle
     shared_handle retval;
 
     auto lock = m_data.try_lock_shared();
-    if (lock) {
+    if (lock)
+    {
         retval = *lock;
     }
 
@@ -303,12 +311,14 @@ auto cow_guarded<T, M>::try_lock_shared() const -> shared_handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto cow_guarded<T, M>::try_lock_shared_for(const Duration &duration) const -> shared_handle
+auto cow_guarded<T, M>::try_lock_shared_for(const Duration &duration) const
+  -> shared_handle
 {
     shared_handle retval;
 
     auto lock = m_data.try_lock_shared_for(duration);
-    if (lock) {
+    if (lock)
+    {
         retval = *lock;
     }
 
@@ -317,17 +327,19 @@ auto cow_guarded<T, M>::try_lock_shared_for(const Duration &duration) const -> s
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto cow_guarded<T, M>::try_lock_shared_until(const TimePoint &timepoint) const -> shared_handle
+auto cow_guarded<T, M>::try_lock_shared_until(const TimePoint &timepoint) const
+  -> shared_handle
 {
     shared_handle retval;
 
     auto lock = m_data.try_lock_shared_until(timepoint);
-    if (lock) {
+    if (lock)
+    {
         retval = *lock;
     }
 
     return retval;
 }
-}
+}  // namespace libguarded
 
-#endif
+}  // namespace gmlc

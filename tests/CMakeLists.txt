@@ -19,7 +19,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 foreach(T ${CONCURRENCY_TESTS})
 
     add_executable(${T} ${T}.cpp )
-    target_link_libraries(${T} PUBLIC CONCURRENCY)
+    target_link_libraries(${T} PUBLIC concurrency)
     add_gtest(${T})
 	set_target_properties(${T} PROPERTIES FOLDER tests)
    
