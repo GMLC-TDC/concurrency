@@ -3,7 +3,7 @@ set -evx
 
 clang-format --version
 
-git ls-files -- '*Lock*.*pp' '*Test*.*pp' '*Buffer*.*pp' '*Vector*.hpp' '*Deque*.hpp' '*Queue*.*pp' '*Benchmarks*.cpp'| xargs clang-format -sort-includes -i -style=file
+git ls-files -- '*Trigger*.*pp' '*Test*.*pp' '*_guarded*.*pp' '*Benchmarks*.cpp'| xargs clang-format -sort-includes -i -style=file
 
 git diff --exit-code --color
 

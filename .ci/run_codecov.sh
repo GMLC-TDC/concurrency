@@ -7,9 +7,9 @@ set -evx
 cd ${TRAVIS_BUILD_DIR}
 mkdir -p build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Coverage -DGMLC_CONTAINERS_BENCHMARK=OFF
+cmake .. -DCMAKE_BUILD_TYPE=Coverage -DGMLC_CONCURRENCY_BENCHMARK=OFF
 cmake --build . -- -j2
-cmake --build . --target CONTAINERS_coverage
+cmake --build . --target CONCURRENCY_coverage
 
 set +evx
 echo -en "travis_fold:end:script.build\\r"
