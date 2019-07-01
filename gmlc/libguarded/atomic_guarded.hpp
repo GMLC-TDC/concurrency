@@ -17,7 +17,7 @@ for Sustainable Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER
 for more details.
 */
 /*
-this file is a new addition to the library
+this file is not in the original libguared
 */
 #pragma once
 

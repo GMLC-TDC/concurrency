@@ -57,6 +57,8 @@ class deferred_guarded
 #endif
 {
   public:
+    using shared_handle = shared_lock_handle<T, M>;
+
     template <typename... Us>
     deferred_guarded(Us &&... data);
 
@@ -191,8 +193,8 @@ auto package_task_void(Func &&func) -> typename std::enable_if<
     std::packaged_task<Ret(T &)> task(std::forward<Func>(func));
     std::future<Ret> task_future(task.get_future());
 
-    return std::make_pair(std::packaged_task<void(T &)>(std::move(task)),
-                          std::move(task_future));
+    return {std::packaged_task<void(T &)>(std::move(task)),
+            std::move(task_future)};
 }
 
 template <typename T, typename M>
@@ -291,7 +293,7 @@ auto deferred_guarded<T, M>::try_lock_shared_until(const TimePoint &tp) const
   -> shared_handle
 {
     do_pending_writes();
-    return try_lock_shared_handle_until(&m_obj, m_mutex, timepoint);
+    return try_lock_shared_handle_until(&m_obj, m_mutex, tp);
 }
 }  // namespace libguarded
 

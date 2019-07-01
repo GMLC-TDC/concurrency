@@ -1,45 +1,64 @@
+/***********************************************************************
+ *
+ * Copyright (c) 2015-2017 Ansel Sermersheim
+ * All rights reserved.
+ *
+ * This file is part of libguarded
+ *
+ * libguarded is free software, released under the BSD 2-Clause license.
+ * For license details refer to LICENSE provided with this project.
+ *
+ ***********************************************************************/
+
+/*
+Copyright © 2017-2019,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER
+for more details.
+*/
+/*
+modified to use google test
+*/
+#include "gtest/gtest.h"
 
 #include <libguarded/lr_guarded.hpp>
 
 #include <thread>
 
-#include <boost/test/unit_test.hpp>
+using namespace gmlc::libguarded;
 
-using namespace libguarded;
-
-BOOST_AUTO_TEST_CASE(lr_guarded_1)
+TEST(lr_guarded, lr_guarded_1)
 {
-
     lr_guarded<int, std::timed_mutex> data(0);
 
     {
-        data.modify([](int & x) { ++x; });
+        data.modify([](int &x) { ++x; });
     }
 
     {
         auto data_handle = data.lock_shared();
 
-        BOOST_CHECK(data_handle != nullptr);
-        BOOST_CHECK_EQUAL(*data_handle, 1);
+        EXPECT_TRUE(data_handle != nullptr);
+        EXPECT_EQ(*data_handle, 1);
 
         std::thread th1([&data]() {
             auto data_handle2 = data.try_lock_shared();
-            BOOST_CHECK(data_handle2 != nullptr);
-            BOOST_CHECK_EQUAL(*data_handle2, 1);
+            EXPECT_TRUE(data_handle2 != nullptr);
+            EXPECT_EQ(*data_handle2, 1);
         });
 
         std::thread th2([&data]() {
-            auto data_handle2 = data.try_lock_shared_for(std::chrono::milliseconds(20));
-            BOOST_CHECK(data_handle2 != nullptr);
-            BOOST_CHECK_EQUAL(*data_handle2, 1);
-
+            auto data_handle2 =
+              data.try_lock_shared_for(std::chrono::milliseconds(20));
+            EXPECT_TRUE(data_handle2 != nullptr);
+            EXPECT_EQ(*data_handle2, 1);
         });
 
         std::thread th3([&data]() {
-            auto data_handle2 = data.try_lock_shared_until(std::chrono::steady_clock::now() +
-                                                           std::chrono::milliseconds(20));
-            BOOST_CHECK(data_handle2 != nullptr);
-            BOOST_CHECK_EQUAL(*data_handle2, 1);
+            auto data_handle2 = data.try_lock_shared_until(
+              std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
+            EXPECT_TRUE(data_handle2 != nullptr);
+            EXPECT_EQ(*data_handle2, 1);
         });
 
         th1.join();
@@ -51,32 +70,35 @@ BOOST_AUTO_TEST_CASE(lr_guarded_1)
     {
         auto data_handle = data.lock_shared();
 
-        BOOST_CHECK(data_handle != nullptr);
-        BOOST_CHECK_EQUAL(*data_handle, 1);
+        EXPECT_TRUE(data_handle != nullptr);
+        EXPECT_EQ(*data_handle, 1);
     }
 }
 
-BOOST_AUTO_TEST_CASE(lr_guarded_2)
+TEST(lr_guarded, lr_guarded_2)
 {
     lr_guarded<int> data(0);
 
     std::thread th1([&data]() {
-        for (int i = 0; i < 100000; ++i) {
-            data.modify([](int & x) { ++x; });
+        for (int i = 0; i < 100000; ++i)
+        {
+            data.modify([](int &x) { ++x; });
         }
     });
 
     std::thread th2([&data]() {
-        for (int i = 0; i < 100000; ++i) {
-            data.modify([](int & x) { ++x; });
+        for (int i = 0; i < 100000; ++i)
+        {
+            data.modify([](int &x) { ++x; });
         }
     });
 
     std::thread th3([&data]() {
         int last_val = 0;
-        while (last_val != 200000) {
+        while (last_val != 200000)
+        {
             auto data_handle = data.lock_shared();
-            BOOST_CHECK(last_val <= *data_handle);
+            EXPECT_TRUE(last_val <= *data_handle);
             last_val = *data_handle;
         }
     });
@@ -87,5 +109,5 @@ BOOST_AUTO_TEST_CASE(lr_guarded_2)
 
     auto data_handle = data.lock_shared();
 
-    BOOST_CHECK_EQUAL(*data_handle, 200000);
+    EXPECT_EQ(*data_handle, 200000);
 }

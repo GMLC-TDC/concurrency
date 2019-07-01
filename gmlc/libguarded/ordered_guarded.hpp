@@ -21,11 +21,11 @@ additions include load store operations and use of handles.hpp
 */
 #pragma once
 
+#include "handles.hpp"
 #include <memory>
 #include <mutex>
-#include <type_traits>
-
 #include <shared_mutex>
+#include <type_traits>
 
 namespace gmlc
 {

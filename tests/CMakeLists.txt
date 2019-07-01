@@ -25,6 +25,8 @@ foreach(T ${CONCURRENCY_TESTS})
    
 endforeach()
 
+add_subdirectory(libguarded)
+
 if(CMAKE_BUILD_TYPE STREQUAL Coverage)
     include(CodeCoverage)
     setup_target_for_coverage(

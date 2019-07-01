@@ -19,6 +19,7 @@ class lock_handle
 {
   public:
     using pointer = T *;
+    using lock_type = std::unique_lock<M>;
 
     lock_handle(pointer val, std::unique_lock<M> lock)
         : data(val), m_handle_lock(std::move(lock))
@@ -98,7 +99,26 @@ lock_handle<T, M> try_lock_handle_until(T *obj, M &gmutex, const TimePoint &tp)
     }
 }
 
+// Check for streamability
+// Based on
+// https://stackoverflow.com/questions/22758291/how-can-i-detect-if-a-type-can-be-streamed-to-an-stdostream
+
+template <typename T>
+class is_shared_lockable
+{
+    template <typename TT>
+    static auto test(int)
+      -> decltype(std::declval<TT>().lock_shared(), std::true_type());
+
+    template <typename, typename>
+    static auto test(...) -> std::false_type;
+
+  public:
+    static const bool value = decltype(test<T>(0))::value;
+};
+
 /** template SFINAE if lock shared is available*/
+/**
 template <class T>
 class Has_lock_shared
 {
@@ -130,6 +150,7 @@ struct has_lock_shared
 {
 };
 
+*/
 template <typename M>
 class shared_locker
 {
@@ -198,14 +219,17 @@ class shared_lock_handle
     {  // return pointer to class object
         return *data;
     }
+    /// bool operator to check if the data is valid and the locked
     operator bool() const noexcept { return (data != nullptr); }
+    /// begin operator to start the data
     auto begin() const { return std::begin(*data); }
+    /// end operator for use in range based for and other algorithms
     auto end() const { return std::end(*data); }
 
   private:
     // this is a non owning pointer
-    pointer data;
-    lock_type m_handle_lock;
+    pointer data;  //!< non-owning pointer to the data
+    lock_type m_handle_lock;  //!< locking object
 };
 
 template <typename T, typename M>
