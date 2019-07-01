@@ -66,7 +66,7 @@ class deferred_guarded
     void modify_detach(Func &&func);
 
     template <typename Func>
-    auto modify_async(Func &&func) ->
+    auto modify_async(Func func) ->
       typename std::future<decltype(std::declval<Func>()(declref<T>()))>;
 
     shared_handle lock_shared() const;
@@ -186,20 +186,19 @@ auto package_task_void(Func &&func) -> typename std::enable_if<
 }
 
 template <typename Ret, typename T, typename Func>
-auto package_task_void(Func &&func) -> typename std::enable_if<
+auto package_task_void(Func func) -> typename std::enable_if<
   !std::is_same<Ret, void>::value,
   std::pair<std::packaged_task<void(T &)>, std::future<T>>>::type
 {
-    std::packaged_task<Ret(T &)> task(std::forward<Func>(func));
-    std::future<Ret> task_future(task.get_future());
-
-    return {std::packaged_task<void(T &)>(std::move(task)),
-            std::move(task_future)};
+    std::pair<std::packaged_task<void(T &)>, std::future<T>> ret;
+    ret.first = std::packaged_task<Ret(T &)>(std::move(func));
+    ret.second = ret.first.get_future();
+    return ret;
 }
 
 template <typename T, typename M>
 template <typename Func>
-auto deferred_guarded<T, M>::modify_async(Func &&func) ->
+auto deferred_guarded<T, M>::modify_async(Func func) ->
   typename std::future<decltype(std::declval<Func>()(declref<T>()))>
 {
     using return_t = decltype(func(m_obj));
@@ -227,8 +226,7 @@ auto deferred_guarded<T, M>::modify_async(Func &&func) ->
     else
     {
         std::pair<std::packaged_task<void(T &)>, std::future<return_t>>
-          task_future =
-            package_task_void<return_t, T>(std::forward<Func>(func));
+          task_future = package_task_void<return_t, T>(std::move(func));
 
         retval = std::move(task_future.second);
 

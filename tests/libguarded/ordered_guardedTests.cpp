@@ -53,7 +53,7 @@ TEST(ordered_guarded, ordered_guarded_1)
 
         std::thread th1([&data, &th1_ok]() {
             auto data_handle2 = data.try_lock_shared();
-            if (data_handle2)
+            if (!data_handle2)
                 th1_ok = false;
             if (*data_handle2 != 1)
                 th1_ok = false;
@@ -62,7 +62,7 @@ TEST(ordered_guarded, ordered_guarded_1)
         std::thread th2([&data, &th2_ok]() {
             auto data_handle2 =
               data.try_lock_shared_for(std::chrono::milliseconds(20));
-            if (data_handle2)
+            if (!data_handle2)
                 th2_ok = false;
             if (*data_handle2 != 1)
                 th2_ok = false;
@@ -71,7 +71,7 @@ TEST(ordered_guarded, ordered_guarded_1)
         std::thread th3([&data, &th3_ok]() {
             auto data_handle2 = data.try_lock_shared_until(
               std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
-            if (data_handle2)
+            if (!data_handle2)
                 th3_ok = false;
             if (*data_handle2 != 1)
                 th3_ok = false;
