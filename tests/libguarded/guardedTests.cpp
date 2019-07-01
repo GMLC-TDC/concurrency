@@ -23,7 +23,6 @@ modified to use google test
 
 #include "libguarded/guarded.hpp"
 
-
 #include <atomic>
 #include <thread>
 
@@ -31,7 +30,6 @@ using namespace gmlc::libguarded;
 
 TEST(guarded, guarded_1)
 {
-
     guarded<int, std::timed_mutex> data(0);
 
     {
@@ -55,21 +53,20 @@ TEST(guarded, guarded_1)
 
         std::thread th1([&data, &th1_ok]() {
             auto data_handle2 = data.try_lock();
-            if (data_handle2 )
+            if (data_handle2)
                 th1_ok = false;
         });
 
         std::thread th2([&data, &th2_ok]() {
             auto data_handle2 =
-                data.try_lock_for(std::chrono::milliseconds(20));
+              data.try_lock_for(std::chrono::milliseconds(20));
             if (data_handle2)
                 th2_ok = false;
         });
 
         std::thread th3([&data, &th3_ok]() {
-            auto data_handle2 =
-                data.try_lock_until(std::chrono::steady_clock::now() +
-                                    std::chrono::milliseconds(20));
+            auto data_handle2 = data.try_lock_until(
+              std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
             if (data_handle2)
                 th3_ok = false;
         });
@@ -88,14 +85,16 @@ TEST(guarded, guarded_2)
     guarded<int> data(0);
 
     std::thread th1([&data]() {
-        for (int i = 0; i < 10000; ++i) {
+        for (int i = 0; i < 10000; ++i)
+        {
             auto data_handle = data.lock();
             ++(*data_handle);
         }
     });
 
     std::thread th2([&data]() {
-        for (int i = 0; i < 10000; ++i) {
+        for (int i = 0; i < 10000; ++i)
+        {
             auto data_handle = data.lock();
             ++(*data_handle);
         }
