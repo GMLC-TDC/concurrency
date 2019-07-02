@@ -76,6 +76,7 @@ TEST(rcu_guarded, rcu_guarded_1)
         for (auto it = h->begin(); it != h->end(); ++it)
         {
             escape = *it;
+            (void)escape;
             ++count;
         }
         EXPECT_EQ(count, 0);
@@ -96,6 +97,7 @@ TEST(rcu_guarded, rcu_guarded_1)
                     for (auto it = rh->begin(); it != rh->end(); ++it)
                     {
                         escape = *it;
+                        (void)escape;
                     }
                 }
             });
@@ -109,6 +111,7 @@ TEST(rcu_guarded, rcu_guarded_1)
                     for (auto it = wh->begin(); it != wh->end(); ++it)
                     {
                         escape = *it;
+                        (void)escape;
                     }
                     for (int ii = 0; ii < 2; ++ii)
                     {
@@ -155,6 +158,7 @@ TEST(rcu_guarded, rcu_guarded_1)
         for (auto it = h->begin(); it != h->end(); ++it)
         {
             escape = *it;
+            (void)escape;
             ++count;
         }
         EXPECT_EQ(count, 0);
