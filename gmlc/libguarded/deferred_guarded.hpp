@@ -182,20 +182,25 @@ auto package_task_void(Func &&func) -> typename std::enable_if<
     std::packaged_task<void(T &)> task(std::forward<Func>(func));
     std::future<void> task_future(task.get_future());
 
-    return std::make_pair(std::move(task), std::move(task_future));
+    return {std::move(task), std::move(task_future)};
 }
-
+/*
 template <typename Ret, typename T, typename Func>
 auto package_task_void(Func func) -> typename std::enable_if<
   !std::is_same<Ret, void>::value,
-  std::pair<std::packaged_task<void(T &)>, std::future<T>>>::type
+  std::pair<std::packaged_task<void(T &)>, std::future<Ret>>>::type
 {
-    std::pair<std::packaged_task<void(T &)>, std::future<T>> ret;
-    ret.first = std::packaged_task<Ret(T &)>(std::move(func));
-    ret.second = ret.first.get_future();
-    return ret;
-}
+    std::promise<Ret> prom;
+    std::future<Ret> task_future(prom.get_future());
 
+    std::packaged_task<void(T &)> vtask{
+      [func = std::move(func), proms{std::move(prom)}](T &val) mutable {
+          auto T = func(val);
+          proms.set_value(std::move(T));
+      }};
+    return {std::move(vtask), std::move(task_future)};
+}
+*/
 template <typename T, typename M>
 template <typename Func>
 auto deferred_guarded<T, M>::modify_async(Func func) ->
@@ -225,8 +230,7 @@ auto deferred_guarded<T, M>::modify_async(Func func) ->
     }
     else
     {
-        std::pair<std::packaged_task<void(T &)>, std::future<return_t>>
-          task_future = package_task_void<return_t, T>(std::move(func));
+        auto task_future = package_task_void<return_t, T>(std::move(func));
 
         retval = std::move(task_future.second);
 

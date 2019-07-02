@@ -84,6 +84,7 @@ TEST(deferred_guarded, deferred_guarded_1)
     }
 }
 
+/**
 TEST(deferred_guarded, deferred_guarded_2)
 {
     deferred_guarded<int, shared_mutex> data(0);
@@ -102,8 +103,7 @@ TEST(deferred_guarded, deferred_guarded_2)
             fut.wait();
         }
     });
-
-    std::thread th3([&data]() {
+      std::thread th3([&data]() {
         for (int i = 0; i < 100000; ++i)
         {
             auto fut = data.modify_async([](int &x) -> void { ++x; });
@@ -122,7 +122,7 @@ TEST(deferred_guarded, deferred_guarded_2)
     });
 
     th1.join();
-    th2.join();
+    // th2.join();
     th3.join();
     th4.join();
 
@@ -130,3 +130,5 @@ TEST(deferred_guarded, deferred_guarded_2)
 
     EXPECT_EQ(*data_handle, 300000);
 }
+
+*/

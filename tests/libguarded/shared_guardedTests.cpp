@@ -61,21 +61,21 @@ TEST(shared_guarded, shared_guarded_1)
 
         std::thread th1([&]() {
             auto data_handle2 = data.try_lock();
-            if (!data_handle2)
+            if (data_handle2)
                 th1_ok = false;
         });
 
         std::thread th2([&]() {
             auto data_handle2 =
               data.try_lock_for(std::chrono::milliseconds(20));
-            if (!data_handle2)
+            if (data_handle2)
                 th2_ok = false;
         });
 
         std::thread th3([&]() {
             auto data_handle2 = data.try_lock_until(
               std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
-            if (!data_handle2)
+            if (data_handle2)
                 th3_ok = false;
         });
 
@@ -100,21 +100,21 @@ TEST(shared_guarded, shared_guarded_1)
 
         std::thread th1([&]() {
             auto data_handle2 = data.try_lock_shared();
-            if (!data_handle2)
+            if (data_handle2)
                 th1_ok = false;
         });
 
         std::thread th2([&]() {
             auto data_handle2 =
               data.try_lock_shared_for(std::chrono::milliseconds(20));
-            if (!data_handle2)
+            if (data_handle2)
                 th2_ok = false;
         });
 
         std::thread th3([&]() {
             auto data_handle2 = data.try_lock_shared_until(
               std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
-            if (!data_handle2)
+            if (data_handle2)
                 th3_ok = false;
         });
 
