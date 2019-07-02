@@ -93,9 +93,9 @@ TEST(rcu_guarded, rcu_guarded_1)
                 {
                     auto rh = my_list.lock_write();
                     volatile int escape;
-                    for (auto item : *rh)
+                    for (auto it = rh->begin(); it != rh->end(); ++it)
                     {
-                        escape = item;
+                        escape = *it;
                     }
                 }
             });
@@ -106,9 +106,9 @@ TEST(rcu_guarded, rcu_guarded_1)
                 {
                     auto wh = my_list.lock_write();
                     volatile int escape;
-                    for (auto item : *wh)
+                    for (auto it = wh->begin(); it != wh->end(); ++it)
                     {
-                        escape = item;
+                        escape = *it;
                     }
                     for (int ii = 0; ii < 2; ++ii)
                     {
