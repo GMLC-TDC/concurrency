@@ -42,8 +42,9 @@ TEST(rcu_guarded, rcu_guarded_1)
         auto h = my_list.lock_read();
 
         int count = 0;
-        for (auto &item : *h)
+        for (auto it = h->begin(); it != h->end(); ++it)
         {
+            auto item = *it;
             ++count;
             EXPECT_EQ(item, 42);
         }
@@ -72,9 +73,9 @@ TEST(rcu_guarded, rcu_guarded_1)
 
         int count = 0;
         volatile int escape;
-        for (auto &item : *h)
+        for (auto it = h->begin(); it != h->end(); ++it)
         {
-            escape = item;
+            escape = *it;
             ++count;
         }
         EXPECT_EQ(count, 0);
@@ -109,12 +110,12 @@ TEST(rcu_guarded, rcu_guarded_1)
                     {
                         escape = item;
                     }
-                    for (int i = 0; i < 2; ++i)
+                    for (int ii = 0; ii < 2; ++ii)
                     {
-                        wh->emplace_back(i);
-                        wh->emplace_front(i - 1);
-                        wh->push_back(i + 4);
-                        wh->push_front(i - 7);
+                        wh->emplace_back(ii);
+                        wh->emplace_front(ii - 1);
+                        wh->push_back(ii + 4);
+                        wh->push_front(ii - 7);
                     }
                     ++count;
                 }
@@ -151,9 +152,9 @@ TEST(rcu_guarded, rcu_guarded_1)
 
         int count = 0;
         volatile int escape;
-        for (auto &item : *h)
+        for (auto it = h->begin(); it != h->end(); ++it)
         {
-            escape = item;
+            escape = *it;
             ++count;
         }
         EXPECT_EQ(count, 0);
@@ -176,7 +177,7 @@ class mock_allocator
   public:
     using value_type = T;
 
-    explicit mock_allocator(event_log *log) : log(log) {}
+    explicit mock_allocator(event_log *elog) : log(elog) {}
     mock_allocator(const mock_allocator &other) : log(other.log) {}
 
     // converting copy constructor (requires friend)

@@ -174,7 +174,7 @@ class cow_guarded
                 std::shared_ptr<const T> newPtr(ptr);
 
                 m_guarded.m_data.modify(
-                  [newPtr](std::shared_ptr<const T> &ptr) { ptr = newPtr; });
+                  [newPtr](std::shared_ptr<const T> &sptr) { sptr = newPtr; });
             }
 
             if (m_lock.owns_lock())
@@ -291,8 +291,8 @@ auto cow_guarded<T, M>::try_lock_until(const TimePoint &timepoint) -> handle
 template <typename T, typename M>
 auto cow_guarded<T, M>::lock_shared() const -> shared_handle
 {
-    auto lock = m_data.lock_shared();
-    return *lock;
+    auto slock = m_data.lock_shared();
+    return *slock;
 }
 
 template <typename T, typename M>
@@ -300,10 +300,10 @@ auto cow_guarded<T, M>::try_lock_shared() const -> shared_handle
 {
     shared_handle retval;
 
-    auto lock = m_data.try_lock_shared();
-    if (lock)
+    auto slock = m_data.try_lock_shared();
+    if (slock)
     {
-        retval = *lock;
+        retval = *slock;
     }
 
     return retval;
@@ -316,10 +316,10 @@ auto cow_guarded<T, M>::try_lock_shared_for(const Duration &duration) const
 {
     shared_handle retval;
 
-    auto lock = m_data.try_lock_shared_for(duration);
-    if (lock)
+    auto slock = m_data.try_lock_shared_for(duration);
+    if (slock)
     {
-        retval = *lock;
+        retval = *slock;
     }
 
     return retval;
@@ -332,10 +332,10 @@ auto cow_guarded<T, M>::try_lock_shared_until(const TimePoint &timepoint) const
 {
     shared_handle retval;
 
-    auto lock = m_data.try_lock_shared_until(timepoint);
-    if (lock)
+    auto slock = m_data.try_lock_shared_until(timepoint);
+    if (slock)
     {
-        retval = *lock;
+        retval = *slock;
     }
 
     return retval;

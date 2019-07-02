@@ -176,7 +176,9 @@ class deallocator
     allocator_type alloc;
 
   public:
-    explicit deallocator(const allocator_type &alloc) noexcept : alloc(alloc) {}
+    explicit deallocator(const allocator_type &allocr) noexcept : alloc(allocr)
+    {
+    }
 
     void operator()(pointer p)
     {
@@ -249,7 +251,7 @@ void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_unlock(
   const rcu_list<T, M, Alloc> &)
 {
     unlock();
-};
+}
 
 template <typename T, typename M, typename Alloc>
 void rcu_list<T, M, Alloc>::rcu_guard::unlock()
@@ -602,7 +604,7 @@ auto rcu_list<T, M, Alloc>::erase(const_iterator iter) -> iterator
 {
     std::lock_guard<M> guard(m_write_mutex);
     // make sure the node has not already been marked for deletion
-    node *oldNext = iter.m_current->next.load();
+    node *oldNextOrig = iter.m_current->next.load();
     if (!iter.m_current->deleted)
     {
         iter.m_current->deleted = true;
@@ -642,7 +644,7 @@ auto rcu_list<T, M, Alloc>::erase(const_iterator iter) -> iterator
         } while (!m_zombie_head.compare_exchange_weak(oldZombie, newZombie));
     }
 
-    return iterator(oldNext);
+    return iterator(oldNextOrig);
 }
 
 template <typename T>
