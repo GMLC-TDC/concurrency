@@ -17,7 +17,7 @@ for Sustainable Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER
 for more details.
 */
 /*
-this file is not in the original libguared
+this file is not in the original libguarded
 */
 #pragma once
 
@@ -94,7 +94,7 @@ class atomic_guarded
         return newValue;
     }
 
-    /** do a compare and exchage operation
+    /** do a compare and exchange operation
     if the object is equal to the expected value it is replaced with desired
     and true is returned otherwise expected will contain the current value and
     false is returned
@@ -118,5 +118,4 @@ class atomic_guarded
 };
 
 }  // namespace libguarded
-
 }  // namespace gmlc

@@ -6,6 +6,7 @@ set(LIBGUARDED_TESTS
 	ordered_guarded
 	rcu_guarded
 	shared_guarded
+	atomic_guarded
     )
 
 # Only affects current directory, so safe
