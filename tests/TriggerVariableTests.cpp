@@ -36,3 +36,61 @@ TEST(triggervariable_tests, basic_tests)
     EXPECT_TRUE(trigger.isActive());
     EXPECT_TRUE(trigger.isTriggered());
 }
+
+/** test basic operations */
+TEST(triggervariable_tests, waitActivation)
+{
+    TriggerVariable trigger;
+    std::atomic<bool> started{false};
+    std::atomic<bool> completed{false};
+    auto fut = std::async(std::launch::async, [&]() {
+        started = true;
+        trigger.waitActivation();
+        completed = true;
+    });
+
+    std::this_thread::yield();
+    while (!started.load())
+    {
+        std::this_thread::yield();
+    }
+    EXPECT_TRUE(started.load());
+    EXPECT_FALSE(completed.load());
+    trigger.activate();
+    std::this_thread::yield();
+    if (!completed.load())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    EXPECT_TRUE(completed.load());
+}
+
+/** test basic operations */
+TEST(triggervariable_tests, waitTrigger)
+{
+    TriggerVariable trigger;
+    trigger.activate();
+    std::atomic<bool> started{false};
+    std::atomic<bool> completed{false};
+    auto fut = std::async(std::launch::async, [&]() {
+        started = true;
+        trigger.wait();
+        completed = true;
+    });
+
+    std::this_thread::yield();
+    while (!started.load())
+    {
+        std::this_thread::yield();
+    }
+    EXPECT_TRUE(started.load());
+
+    EXPECT_FALSE(completed.load());
+    trigger.trigger();
+    std::this_thread::yield();
+    if (!completed.load())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    EXPECT_TRUE(completed.load());
+}

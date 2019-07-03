@@ -7,6 +7,10 @@
 set(
   concurrency_headers
   concurrency/TriggerVariable.hpp
+  concurrency/DelayedObjects.hpp
+  concurrency/TripWire.hpp
+  concurrency/DelayedDestructor.hpp
+  concurrency/SearchableObjectHolder.hpp
   libguarded/atomic_guarded.hpp
   libguarded/cow_guarded.hpp
   libguarded/deferred_guarded.hpp
@@ -26,6 +30,7 @@ set(
 set(
   concurrency_sources
   concurrency/TriggerVariable.cpp
+  concurrency/TripWire.cpp
   empty.cpp
 )
 
