@@ -16,6 +16,13 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 for Sustainable Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER
 for more details.
 */
+
+/*
+modified to use handle object instead of unique_ptr deleters
+
+modified to use a task_runner instead of pure packaged_task which was not
+copyable and causing issues on some compilers
+*/
 #pragma once
 
 #include "guarded.hpp"

@@ -27,8 +27,11 @@ TEST(triggervariable_tests, basic_tests)
 
     EXPECT_FALSE(trigger.isActive());
     EXPECT_FALSE(trigger.isTriggered());
-
+    // trigger is not active so can't be triggered
+    EXPECT_FALSE(trigger.trigger());
     EXPECT_TRUE(trigger.activate());
+    // second activate should be false;
+    EXPECT_FALSE(trigger.activate());
     EXPECT_TRUE(trigger.isActive());
     EXPECT_FALSE(trigger.isTriggered());
 
