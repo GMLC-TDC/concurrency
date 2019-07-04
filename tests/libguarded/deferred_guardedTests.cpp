@@ -121,7 +121,7 @@ TEST(deferred_guarded, deferred_guarded_2)
     });
 
     th1.join();
-    // th2.join();
+    th2.join();
     th3.join();
     th4.join();
 
