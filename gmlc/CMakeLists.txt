@@ -29,8 +29,6 @@ set(
 
 set(
   concurrency_sources
-  concurrency/TriggerVariable.cpp
-  concurrency/TripWire.cpp
   empty.cpp
 )
 

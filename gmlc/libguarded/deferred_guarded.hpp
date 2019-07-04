@@ -48,6 +48,33 @@ typename std::add_lvalue_reference<T>::type declref();
    The shared_handle returned by the various lock methods is moveable
    but not copyable.
 */
+
+/// container for packaging up different types of tasks
+template <typename T>
+class task_runner
+{
+  public:
+    virtual ~task_runner() {}
+    virtual void run_task(T &) = 0;
+};
+/// class to contain a void packaged task
+template <typename T>
+class void_runner : public task_runner<T>
+{
+  public:
+    virtual void run_task(T &obj) { task(obj); }
+    std::packaged_task<void(T &)> task;
+};
+
+/// class to contain a typed return packaged task
+template <typename T, typename Ret>
+class type_runner : public task_runner<T>
+{
+  public:
+    virtual void run_task(T &obj) { task(obj); }
+    std::packaged_task<Ret(T &)> task;
+};
+
 #ifdef LIBGUARDED_NO_DEFAULT
 template <typename T, typename M>
 class deferred_guarded
@@ -89,12 +116,12 @@ class deferred_guarded
 
   private:
     void do_pending_writes() const;
-
+    void do_pending_writes_internal() const;
     mutable T m_obj;
     mutable M m_mutex;
 
     mutable std::atomic<bool> m_pendingWrites;
-    mutable guarded<std::vector<std::packaged_task<void(T &)>>> m_pendingList;
+    mutable guarded<std::vector<std::unique_ptr<task_runner<T>>>> m_pendingList;
 };
 
 template <typename T, typename M>
@@ -112,25 +139,14 @@ void deferred_guarded<T, M>::modify_detach(Func &&func)
 
     if (lock.owns_lock())
     {
-        // consider looser memory ordering
-        if (m_pendingWrites.load())
-        {
-            std::vector<std::packaged_task<void(T &)>> localPending;
-            m_pendingWrites.store(false);
-            swap(localPending, *(m_pendingList.lock()));
-
-            for (auto &f : localPending)
-            {
-                f(m_obj);
-            }
-        }
-
+        do_pending_writes_internal();
         func(m_obj);
     }
     else
     {
-        m_pendingList.lock()->push_back(
-          std::packaged_task<void(T &)>(std::forward<Func>(func)));
+        auto vtask = std::unique_ptr<void_runner<T>>(new void_runner<T>);
+        vtask->task = std::packaged_task<void(T &)>(std::forward<Func>(func));
+        m_pendingList.lock()->emplace_back(std::move(vtask));
         m_pendingWrites.store(true);
     }
 }
@@ -177,30 +193,25 @@ auto call_returning_future(Func &func, T &data) ->
 template <typename Ret, typename T, typename Func>
 auto package_task_void(Func &&func) -> typename std::enable_if<
   std::is_same<Ret, void>::value,
-  std::pair<std::packaged_task<void(T &)>, std::future<void>>>::type
+  std::pair<std::unique_ptr<task_runner<T>>, std::future<void>>>::type
 {
-    std::packaged_task<void(T &)> task(std::forward<Func>(func));
-    std::future<void> task_future(task.get_future());
-
-    return {std::move(task), std::move(task_future)};
-}
-/*
-template <typename Ret, typename T, typename Func>
-auto package_task_void(Func func) -> typename std::enable_if<
-  !std::is_same<Ret, void>::value,
-  std::pair<std::packaged_task<void(T &)>, std::future<Ret>>>::type
-{
-    std::promise<Ret> prom;
-    std::future<Ret> task_future(prom.get_future());
-
-    std::packaged_task<void(T &)> vtask{
-      [func = std::move(func), proms{std::move(prom)}](T &val) mutable {
-          auto T = func(val);
-          proms.set_value(std::move(T));
-      }};
+    auto vtask = std::unique_ptr<void_runner<T>>(new void_runner<T>);
+    vtask->task = std::packaged_task<void(T &)>(std::forward<Func>(func));
+    std::future<void> task_future(vtask->task.get_future());
     return {std::move(vtask), std::move(task_future)};
 }
-*/
+
+template <typename Ret, typename T, typename Func>
+auto package_task_void(Func &&func) -> typename std::enable_if<
+  !std::is_same<Ret, void>::value,
+  std::pair<std::unique_ptr<task_runner<T>>, std::future<Ret>>>::type
+{
+    auto ttask = std::unique_ptr<type_runner<T, Ret>>(new type_runner<T, Ret>);
+    ttask->task = std::packaged_task<Ret(T &)>(std::forward<Func>(func));
+    std::future<Ret> task_future(ttask->task.get_future());
+    return {std::move(ttask), std::move(task_future)};
+}
+
 template <typename T, typename M>
 template <typename Func>
 auto deferred_guarded<T, M>::modify_async(Func func) ->
@@ -214,18 +225,7 @@ auto deferred_guarded<T, M>::modify_async(Func func) ->
 
     if (lock.owns_lock())
     {
-        if (m_pendingWrites.load())
-        {
-            std::vector<std::packaged_task<void(T &)>> localPending;
-
-            m_pendingWrites.store(false);
-            swap(localPending, *(m_pendingList.lock()));
-            for (auto &f : localPending)
-            {
-                f(m_obj);
-            }
-        }
-
+        do_pending_writes_internal();
         retval = call_returning_future<return_t>(func, m_obj);
     }
     else
@@ -250,18 +250,24 @@ void deferred_guarded<T, M>::do_pending_writes() const
 
         if (lock.owns_lock())
         {
-            if (m_pendingWrites.load())
-            {
-                std::vector<std::packaged_task<void(T &)>> localPending;
+            do_pending_writes_internal();
+        }
+    }
+}
 
-                m_pendingWrites.store(false);
-                swap(localPending, *(m_pendingList.lock()));
+template <typename T, typename M>
+void deferred_guarded<T, M>::do_pending_writes_internal() const
+{
+    if (m_pendingWrites.load())
+    {
+        std::vector<std::unique_ptr<task_runner<T>>> localPending;
 
-                for (auto &f : localPending)
-                {
-                    f(m_obj);
-                }
-            }
+        m_pendingWrites.store(false);
+        swap(localPending, *(m_pendingList.lock()));
+
+        for (auto &f : localPending)
+        {
+            f->run_task(m_obj);
         }
     }
 }
