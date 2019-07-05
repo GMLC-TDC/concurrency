@@ -11,11 +11,12 @@
  ***********************************************************************/
 
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
-for Sustainable Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER
-for more details.
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
+
 /*
 this entire file was added to the library to meet a need of a shared type where
 the locking could be disabled at construction

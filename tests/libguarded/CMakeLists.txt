@@ -1,24 +1,22 @@
-set(LIBGUARDED_TESTS
-    cow_guarded
-	deferred_guarded
-	guarded
-	lr_guarded
-	ordered_guarded
-	rcu_guarded
-	shared_guarded
-	atomic_guarded
+set(LIBGUARDED_TEST_SOURCES
+    cow_guardedTests.cpp
+	deferred_guardedTests.cpp
+	guardedTests.cpp
+	guarded_optTests.cpp
+	lr_guardedTests.cpp
+	ordered_guardedTests.cpp
+	rcu_guardedTests.cpp
+	shared_guardedTests.cpp
+	shared_guarded_optTests.cpp
+	atomic_guardedTests.cpp
     )
 
-# Only affects current directory, so safe
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-foreach(T ${LIBGUARDED_TESTS})
-
-    add_executable(${T} ${T}Tests.cpp )
-    target_link_libraries(${T} PUBLIC concurrency)
-    add_gtest(${T})
-	set_target_properties(${T} PROPERTIES FOLDER tests)
+add_executable(libguarded_test ${LIBGUARDED_TEST_SOURCES} )
+target_link_libraries(libguarded_test PUBLIC concurrency)
+add_gtest(libguarded_test )
+set_target_properties(libguarded_test PROPERTIES FOLDER tests)
    
-endforeach()
+
 
 

@@ -6,7 +6,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#ifdef ENABLE_TRIPWIRE
 #include "TripWire.hpp"
+#endif
+#include <algorithm>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -19,27 +22,31 @@ namespace gmlc
 namespace concurrency
 {
 /** helper class to contain a list of objects that need to be referencable at
- * some level*/
+ * some level the objects are stored through shared_ptrs*/
 template <class X>
 class SearchableObjectHolder
 {
   private:
     std::mutex mapLock;
     std::map<std::string, std::shared_ptr<X>> ObjectMap;
+#ifdef ENABLE_TRIPWIRE
     tripwire::TripWireDetector trippedDetect;
-
+#endif
   public:
     SearchableObjectHolder() = default;
+    // class is not movable
     SearchableObjectHolder(SearchableObjectHolder &&) noexcept = delete;
     SearchableObjectHolder &
     operator=(SearchableObjectHolder &&) noexcept = delete;
     ~SearchableObjectHolder()
     {
+#ifdef ENABLE_TRIPWIRE
         // this is a short circuit used to detect shutdown
         if (trippedDetect.isTripped())
         {
             return;
         }
+#endif
         std::unique_lock<std::mutex> lock(mapLock);
         int cntr = 0;
         while (true)
@@ -119,10 +126,12 @@ class SearchableObjectHolder
 
     std::shared_ptr<X> findObject(const std::string &name)
     {
+#ifdef ENABLE_TRIPWIRE
         if (trippedDetect.isTripped())
         {
             return nullptr;
         }
+#endif
         std::lock_guard<std::mutex> lock(mapLock);
         auto fnd = ObjectMap.find(name);
         if (fnd != ObjectMap.end())
@@ -136,12 +145,12 @@ class SearchableObjectHolder
     findObject(std::function<bool(const std::shared_ptr<X> &)> operand)
     {
         std::lock_guard<std::mutex> lock(mapLock);
-        for (auto obj = ObjectMap.begin(); obj != ObjectMap.end(); ++obj)
+        auto obj =
+          std::find_if(ObjectMap.begin(), ObjectMap.end(),
+                       [&operand](auto &val) { return operand(val.second); });
+        if (obj != ObjectMap.end())
         {
-            if (operand(obj->second))
-            {
-                return obj->second;
-            }
+            return obj->second;
         }
         return nullptr;
     }

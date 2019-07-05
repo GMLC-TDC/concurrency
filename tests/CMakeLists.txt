@@ -9,21 +9,16 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/config/cmake")
 set(GOOGLE_TEST_INDIVIDUAL OFF)
 include(AddGoogletest)
 
-set(CONCURRENCY_TESTS
-    TriggerVariableTests
+set(CONCURRENCY_TEST_SOURCES
+    TriggerVariableTests.cpp
+	SearchableObjectHolderTests.cpp
     )
 
-# Only affects current directory, so safe
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-foreach(T ${CONCURRENCY_TESTS})
-
-    add_executable(${T} ${T}.cpp )
-    target_link_libraries(${T} PUBLIC concurrency)
-    add_gtest(${T})
-	set_target_properties(${T} PROPERTIES FOLDER tests)
+add_executable(concurrencyTests ${CONCURRENCY_TEST_SOURCES})
+target_link_libraries(concurrencyTests PUBLIC concurrency)
+add_gtest(concurrencyTests)
+set_target_properties(concurrencyTests PROPERTIES FOLDER tests)
    
-endforeach()
 
 add_subdirectory(libguarded)
 

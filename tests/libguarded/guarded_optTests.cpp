@@ -21,16 +21,16 @@ modified to use google test
 */
 #include "gtest/gtest.h"
 
-#include "libguarded/guarded.hpp"
+#include "libguarded/guarded_opt.hpp"
 
 #include <atomic>
 #include <thread>
 
 using namespace gmlc::libguarded;
 
-TEST(guarded, guarded_1)
+TEST(guarded_opt, guarded_1)
 {
-    guarded<int, std::timed_mutex> data(0);
+    guarded_opt<int, std::timed_mutex> data(true, 0);
 
     {
         auto data_handle = data.lock();
@@ -80,9 +80,9 @@ TEST(guarded, guarded_1)
     }
 }
 
-TEST(guarded, guarded_2)
+TEST(guarded_opt, guarded_2)
 {
-    guarded<int> data(0);
+    guarded_opt<int> data(true, 0);
 
     std::thread th1([&data]() {
         for (int i = 0; i < 10000; ++i)

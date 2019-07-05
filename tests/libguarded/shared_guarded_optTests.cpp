@@ -21,7 +21,7 @@ modified to use google test
 */
 #include "gtest/gtest.h"
 
-#include <libguarded/shared_guarded.hpp>
+#include <libguarded/shared_guarded_opt.hpp>
 
 #include <atomic>
 #include <thread>
@@ -36,9 +36,9 @@ namespace chrono = std::chrono;
 
 using namespace gmlc::libguarded;
 
-TEST(shared_guarded, shared_guarded_1)
+TEST(shared_guarded_opt, shared_guarded_1)
 {
-    shared_guarded<int, shared_mutex> data(0);
+    shared_guarded_opt<int, shared_mutex> data(true, 0);
 
     {
         auto data_handle = data.lock();
@@ -173,9 +173,9 @@ TEST(shared_guarded, shared_guarded_1)
     }
 }
 
-TEST(shared_guarded, shared_guarded_2)
+TEST(shared_guarded_opt, shared_guarded_2)
 {
-    shared_guarded<int, shared_mutex> data(0);
+    shared_guarded_opt<int, shared_mutex> data(true, 0);
 
     std::thread th1([&data]() {
         for (int i = 0; i < 100000; ++i)

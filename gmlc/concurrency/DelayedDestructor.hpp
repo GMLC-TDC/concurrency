@@ -6,7 +6,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#ifdef ENABLE_TRIPWIRE
 #include "TripWire.hpp"
+#endif
+
 #include <algorithm>
 #include <chrono>
 #include <functional>
@@ -21,7 +24,8 @@ namespace gmlc
 namespace concurrency
 {
 /** helper class to destroy objects at a late time when it is convenient and
- * there are no more possibilities of threading issues*/
+ * there are no more possibilities of threading issues
+ @details this is essentially a delayed garbage collector*/
 template <class X>
 class DelayedDestructor
 {
@@ -29,7 +33,9 @@ class DelayedDestructor
     std::mutex destructionLock;
     std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
     std::function<void(std::shared_ptr<X> &ptr)> callBeforeDeleteFunction;
+#ifdef ENABLE_TRIPWIRE
     tripwire::TripWireDetector tripDetect;
+#endif
 
   public:
     DelayedDestructor() = default;
@@ -49,11 +55,13 @@ class DelayedDestructor
                 destroyObjects();
                 if (!ElementsToBeDestroyed.empty())
                 {
+#ifdef ENABLE_TRIPWIRE
                     // short circuit if the tripline was triggered
                     if (tripDetect.isTripped())
                     {
                         return;
                     }
+#endif
                     if (ii > 4)
                     {
                         destroyObjects();

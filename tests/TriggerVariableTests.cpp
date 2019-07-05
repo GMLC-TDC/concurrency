@@ -97,3 +97,20 @@ TEST(triggervariable_tests, waitTrigger)
     }
     EXPECT_TRUE(completed.load());
 }
+
+TEST(triggervariable_tests, reset1)
+{
+    TriggerVariable trigger(true);
+
+    EXPECT_TRUE(trigger.isActive());
+    EXPECT_TRUE(trigger.trigger());
+
+    trigger.reset();
+
+    EXPECT_FALSE(trigger.isActive());
+    EXPECT_TRUE(trigger.isTriggered());
+
+    EXPECT_TRUE(trigger.activate());
+    EXPECT_FALSE(trigger.isTriggered());
+    EXPECT_TRUE(trigger.isActive());
+}

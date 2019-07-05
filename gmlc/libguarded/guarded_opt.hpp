@@ -11,10 +11,10 @@
  ***********************************************************************/
 
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
-for Sustainable Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER
-for more details.
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 /*
 this entire file is newly added to the library
@@ -45,20 +45,20 @@ namespace libguarded
    copyable.
 */
 template <typename T, typename M = std::mutex>
-class guarded
+class guarded_opt
 {
   private:
     using handle = lock_handle<T, M>;
 
   public:
-    explicit guarded(bool enableLocking) : enabled(enableLocking){};
+    explicit guarded_opt(bool enableLocking) : enabled(enableLocking){};
     /**
      Construct a guarded object. This constructor will accept any
      number of parameters, all of which are forwarded to the
      constructor of T.
     */
     template <typename... Us>
-    guarded(bool enableLocking, Us &&... data);
+    guarded_opt(bool enableLocking, Us &&... data);
 
     /**
      Acquire a handle to the protected object. As a side effect, the
@@ -144,20 +144,20 @@ class guarded
 
 template <typename T, typename M>
 template <typename... Us>
-guarded<T, M>::guarded(bool enableLocking, Us &&... data)
+guarded_opt<T, M>::guarded_opt(bool enableLocking, Us &&... data)
     : m_obj(std::forward<Us>(data)...), enabled(enableLocking)
 {
 }
 
 template <typename T, typename M>
-auto guarded<T, M>::lock() -> handle
+auto guarded_opt<T, M>::lock() -> handle
 {
     return (enabled) ? handle(&m_obj, m_mutex) :
                        handle(&m_obj, std::unique_lock<M>());
 }
 
 template <typename T, typename M>
-auto guarded<T, M>::try_lock() -> handle
+auto guarded_opt<T, M>::try_lock() -> handle
 {
     return (enabled) ? try_lock_handle(&m_obj, m_mutex) :
                        handle(&m_obj, std::unique_lock<M>());
@@ -165,7 +165,7 @@ auto guarded<T, M>::try_lock() -> handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto guarded<T, M>::try_lock_for(const Duration &d) -> handle
+auto guarded_opt<T, M>::try_lock_for(const Duration &d) -> handle
 {
     return (enabled) ? try_lock_handle_for(&m_obj, m_mutex, d) :
                        handle(&m_obj, std::unique_lock<M>());
@@ -173,7 +173,7 @@ auto guarded<T, M>::try_lock_for(const Duration &d) -> handle
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
+auto guarded_opt<T, M>::try_lock_until(const TimePoint &tp) -> handle
 {
     return (enabled) ? try_lock_handle_until(&m_obj, m_mutex, tp) :
                        handle(&m_obj, std::unique_lock<M>());

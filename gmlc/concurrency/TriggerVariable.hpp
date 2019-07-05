@@ -33,6 +33,8 @@ class TriggerVariable
             return false;
         }
         activated = true;
+        // relaxed since it is inside the lock
+        triggered.store(false, std::memory_order_relaxed);
         cv_active.notify_all();
         return true;
     }
@@ -50,7 +52,7 @@ class TriggerVariable
         }
         return false;
     }
-    /** check if the variable has been triggered*/
+    /** check if the variable has been triggered after the last activation*/
     bool isTriggered() const
     {
         return triggered.load(std::memory_order_acquire);
@@ -98,7 +100,10 @@ class TriggerVariable
         }
         return true;
     }
-    /** reset the trigger Variable to the inactive state*/
+    /** reset the trigger Variable to the inactive state
+    @details reset on an untriggered but active trigger variable will cause the
+    trigger to occur and then be reset
+    */
     void reset()
     {
         std::unique_lock<std::mutex> lk(stateLock);
