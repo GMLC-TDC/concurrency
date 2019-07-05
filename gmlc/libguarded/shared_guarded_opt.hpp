@@ -148,8 +148,9 @@ auto shared_guarded_opt<T, M>::lock_shared() const -> shared_handle
 template <typename T, typename M>
 auto shared_guarded_opt<T, M>::try_lock_shared() const -> shared_handle
 {
-    return (enabled) ? try_lock_shared_handle(&m_obj, m_mutex) :
-                       shared_handle(&m_obj, shared_locker<M>::locker_type());
+    return (enabled) ?
+             try_lock_shared_handle(&m_obj, m_mutex) :
+             shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
 }
 
 template <typename T, typename M>
@@ -157,8 +158,9 @@ template <typename Duration>
 auto shared_guarded_opt<T, M>::try_lock_shared_for(const Duration &d) const
   -> shared_handle
 {
-    return (enabled) ? try_lock_shared_handle_for(&m_obj, m_mutex, d) :
-                       shared_handle(&m_obj, shared_locker<M>::locker_type());
+    return (enabled) ?
+             try_lock_shared_handle_for(&m_obj, m_mutex, d) :
+             shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
 }
 
 template <typename T, typename M>
@@ -167,7 +169,7 @@ auto shared_guarded_opt<T, M>::try_lock_shared_until(const TimePoint &tp) const
   -> shared_handle
 {
     return (enabled) ? try_lock_shared_handle_until(&m_obj, m_mutex, tp) :
-                       shared_handle(&m_obj, shared_locker<M>::locker_type());
+                       shared_handle(&m_obj, shared_locker<M>::locker_type{});
 }
 }  // namespace libguarded
 }  // namespace gmlc
