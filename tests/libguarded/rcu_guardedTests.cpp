@@ -188,7 +188,7 @@ class mock_allocator
     template <typename>
     friend class mock_allocator;
     template <typename U>
-    mock_allocator(const mock_allocator<U> &other) : log(other.log)
+    explicit mock_allocator(const mock_allocator<U> &other) : log(other.log)
     {
     }
 

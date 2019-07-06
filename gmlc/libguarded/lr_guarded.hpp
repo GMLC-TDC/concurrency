@@ -56,7 +56,7 @@ class lr_guarded
      constructor of T.
     */
     template <typename... Us>
-    lr_guarded(Us &&... data);
+    explicit lr_guarded(Us &&... data);
 
     /**
      Modify the data by passing a functor. The functor must take
@@ -109,7 +109,7 @@ class lr_guarded
         shared_deleter(const shared_deleter &) = delete;
         shared_deleter(shared_deleter &&) = default;
 
-        shared_deleter(std::atomic<int> &readingCount)
+        explicit shared_deleter(std::atomic<int> &readingCount)
             : m_readingCount(readingCount)
         {
         }

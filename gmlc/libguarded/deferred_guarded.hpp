@@ -94,7 +94,7 @@ class deferred_guarded
     using shared_handle = shared_lock_handle<T, M>;
 
     template <typename... Us>
-    deferred_guarded(Us &&... data);
+    explicit deferred_guarded(Us &&... data);
 
     template <typename Func>
     void modify_detach(Func &&func);

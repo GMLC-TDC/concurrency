@@ -128,9 +128,9 @@ class rcu_list
 
     struct zombie_list_node
     {
-        zombie_list_node(node *n) noexcept : zombie_node(n) {}
+        explicit zombie_list_node(node *n) noexcept : zombie_node(n) {}
 
-        zombie_list_node(rcu_guard *g) noexcept : owner(g) {}
+        explicit zombie_list_node(rcu_guard *g) noexcept : owner(g) {}
 
         // uncopyable, unmoveable
         zombie_list_node(const zombie_list_node &) = delete;
@@ -383,6 +383,7 @@ class rcu_list<T, M, Alloc>::const_iterator
     using difference_type = size_t;
 
     const_iterator() : m_current(nullptr){};
+    /* implicit */
     const_iterator(const typename rcu_list<T, M, Alloc>::iterator &it)
         : m_current(it.m_current){};
 

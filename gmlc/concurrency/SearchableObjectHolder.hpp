@@ -30,7 +30,7 @@ class SearchableObjectHolder
     std::mutex mapLock;
     std::map<std::string, std::shared_ptr<X>> ObjectMap;
 #ifdef ENABLE_TRIPWIRE
-    tripwire::TripWireDetector trippedDetect;
+    TripWireDetector trippedDetect;
 #endif
   public:
     SearchableObjectHolder() = default;

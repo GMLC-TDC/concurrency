@@ -34,7 +34,7 @@ class DelayedDestructor
     std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
     std::function<void(std::shared_ptr<X> &ptr)> callBeforeDeleteFunction;
 #ifdef ENABLE_TRIPWIRE
-    tripwire::TripWireDetector tripDetect;
+    TripWireDetector tripDetect;
 #endif
 
   public:

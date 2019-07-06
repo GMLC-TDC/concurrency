@@ -64,7 +64,7 @@ class cow_guarded
      constructor of T.
     */
     template <typename... Us>
-    cow_guarded(Us &&... data);
+    explicit cow_guarded(Us &&... data);
 
     /**
      Acquire a handle to the protected object. As a side effect, the

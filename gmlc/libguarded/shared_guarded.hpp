@@ -58,7 +58,7 @@ class shared_guarded
 
   public:
     template <typename... Us>
-    shared_guarded(Us &&... data);
+    explicit shared_guarded(Us &&... data);
 
     // exclusive access
     handle lock();

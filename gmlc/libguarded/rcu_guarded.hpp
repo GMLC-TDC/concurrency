@@ -34,7 +34,7 @@ class rcu_guarded
     class read_handle;
 
     template <typename... Us>
-    rcu_guarded(Us &&... data);
+    explicit rcu_guarded(Us &&... data);
 
     // write access
     write_handle lock_write();
@@ -48,7 +48,7 @@ class rcu_guarded
         using pointer = T *;
         using element_type = T;
 
-        write_handle(T *ptr);
+        explicit write_handle(T *ptr);
 
         ~write_handle()
         {
@@ -91,7 +91,7 @@ class rcu_guarded
         using pointer = const T *;
         using element_type = const T;
 
-        read_handle(const T *ptr) : m_ptr(ptr), m_accessed(false) {}
+        explicit read_handle(const T *ptr) : m_ptr(ptr), m_accessed(false) {}
 
         ~read_handle()
         {

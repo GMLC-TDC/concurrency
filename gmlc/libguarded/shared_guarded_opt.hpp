@@ -48,7 +48,7 @@ namespace libguarded
 */
 #ifdef LIBGUARDED_NO_DEFAULT
 template <typename T, typename M>
-class shared_guarded
+class shared_guarded_opt
 #else
 template <typename T, typename M = std::shared_timed_mutex>
 class shared_guarded_opt

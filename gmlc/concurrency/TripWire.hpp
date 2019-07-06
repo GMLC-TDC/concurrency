@@ -82,11 +82,13 @@ class TripWireDetector
 {
   public:
     TripWireDetector() : lineDetector(TripWire::getLine()) {}
-    TripWireDetector(unsigned int index)
+    explicit TripWireDetector(unsigned int index)
         : lineDetector(TripWire::getIndexedLine(index))
     {
     }
-    TripWireDetector(TriplineType line) : lineDetector(std::move(line)) {}
+    explicit TripWireDetector(TriplineType line) : lineDetector(std::move(line))
+    {
+    }
     /** check if the line was tripped*/
     bool isTripped() const noexcept
     {
@@ -104,11 +106,13 @@ class TripWireTrigger
   public:
     /** default constructor*/
     TripWireTrigger() : lineTrigger(TripWire::getLine()) {}
-    TripWireTrigger(unsigned int index)
+    explicit TripWireTrigger(unsigned int index)
         : lineTrigger(TripWire::getIndexedLine(index))
     {
     }
-    TripWireTrigger(TriplineType line) : lineTrigger(std::move(line)) {}
+    explicit TripWireTrigger(TriplineType line) : lineTrigger(std::move(line))
+    {
+    }
     /** destructor*/
     ~TripWireTrigger() { lineTrigger->store(true, std::memory_order_release); }
     /** move constructor*/

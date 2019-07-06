@@ -61,7 +61,7 @@ class ordered_guarded
      of parameters, all of which are forwarded to the constructor of T.
     */
     template <typename... Us>
-    ordered_guarded(Us &&... data);
+    explicit ordered_guarded(Us &&... data);
 
     template <typename Func>
     typename std::enable_if<
