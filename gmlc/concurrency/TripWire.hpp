@@ -31,12 +31,12 @@ class TripWire
     friend class TripWireTrigger;
 };
 
-TriplineType make_tripline()
+inline TriplineType make_tripline()
 {
     return std::make_shared<std::atomic<bool>>(false);
 }
 
-std::vector<TriplineType> make_triplines(int count)
+inline std::vector<TriplineType> make_triplines(int count)
 {
     std::vector<TriplineType> lines(count);
     for (auto &line : lines)
