@@ -12,6 +12,7 @@ include(AddGoogletest)
 set(CONCURRENCY_TEST_SOURCES
     TriggerVariableTests.cpp
 	SearchableObjectHolderTests.cpp
+	TripWireTests.cpp
     )
 
 add_executable(concurrencyTests ${CONCURRENCY_TEST_SOURCES})

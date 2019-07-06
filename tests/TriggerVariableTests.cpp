@@ -10,7 +10,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <thread>
 #include <utility>
-/** these test cases test data_block and data_view objects
+/** these test cases test TriggerVariables
  */
 
 #include "gtest/gtest.h"

@@ -8,6 +8,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include <atomic>
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
 namespace gmlc
@@ -15,8 +16,7 @@ namespace gmlc
 namespace concurrency
 {
 /** namespace for the global variable in tripwire*/
-namespace tripwire
-{
+
 /** the actual tripwire type*/
 using TriplineType = std::shared_ptr<std::atomic<bool>>;
 
@@ -31,9 +31,12 @@ class TripWire
     friend class TripWireTrigger;
 };
 
-TriplineType make_line() { return std::make_shared<std::atomic<bool>>(false); }
+TriplineType make_tripline()
+{
+    return std::make_shared<std::atomic<bool>>(false);
+}
 
-std::vector<TriplineType> make_lines(int count)
+std::vector<TriplineType> make_triplines(int count)
 {
     std::vector<TriplineType> lines(count);
     for (auto &line : lines)
@@ -44,20 +47,35 @@ std::vector<TriplineType> make_lines(int count)
 }
 
 #define DECLARE_TRIPLINE()                                                     \
+    namespace gmlc                                                             \
+    {                                                                          \
+    namespace concurrency                                                      \
+    {                                                                          \
     TriplineType TripWire::getLine()                                           \
     {                                                                          \
-        static TriplineType staticline = make_line();                          \
+        static TriplineType staticline = make_tripline();                      \
         return staticline;                                                     \
-    }
+    }                                                                          \
+    } /*namespace concurrency*/                                                \
+    } /*namespace gmlc */
 
 #define DECLARE_INDEXED_TRIPLINES(COUNT)                                       \
+    namespace gmlc                                                             \
+    {                                                                          \
+    namespace concurrency                                                      \
+    {                                                                          \
     TriplineType TripWire::getIndexedLine(unsigned int index)                  \
     {                                                                          \
-        static const std::vector<TriplineType> triplines = make_lines(COUNT);  \
-        return (index < COUNT) ? triplines[index] :                            \
-                                 throw(std::out_of_range()),                   \
-               nullptr;                                                        \
-    }
+        static const std::vector<TriplineType> triplines =                     \
+          make_triplines(COUNT);                                               \
+        return (index < COUNT) ?                                               \
+                 triplines[index] :                                            \
+                 (throw(std::out_of_range(                                     \
+                    "index exceeds the number of generated lines")),           \
+                  nullptr);                                                    \
+    }                                                                          \
+    } /*namespace concurrency*/                                                \
+    } /*namespace gmlc */
 
 /** class to check if a trip line was tripped*/
 class TripWireDetector
@@ -105,7 +123,5 @@ class TripWireTrigger
   private:
     TriplineType lineTrigger;  //!< the tripwire
 };
-}  // namespace tripwire
-
 }  // namespace concurrency
 }  // namespace gmlc

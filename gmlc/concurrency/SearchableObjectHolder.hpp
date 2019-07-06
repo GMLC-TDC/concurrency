@@ -49,29 +49,22 @@ class SearchableObjectHolder
 #endif
         std::unique_lock<std::mutex> lock(mapLock);
         int cntr = 0;
-        while (true)
+        while (!ObjectMap.empty())
         {
-            if (!ObjectMap.empty())
-            {  // wait for the objectMap to be cleared
-                ++cntr;
-                lock.unlock();
-                // don't leave things locked while sleeping or yielding
-                if (cntr % 2 != 0)
-                {
-                    std::this_thread::yield();
-                }
-                else
-                {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                }
-
-                lock.lock();
-                if (cntr > 6)
-                {
-                    break;
-                }
+            ++cntr;
+            lock.unlock();
+            // don't leave things locked while sleeping or yielding
+            if (cntr % 2 != 0)
+            {
+                std::this_thread::yield();
             }
             else
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+
+            lock.lock();
+            if (cntr > 6)
             {
                 break;
             }
