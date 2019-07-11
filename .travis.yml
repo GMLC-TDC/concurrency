@@ -27,6 +27,14 @@ matrix:
   - compiler: clang
     env:
     - CCACHE_CPP2=yes
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+          - llvm-toolchain-xenial-7
+        packages:
+          - libc++-7-dev
+          - libc++abi-7-dev
     script:
     - .ci/make_and_sanitize.sh
 
