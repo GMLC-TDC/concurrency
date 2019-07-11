@@ -23,6 +23,13 @@ matrix:
     script:
     - .ci/make_and_test.sh
 
+    # thread sanitize
+  - compiler: clang
+    env:
+    - CCACHE_CPP2=yes
+    script:
+    - .ci/make_and_sanitize.sh
+
     # Check style/tidy
   - compiler: clang
     env:

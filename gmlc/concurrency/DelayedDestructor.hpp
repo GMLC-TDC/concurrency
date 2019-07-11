@@ -25,7 +25,7 @@ namespace concurrency
 {
 /** helper class to destroy objects at a late time when it is convenient and
  * there are no more possibilities of threading issues
- @details this is essentially a delayed garbage collector*/
+ @details this is essentially a delayed garbage collector based on shared_ptrs*/
 template <class X>
 class DelayedDestructor
 {
