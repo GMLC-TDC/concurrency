@@ -16,7 +16,7 @@ echo -en "travis_fold:start:script.test\\r"
 echo "Testing..."
 set -evx
 
-ctest
+ctest --verbose
 
 set +evx
 echo -en "travis_fold:end:script.test\\r"
