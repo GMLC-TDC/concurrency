@@ -25,6 +25,7 @@ matrix:
 
     # thread sanitize
   - compiler: clang
+    name: "Thread Sanitizer"
     env:
     - CCACHE_CPP2=yes
     addons:
@@ -111,6 +112,8 @@ matrix:
     - export CXX=g++-4.9
     script:
     - .ci/make_and_test.sh
+  allow_failures:
+    - name: "Thread Sanitizer"
 
 install: skip
 
