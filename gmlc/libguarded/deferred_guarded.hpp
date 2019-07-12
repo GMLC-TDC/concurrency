@@ -69,8 +69,12 @@ template <typename T>
 class void_runner : public task_runner<T>
 {
   public:
-    virtual void run_task(T &obj) { task(obj); }
-    std::packaged_task<void(T &)> task;
+    void_runner(std::packaged_task<void(T &)> &&tsk) : task(std::move(tsk)) {}
+    virtual void run_task(T &obj) { task.lock()->operator()(obj); }
+    std::future<void> get_future() { return task.lock()->get_future(); }
+
+  private:
+    guarded<std::packaged_task<void(T &)>> task;
 };
 
 /// class to contain a typed return packaged task
@@ -78,8 +82,12 @@ template <typename T, typename Ret>
 class type_runner : public task_runner<T>
 {
   public:
-    virtual void run_task(T &obj) { task(obj); }
-    std::packaged_task<Ret(T &)> task;
+    type_runner(std::packaged_task<Ret(T &)> &&tsk) : task(std::move(tsk)) {}
+    virtual void run_task(T &obj) { task.lock()->operator()(obj); }
+    std::future<Ret> get_future() { return task.lock()->get_future(); }
+
+  private:
+    guarded<std::packaged_task<Ret(T &)>> task;
 };
 
 #ifdef LIBGUARDED_NO_DEFAULT
@@ -151,8 +159,8 @@ void deferred_guarded<T, M>::modify_detach(Func &&func)
     }
     else
     {
-        auto vtask = std::unique_ptr<void_runner<T>>(new void_runner<T>);
-        vtask->task = std::packaged_task<void(T &)>(std::forward<Func>(func));
+        auto vtask = std::unique_ptr<void_runner<T>>(new void_runner<T>(
+          std::packaged_task<void(T &)>(std::forward<Func>(func))));
         m_pendingList.lock()->emplace_back(std::move(vtask));
         m_pendingWrites.store(true);
     }
@@ -202,9 +210,9 @@ auto package_task_void(Func &&func) -> typename std::enable_if<
   std::is_same<Ret, void>::value,
   std::pair<std::unique_ptr<task_runner<T>>, std::future<void>>>::type
 {
-    auto vtask = std::unique_ptr<void_runner<T>>(new void_runner<T>);
-    vtask->task = std::packaged_task<void(T &)>(std::forward<Func>(func));
-    std::future<void> task_future(vtask->task.get_future());
+    auto vtask = std::unique_ptr<void_runner<T>>(new void_runner<T>(
+      std::packaged_task<void(T &)>(std::forward<Func>(func))));
+    std::future<void> task_future(vtask->get_future());
     return {std::move(vtask), std::move(task_future)};
 }
 
@@ -213,9 +221,9 @@ auto package_task_void(Func &&func) -> typename std::enable_if<
   !std::is_same<Ret, void>::value,
   std::pair<std::unique_ptr<task_runner<T>>, std::future<Ret>>>::type
 {
-    auto ttask = std::unique_ptr<type_runner<T, Ret>>(new type_runner<T, Ret>);
-    ttask->task = std::packaged_task<Ret(T &)>(std::forward<Func>(func));
-    std::future<Ret> task_future(ttask->task.get_future());
+    auto ttask = std::unique_ptr<type_runner<T, Ret>>(new type_runner<T, Ret>(
+      std::packaged_task<Ret(T &)>(std::forward<Func>(func))));
+    std::future<Ret> task_future(ttask->get_future());
     return {std::move(ttask), std::move(task_future)};
 }
 
