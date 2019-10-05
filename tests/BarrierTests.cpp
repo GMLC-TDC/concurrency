@@ -22,7 +22,7 @@ using namespace gmlc::concurrency;
 TEST(barrier, basic)
 {
     Barrier b1(2);
-    std::atomic<int> ct = 0;
+    std::atomic<int> ct{0};
     auto f1 = std::async(std::launch::async, [&b1, &ct]() {
         b1.wait();
         ++ct;
