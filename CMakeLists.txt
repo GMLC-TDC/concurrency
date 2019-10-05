@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
 # file and DISCLAIMER for more details.
 #
@@ -7,13 +7,13 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project (GMLC_CONCURRENCY VERSION 0.1)
+project (GMLC_CONCURRENCY VERSION 0.1.2)
 
 # -----------------------------------------------------------------------------
 # GMLC concurrency library Version number
 #-----------------------------------------------------------------------------
 set (GMLC_CONCURRENCY_VERSION_BUILD )
-set (GMLC_CONCURRENCY_DATE "06-30-19")
+set (GMLC_CONCURRENCY_DATE "09-07-19")
 
 set(GMLC_CONCURRENCY_VERSION_STRING "${GMLC_CONCURRENCY_VERSION} (${GMLC_CONCURRENCY_DATE})")
 
@@ -40,7 +40,7 @@ include(CMakeDependentOption)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Prohibit in-source build
-if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(
     FATAL_ERROR
       "In-source build is not supported. Please, use an empty directory for building the project."
@@ -98,9 +98,9 @@ endif()
 # -------------------------------------------------------------
 # message(STATUS ${CMAKE_CXX_FLAGS})
 
-option(GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
+option(GMLC_CONCURRENCY_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
-if(GENERATE_DOXYGEN_DOC)
+if(GMLC_CONCURRENCY_GENERATE_DOXYGEN_DOC)
 	find_package(Doxygen)
 	if(DOXYGEN_FOUND)
 
@@ -115,12 +115,12 @@ if(GENERATE_DOXYGEN_DOC)
       ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY
     )
     add_custom_target(
-      doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+      gmlc_concurrency_doc ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
 			WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
-      COMMENT "Generating API documentation with Doxygen"
+      COMMENT "Generating GMLC CONCURRENCY documentation with Doxygen"
       VERBATIM
 		)
 	endif(DOXYGEN_FOUND)
-endif(GENERATE_DOXYGEN_DOC)
+endif(GMLC_CONCURRENCY_GENERATE_DOXYGEN_DOC)
 
 

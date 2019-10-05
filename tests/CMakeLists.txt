@@ -14,6 +14,7 @@ set(CONCURRENCY_TEST_SOURCES
 	SearchableObjectHolderTests.cpp
 	TripWireTests.cpp
 	DelayedObjectsTests.cpp
+	BarrierTests.cpp
     )
 
 add_executable(concurrencyTests ${CONCURRENCY_TEST_SOURCES})
