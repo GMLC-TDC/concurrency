@@ -15,6 +15,7 @@ set(CONCURRENCY_TEST_SOURCES
 	TripWireTests.cpp
 	DelayedObjectsTests.cpp
 	BarrierTests.cpp
+	LatchTests.cpp
     )
 
 add_executable(concurrencyTests ${CONCURRENCY_TEST_SOURCES})

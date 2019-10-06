@@ -12,6 +12,7 @@ set(
   concurrency/DelayedDestructor.hpp
   concurrency/SearchableObjectHolder.hpp
   concurrency/Barrier.hpp
+  concurrency/Latch.hpp
   libguarded/atomic_guarded.hpp
   libguarded/cow_guarded.hpp
   libguarded/deferred_guarded.hpp
