@@ -7,6 +7,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 #include <atomic>
+#include <condition_variable>
 #include <mutex>
 
 namespace gmlc
