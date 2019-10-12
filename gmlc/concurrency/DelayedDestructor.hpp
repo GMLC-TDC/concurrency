@@ -148,7 +148,8 @@ class DelayedDestructor
         using namespace std::literals::chrono_literals;
         std::unique_lock<std::mutex> lock(destructionLock);
         auto delayTime = (delay < 100ms) ? delay : 50ms;
-        int delayCount = (delay < 100ms) ? 1 : (delay / 50).count();
+        int delayCount =
+          (delay < 100ms) ? 1 : static_cast<int>((delay / 50).count());
 
         int cnt = 0;
         while ((!ElementsToBeDestroyed.empty()) && (cnt < delayCount))

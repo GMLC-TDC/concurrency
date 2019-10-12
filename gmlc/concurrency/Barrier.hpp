@@ -6,7 +6,6 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
-#include <atomic>
 #include <condition_variable>
 #include <mutex>
 
@@ -14,29 +13,51 @@ namespace gmlc
 {
 namespace concurrency
 {
-/** namespace for the global variable in tripwire*/
-
+/** class implementing a synchronization barrier*/
 class Barrier
 {
   public:
-    explicit Barrier(size_t count) : count_(count) {}
+    explicit Barrier(size_t count) : count_(count), threshold_(count) {}
+    /// wait on the barrier
     void wait()
     {
         std::unique_lock<std::mutex> lck(mtx);
-        if (--count_ == 0)
+        auto lGen = generation_;
+        if (--count_ <= 0)
         {
+            generation_++;
+            count_ = threshold_;
             cv.notify_all();
         }
         else
         {
-            cv.wait(lck, [this] { return count_ == 0; });
+            cv.wait(lck, [this, lGen] { return lGen != generation_; });
+        }
+    }
+    /// wait on the barrier and remove the object from barrier consideration
+    void wait_and_drop()
+    {
+        std::unique_lock<std::mutex> lck(mtx);
+        auto lGen = generation_;
+        --threshold_;
+        if (--count_ <= 0)
+        {
+            generation_++;
+            count_ = threshold_;
+            cv.notify_all();
+        }
+        else
+        {
+            cv.wait(lck, [this, lGen] { return lGen != generation_; });
         }
     }
 
   private:
     std::mutex mtx;  //!< mutex for protecting count_
     std::condition_variable cv;  //!< associated condition variable
-    size_t count_;  //!< items remaining
+    std::size_t threshold_;
+    std::size_t count_;
+    std::size_t generation_{0};
 };
 }  // namespace concurrency
 }  // namespace gmlc
