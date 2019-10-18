@@ -43,10 +43,11 @@ class TriggerVariable
     been activated yet*/
     bool trigger()
     {
-        std::lock_guard<std::mutex> lock(stateLock);
+        std::unique_lock<std::mutex> lock(stateLock);
         if (activated)
         {
             triggered.store(true, std::memory_order_release);
+            lock.unlock();
             cv_trigger.notify_all();
             return true;
         }

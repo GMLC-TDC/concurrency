@@ -1,0 +1,77 @@
+version: 2
+aliases:
+
+  - &setup_build
+    name: setup_build
+    environment:
+    command: |
+      mkdir -p build
+      cd build
+      eval cmake .. ${CMAKE_FLAGS}
+      make -j 4
+
+  - &run_san_tests
+    name: run_san_tests
+    command: |
+       /root/project/scripts/run-nighly-circleci-tests.sh
+       RESULT=$?
+       exit $RESULT
+
+jobs:
+
+  helicsTSan:
+    docker:
+      - image: helics/buildenv:sanitizers
+    environment:
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
+      TSAN_OPTIONS: 'second_deadlock_stack=1 '
+
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_helics_tests
+
+  helicsASan:
+    docker:
+      - image: helics/buildenv:sanitizers
+    environment:
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -fsanitize-address-use-after-scope -stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
+      LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression.txt'
+      UBSAN_OPTIONS: 'print_stacktrace=1'
+
+    steps:
+      - checkout
+      - run: *setup_build
+      - run: *run_san_tests
+
+  helicsMSan:
+    docker:
+      - image: helics/buildenv:sanitizers
+    environment:
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=memory -stdlib=libc++ -L/root/develop/libcxx_msan/lib -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_msan/lib"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
+
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_helics_tests
+
+workflows:
+  version: 2
+  concurrenty_test:
+    jobs:
+      - helicsMSan
+      - helicsASan
+      - helicsTSan
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - helicsMSan
+      - helicsASan
+      - helicsTSan
+
