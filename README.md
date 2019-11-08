@@ -5,7 +5,8 @@
 [![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/concurrency/blob/master/LICENSE)
 
 # Concurrency
-Collection of data structures used inside [HELICS](https://github.com/GMLC-TDC/HELICS) and supporting repos to support thread synchronization and concurrency.
+The concurrency library is a header only Collection of data structures used inside [HELICS](https://github.com/GMLC-TDC/HELICS) and supporting repos to support thread synchronization and concurrency.
+A significant chunk of the library is based on [libGuarded](https://github.com/copperspice/libguarded)
 
 ## General Structures
 
@@ -23,6 +24,19 @@ A container to hold shared pointers to object so they can be searched and retrie
 
 ### TripWire
 A set of classes class to detect that a scope has closed in an independent location in a thread safe fashion.  The main use case so far is detecting that a program is being closed by the OS from different threads, such that in that case a simpler closeout procedure is performed.  
+
+### Barrier
+A barrier class which does the typical things of a barrier roughly based on the C++20 standard version
+
+### Latch
+A latch class which does the typical things of a latch
+
+## [libGuarded](gmlc/libguarded/README.md)
+The main modifications to libGuarded were the use of a dedicated handles class to allow for a wider assortment of locks to be used and other convenient operations to be used on the handles.  A few additional classes were added including
+-   atomic_guarded  which is useful for wrapping things which are assigned but may allocate, so can't be used in a regular atomic like std::string or std::function and a few other things of that nature.
+-   staged_guarded  class which operates like a guarded during an initialization phase, then transitions to const usage only
+-   guarded_opt    similar to guarded but has a construction time boolean that can disable the locking if needed if it was known to only be used in a single thread context.  
+-   shared_guarded_opt  same as guarded_opt but on a shared_guarded object 
 
 ## Release
 GMLC-TDC/Concurrency library is distributed under the terms of the BSD-3 clause license. All new

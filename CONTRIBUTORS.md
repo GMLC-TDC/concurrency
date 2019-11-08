@@ -5,15 +5,13 @@ If you would like to contribute to the Concurrency or HELICS project see [CONTRI
 ### Pacific Northwest National Lab
 
 ### Lawrence Livermore National Lab
--   Ryan Mast*
--   Philip Top*
+-   Ryan Mast
+-   Philip Top
 
 ### National Renewable Energy Lab
--   Dheepak Krishnamurthy*
+-   Dheepak Krishnamurthy
 
 ### Argonne National Lab
-
- `*` currently active
 
 ## Used Libraries or Code
 
