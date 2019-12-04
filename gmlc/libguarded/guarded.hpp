@@ -129,10 +129,18 @@ class guarded
 
     /** store an updated value into the object*/
     template <typename objType>
-    void operator=(objType &&newObj)
+    guarded &operator=(objType &&newObj)
     {  // uses a forwarding reference
         std::lock_guard<M> glock(m_mutex);
         m_obj = std::forward<objType>(newObj);
+        return *this;
+    }
+
+	/** cast operator so the class can work like T newT=Obj*/
+    operator T() const
+    {
+        std::lock_guard<M> glock(m_mutex);
+        return m_obj;
     }
 
   private:
