@@ -1,10 +1,5 @@
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/googletest/CMakeLists.txt")
-    message(FATAL_ERROR "You have requested tests be built, but googletest is not downloaded. Please run:
-    git submodule update --init")
-endif()
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/config/cmake")
-
 
 set(GOOGLE_TEST_INDIVIDUAL OFF)
 include(AddGoogletest)
