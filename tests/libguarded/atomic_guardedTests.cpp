@@ -19,10 +19,9 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 /*
 modified to use google test
 */
-#include "gtest/gtest.h"
-
 #include "libguarded/atomic_guarded.hpp"
 
+#include "gtest/gtest.h"
 #include <atomic>
 #include <string>
 #include <thread>

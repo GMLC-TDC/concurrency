@@ -13,10 +13,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test TriggerVariables
  */
 
+#include "concurrency/DelayedObjects.hpp"
+
 #include "gtest/gtest.h"
 #include <iostream>
-
-#include "concurrency/DelayedObjects.hpp"
 
 using namespace gmlc::concurrency;
 

@@ -1,19 +1,22 @@
+# ~~~
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# See the top-level NOTICE for additional details.
+# All rights reserved.
 #
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
-#
+# SPDX-License-Identifier: BSD-3-Clause
+# ~~~
 
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project (GMLC_CONCURRENCY VERSION 0.1.2)
+project (GMLC_CONCURRENCY VERSION 0.2.0)
 
 # -----------------------------------------------------------------------------
 # GMLC concurrency library Version number
 #-----------------------------------------------------------------------------
 set (GMLC_CONCURRENCY_VERSION_BUILD )
-set (GMLC_CONCURRENCY_DATE "09-07-19")
+set (GMLC_CONCURRENCY_DATE "12-09-19")
 
 set(GMLC_CONCURRENCY_VERSION_STRING "${GMLC_CONCURRENCY_VERSION} (${GMLC_CONCURRENCY_DATE})")
 

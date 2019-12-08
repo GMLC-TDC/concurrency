@@ -9,55 +9,46 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <condition_variable>
 #include <mutex>
 
-namespace gmlc
-{
-namespace concurrency
-{
-/** class implementing a synchronization barrier*/
-class Barrier
-{
-  public:
-    explicit Barrier(size_t count) : threshold_(count), count_(count) {}
-    /// wait on the barrier
-    void wait()
-    {
-        std::unique_lock<std::mutex> lck(mtx);
-        auto lGen = generation_;
-        if (--count_ <= 0)
+namespace gmlc {
+namespace concurrency {
+    /** class implementing a synchronization barrier*/
+    class Barrier {
+      public:
+        explicit Barrier(size_t count): threshold_(count), count_(count) {}
+        /// wait on the barrier
+        void wait()
         {
-            generation_++;
-            count_ = threshold_;
-            cv.notify_all();
+            std::unique_lock<std::mutex> lck(mtx);
+            auto lGen = generation_;
+            if (--count_ <= 0) {
+                generation_++;
+                count_ = threshold_;
+                cv.notify_all();
+            } else {
+                cv.wait(lck, [this, lGen] { return lGen != generation_; });
+            }
         }
-        else
+        /// wait on the barrier and remove the object from barrier consideration
+        void wait_and_drop()
         {
-            cv.wait(lck, [this, lGen] { return lGen != generation_; });
+            std::unique_lock<std::mutex> lck(mtx);
+            auto lGen = generation_;
+            --threshold_;
+            if (--count_ <= 0) {
+                generation_++;
+                count_ = threshold_;
+                cv.notify_all();
+            } else {
+                cv.wait(lck, [this, lGen] { return lGen != generation_; });
+            }
         }
-    }
-    /// wait on the barrier and remove the object from barrier consideration
-    void wait_and_drop()
-    {
-        std::unique_lock<std::mutex> lck(mtx);
-        auto lGen = generation_;
-        --threshold_;
-        if (--count_ <= 0)
-        {
-            generation_++;
-            count_ = threshold_;
-            cv.notify_all();
-        }
-        else
-        {
-            cv.wait(lck, [this, lGen] { return lGen != generation_; });
-        }
-    }
 
-  private:
-    std::mutex mtx;  //!< mutex for protecting count_
-    std::condition_variable cv;  //!< associated condition variable
-    std::size_t threshold_;
-    std::size_t count_;
-    std::size_t generation_{0};
-};
-}  // namespace concurrency
-}  // namespace gmlc
+      private:
+        std::mutex mtx; //!< mutex for protecting count_
+        std::condition_variable cv; //!< associated condition variable
+        std::size_t threshold_;
+        std::size_t count_;
+        std::size_t generation_{0};
+    };
+} // namespace concurrency
+} // namespace gmlc

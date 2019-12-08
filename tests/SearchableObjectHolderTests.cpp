@@ -13,10 +13,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test data_block and data_view objects
  */
 
+#include "concurrency/SearchableObjectHolder.hpp"
+
 #include "gtest/gtest.h"
 #include <iostream>
-
-#include "concurrency/SearchableObjectHolder.hpp"
 
 using namespace gmlc::concurrency;
 

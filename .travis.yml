@@ -23,22 +23,6 @@ matrix:
     script:
     - .ci/make_and_test.sh
 
-    # thread sanitize
-  - compiler: clang
-    name: "Thread Sanitizer"
-    env:
-    - CCACHE_CPP2=yes
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-          - llvm-toolchain-xenial-7
-        packages:
-          - libc++-7-dev
-          - libc++abi-7-dev
-    script:
-    - .ci/make_and_sanitize.sh
-
     # Check style/tidy
   - compiler: clang
     env:
@@ -112,8 +96,6 @@ matrix:
     - export CXX=g++-4.9
     script:
     - .ci/make_and_test.sh
-  allow_failures:
-    - name: "Thread Sanitizer"
 
 install: skip
 

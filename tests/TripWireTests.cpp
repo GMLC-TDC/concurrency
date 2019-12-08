@@ -12,10 +12,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test tripwire
  */
 
+#include "concurrency/TripWire.hpp"
+
 #include "gtest/gtest.h"
 #include <iostream>
-
-#include "concurrency/TripWire.hpp"
 
 using namespace gmlc::concurrency;
 

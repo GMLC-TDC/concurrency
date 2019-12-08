@@ -19,10 +19,9 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 /*
 modified to use google test
 */
-#include "gtest/gtest.h"
-
 #include "libguarded/guarded_opt.hpp"
 
+#include "gtest/gtest.h"
 #include <atomic>
 #include <thread>
 
@@ -53,22 +52,18 @@ TEST(guarded_opt, guarded_1)
 
         std::thread th1([&data, &th1_ok]() {
             auto data_handle2 = data.try_lock();
-            if (data_handle2)
-                th1_ok = false;
+            if (data_handle2) th1_ok = false;
         });
 
         std::thread th2([&data, &th2_ok]() {
-            auto data_handle2 =
-              data.try_lock_for(std::chrono::milliseconds(20));
-            if (data_handle2)
-                th2_ok = false;
+            auto data_handle2 = data.try_lock_for(std::chrono::milliseconds(20));
+            if (data_handle2) th2_ok = false;
         });
 
         std::thread th3([&data, &th3_ok]() {
             auto data_handle2 = data.try_lock_until(
-              std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
-            if (data_handle2)
-                th3_ok = false;
+                std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
+            if (data_handle2) th3_ok = false;
         });
 
         th1.join();
@@ -85,16 +80,14 @@ TEST(guarded_opt, guarded_2)
     guarded_opt<int> data(true, 0);
 
     std::thread th1([&data]() {
-        for (int i = 0; i < 10000; ++i)
-        {
+        for (int i = 0; i < 10000; ++i) {
             auto data_handle = data.lock();
             ++(*data_handle);
         }
     });
 
     std::thread th2([&data]() {
-        for (int i = 0; i < 10000; ++i)
-        {
+        for (int i = 0; i < 10000; ++i) {
             auto data_handle = data.lock();
             ++(*data_handle);
         }

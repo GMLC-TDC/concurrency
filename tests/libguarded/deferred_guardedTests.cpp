@@ -21,7 +21,6 @@ modified to use google test
 */
 #include "gtest/gtest.h"
 #include <libguarded/deferred_guarded.hpp>
-
 #include <thread>
 
 #ifndef HAVE_CXX14
@@ -37,7 +36,7 @@ TEST(deferred_guarded, deferred_guarded_1)
 {
     deferred_guarded<int, shared_mutex> data(0);
 
-    data.modify_detach([](int &x) { ++x; });
+    data.modify_detach([](int& x) { ++x; });
 
     {
         auto data_handle = data.lock_shared();
@@ -51,28 +50,21 @@ TEST(deferred_guarded, deferred_guarded_1)
 
         std::thread th1([&data, &th1_ok]() {
             auto data_handle2 = data.try_lock_shared();
-            if (!data_handle2)
-                th1_ok = false;
-            if (*data_handle2 != 1)
-                th1_ok = false;
+            if (!data_handle2) th1_ok = false;
+            if (*data_handle2 != 1) th1_ok = false;
         });
 
         std::thread th2([&data, &th2_ok]() {
-            auto data_handle2 =
-              data.try_lock_shared_for(std::chrono::milliseconds(20));
-            if (!data_handle2)
-                th2_ok = false;
-            if (*data_handle2 != 1)
-                th2_ok = false;
+            auto data_handle2 = data.try_lock_shared_for(std::chrono::milliseconds(20));
+            if (!data_handle2) th2_ok = false;
+            if (*data_handle2 != 1) th2_ok = false;
         });
 
         std::thread th3([&data, &th3_ok]() {
             auto data_handle2 = data.try_lock_shared_until(
-              std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
-            if (!data_handle2)
-                th3_ok = false;
-            if (*data_handle2 != 1)
-                th3_ok = false;
+                std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
+            if (!data_handle2) th3_ok = false;
+            if (*data_handle2 != 1) th3_ok = false;
         });
 
         th1.join();
@@ -89,31 +81,27 @@ TEST(deferred_guarded, deferred_guarded_2)
     deferred_guarded<int, shared_mutex> data(0);
 
     std::thread th1([&data]() {
-        for (int i = 0; i < 100000; ++i)
-        {
-            data.modify_detach([](int &x) { ++x; });
+        for (int i = 0; i < 100000; ++i) {
+            data.modify_detach([](int& x) { ++x; });
         }
     });
 
     std::thread th2([&data]() {
-        for (int i = 0; i < 100000; ++i)
-        {
-            auto fut = data.modify_async([](int &x) -> int { return ++x; });
+        for (int i = 0; i < 100000; ++i) {
+            auto fut = data.modify_async([](int& x) -> int { return ++x; });
             fut.wait();
         }
     });
     std::thread th3([&data]() {
-        for (int i = 0; i < 100000; ++i)
-        {
-            auto fut = data.modify_async([](int &x) -> void { ++x; });
+        for (int i = 0; i < 100000; ++i) {
+            auto fut = data.modify_async([](int& x) -> void { ++x; });
             fut.wait();
         }
     });
 
     std::thread th4([&data]() {
         int last_val = 0;
-        while (last_val != 300000)
-        {
+        while (last_val != 300000) {
             auto data_handle = data.lock_shared();
             EXPECT_TRUE(last_val <= *data_handle);
             last_val = *data_handle;
