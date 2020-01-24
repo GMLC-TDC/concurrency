@@ -71,13 +71,13 @@ namespace concurrency {
 			std::lock_guard<std::mutex> lock(promiseLock);
 			for (auto &pr : promiseByInteger)
 			{
-				pr->second.set_value(val);
-				usedPromiseByInteger[index] = std::move(fnd->second);
+				pr.second.set_value(val);
+				usedPromiseByInteger[pr.first] = std::move(pr.second);
 			}
 			for (auto &pr : promiseByString)
 			{
-				pr->second.set_value(val);
-				usedPromiseByString[index] = std::move(fnd->second);
+				pr.second.set_value(val);
+				usedPromiseByString[pr.first] = std::move(pr.second);
 			}
 			promiseByInteger.clear();
 			promiseByString.clear();
