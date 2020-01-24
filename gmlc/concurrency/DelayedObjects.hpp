@@ -64,6 +64,25 @@ namespace concurrency {
                 promiseByString.erase(fnd);
             }
         }
+
+		/// For all remaining promises set them to a value of val
+		void fulfillAllPromises(const X& val)
+		{
+			std::lock_guard<std::mutex> lock(promiseLock);
+			for (auto &pr : promiseByInteger)
+			{
+				pr->second.set_value(val);
+				usedPromiseByInteger[index] = std::move(fnd->second);
+			}
+			for (auto &pr : promiseByString)
+			{
+				pr->second.set_value(val);
+				usedPromiseByString[index] = std::move(fnd->second);
+			}
+			promiseByInteger.clear();
+			promiseByString.clear();
+		}
+
         /// create a delayed object with an index
         std::future<X> getFuture(int index)
         {

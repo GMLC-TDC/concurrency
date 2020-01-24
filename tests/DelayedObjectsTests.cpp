@@ -39,3 +39,20 @@ TEST(DelayedObjects_tests, basic_tests)
 
     objs.finishedWithValue("string1");
 }
+
+/** test basic operations */
+TEST(DelayedObjects_tests, all_fulfill)
+{
+    DelayedObjects<int> objs;
+    auto fut1 = objs.getFuture("t1");
+    auto fut2 = objs.getFuture("t2");
+
+    auto fut3 = objs.getFuture(45);
+    auto fut4 = objs.getFuture(55);
+
+    objs.fulfillAllPromises(19);
+    EXPECT_EQ(fut1.get(), 19);
+    EXPECT_EQ(fut2.get(), 19);
+    EXPECT_EQ(fut3.get(), 19);
+    EXPECT_EQ(fut4.get(), 19);
+}
