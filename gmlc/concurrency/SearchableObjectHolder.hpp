@@ -22,11 +22,12 @@ namespace gmlc {
 namespace concurrency {
     /** helper class to contain a list of objects that need to be referencable at
  * some level the objects are stored through shared_ptrs*/
-    template<class X>
+    template<class X, class Y = int>
     class SearchableObjectHolder {
       private:
-        std::mutex mapLock;
+        mutable std::mutex mapLock;
         std::map<std::string, std::shared_ptr<X>> objectMap;
+        std::map<std::string, std::vector<Y>> typeMap;
 #ifdef ENABLE_TRIPWIRE
         TripWireDetector trippedDetect;
 #endif
@@ -68,6 +69,24 @@ namespace concurrency {
             auto res = objectMap.emplace(name, std::move(obj));
             return res.second;
         }
+
+        /** add and object to container*/
+        bool addObject(const std::string& name, std::shared_ptr<X> obj, Y type)
+        {
+            std::lock_guard<std::mutex> lock(mapLock);
+            auto res = objectMap.emplace(name, std::move(obj));
+            if (res.second) {
+                typeMap.emplace(name, std::vector<Y>{type});
+            }
+            return res.second;
+        }
+        /** add an additional type reference to the object name*/
+        void addType(const std::string& name, Y type)
+        {
+            std::lock_guard<std::mutex> lock(mapLock);
+            typeMap[name].push_back(type);
+        }
+
         /** check if the container is empty
     @details this is really only useful if there is only one thread adding
     object otherwise the results are not totally reliable upon return
@@ -96,8 +115,13 @@ namespace concurrency {
             auto fnd = objectMap.find(name);
             if (fnd != objectMap.end()) {
                 objectMap.erase(fnd);
+                auto fnd2 = typeMap.find(name);
+                if (fnd2 != typeMap.end()) {
+                    typeMap.erase(fnd2);
+                }
                 return true;
             }
+
             return false;
         }
 
@@ -109,6 +133,10 @@ namespace concurrency {
             for (auto obj = objectMap.begin(); obj != objectMap.end(); ++obj) {
                 if (operand(obj->second)) {
                     objectMap.erase(obj);
+                    auto fnd2 = typeMap.find(obj->first);
+                    if (fnd2 != typeMap.end()) {
+                        typeMap.erase(fnd2);
+                    }
                     return true;
                 }
             }
@@ -122,10 +150,31 @@ namespace concurrency {
             if (fnd != objectMap.end()) {
                 auto newObjectPtr = fnd->second;
                 auto ret = objectMap.emplace(copyToName, std::move(newObjectPtr));
+                if (ret.second) {
+                    auto fnd2 = typeMap.find(fnd->first);
+                    if (fnd2 != typeMap.end()) {
+                        typeMap.emplace(copyToName, fnd2->second);
+                    }
+                }
+
                 return ret.second;
             }
             return false;
         }
+        /** check if an object is of a specific type*/
+        bool checkObjectType(const std::string& name, Y type) const {
+            std::lock_guard<std::mutex> lock(mapLock);
+            auto fnd = typeMap.find(name);
+			if (fnd != typeMap.end())
+			{
+				for (auto &stype:fnd->second) {
+                    if (stype==type) {
+                        return true;
+					}
+				}
+			}
+            return false;
+		}
 
         std::shared_ptr<X> findObject(const std::string& name)
         {
@@ -147,6 +196,32 @@ namespace concurrency {
             std::lock_guard<std::mutex> lock(mapLock);
             auto obj = std::find_if(objectMap.begin(), objectMap.end(), [&operand](auto& val) {
                 return operand(val.second);
+            });
+            if (obj != objectMap.end()) {
+                return obj->second;
+            }
+            return nullptr;
+        }
+        /** find an object whose operand evaluates to true and matches a specific type*/
+		std::shared_ptr<X> findObject(std::function<bool(const std::shared_ptr<X>&)> operand, Y type)
+        {
+            std::lock_guard<std::mutex> lock(mapLock);
+            auto obj = std::find_if(objectMap.begin(), objectMap.end(), [&operand,this,type](auto& val) {
+				if (operand(val.second))
+				{
+                    auto tfind = typeMap.find(val.first);
+					if (tfind != typeMap.end())
+					{
+						for (auto &t : tfind->second)
+						{
+							if (t == type)
+							{
+                                return true;
+							}
+						}
+					}
+				}
+                return false;
             });
             if (obj != objectMap.end()) {
                 return obj->second;

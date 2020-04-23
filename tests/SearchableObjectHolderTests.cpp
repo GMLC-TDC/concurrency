@@ -50,3 +50,22 @@ TEST(SOH_tests, contained_tests)
     EXPECT_EQ(*(v[2]), "test_3");
     v.clear();
 }
+
+TEST(SOH_tests, contained_type_check)
+{
+    SearchableObjectHolder<std::string, char> SOH1;
+    EXPECT_TRUE(SOH1.empty());
+    SOH1.addObject("test1", std::make_shared<std::string>("test_1"), '1');
+    SOH1.addObject("test2", std::make_shared<std::string>("test_2"), '2');
+    SOH1.addObject("test3", std::make_shared<std::string>("test_3"), '3');
+
+    auto v = SOH1.getObjects();
+    ASSERT_EQ(v.size(), 3u);
+    EXPECT_EQ(*(v[0]), "test_1");
+    EXPECT_EQ(*(v[1]), "test_2");
+    EXPECT_EQ(*(v[2]), "test_3");
+
+    EXPECT_TRUE(SOH1.checkObjectType("test1", '1'));
+
+    v.clear();
+}
