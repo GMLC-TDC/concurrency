@@ -28,6 +28,15 @@ TEST(DelayedObjects_tests, basic_tests)
     auto fut1 = objs.getFuture("string1");
     auto fut2 = objs.getFuture(45);
 
+	EXPECT_TRUE(objs.isRecognized("string1"));
+    EXPECT_TRUE(objs.isRecognized(45));
+
+	EXPECT_FALSE(objs.isRecognized("string2"));
+    EXPECT_FALSE(objs.isRecognized(67));
+
+	EXPECT_FALSE(objs.isCompleted("string1"));
+    EXPECT_FALSE(objs.isCompleted(45));
+
     objs.setDelayedValue("string1", "string num1");
 
     auto str1 = fut1.get();
@@ -37,7 +46,18 @@ TEST(DelayedObjects_tests, basic_tests)
     auto str2 = fut2.get();
     EXPECT_EQ(str2, "string2");
 
+	EXPECT_TRUE(objs.isRecognized("string1"));
+    EXPECT_TRUE(objs.isRecognized(45));
+
+    EXPECT_TRUE(objs.isCompleted("string1"));
+    EXPECT_TRUE(objs.isCompleted(45));
+
     objs.finishedWithValue("string1");
+
+	EXPECT_FALSE(objs.isRecognized("string1"));
+    EXPECT_TRUE(objs.isRecognized(45));
+    objs.finishedWithValue(45);
+    EXPECT_FALSE(objs.isRecognized(45));
 }
 
 /** test basic operations */

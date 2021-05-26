@@ -15,7 +15,7 @@ jobs:
 
 - job: macOS
   pool:
-    vmImage: 'macOS-10.13'
+    vmImage: 'macOS-latest'
   steps:
     - template: .ci/azure-steps.yml
 
