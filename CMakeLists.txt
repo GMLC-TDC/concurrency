@@ -10,13 +10,13 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project (GMLC_CONCURRENCY VERSION 0.2.0)
+project (GMLC_CONCURRENCY VERSION 0.2.1)
 
 # -----------------------------------------------------------------------------
 # GMLC concurrency library Version number
 #-----------------------------------------------------------------------------
 set (GMLC_CONCURRENCY_VERSION_BUILD )
-set (GMLC_CONCURRENCY_DATE "12-09-19")
+set (GMLC_CONCURRENCY_DATE "05-26-21")
 
 set(GMLC_CONCURRENCY_VERSION_STRING "${GMLC_CONCURRENCY_VERSION} (${GMLC_CONCURRENCY_DATE})")
 
