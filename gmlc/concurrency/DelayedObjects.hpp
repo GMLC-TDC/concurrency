@@ -64,24 +64,65 @@ namespace concurrency {
                 promiseByString.erase(fnd);
             }
         }
+		/// check whether the index is known (either fulfilled or unfulfilled)
+        bool isRecognized(int index)
+        {
+            std::lock_guard<std::mutex> lock(promiseLock);
+            auto fnd = promiseByInteger.find(index);
+            if (fnd != promiseByInteger.end()) {
+                return true;
+            }
+            auto fnd2 = usedPromiseByInteger.find(index);
+            if (fnd2 != usedPromiseByInteger.end()) {
+                return true;
+            }
+            return false;
+        }
+        /// check whether the name is known (either fulfilled or unfulfilled)
+        bool isRecognized(const std::string& name)
+        {
+            std::lock_guard<std::mutex> lock(promiseLock);
+            auto fnd = promiseByString.find(name);
+            if (fnd != promiseByString.end()) {
+                return true;
+            }
+            auto fnd2 = usedPromiseByString.find(name);
+            if (fnd2 != usedPromiseByString.end()) {
+                return true;
+            }
+            return false;
+        }
 
-		/// For all remaining promises set them to a value of val
-		void fulfillAllPromises(const X& val)
+		/// check whether the index is known and completed
+        bool isCompleted(int index)
 		{
-			std::lock_guard<std::mutex> lock(promiseLock);
-			for (auto &pr : promiseByInteger)
-			{
-				pr.second.set_value(val);
-				usedPromiseByInteger[pr.first] = std::move(pr.second);
-			}
-			for (auto &pr : promiseByString)
-			{
-				pr.second.set_value(val);
-				usedPromiseByString[pr.first] = std::move(pr.second);
-			}
-			promiseByInteger.clear();
-			promiseByString.clear();
+            std::lock_guard<std::mutex> lock(promiseLock);
+            auto fnd = usedPromiseByInteger.find(index);
+            return (fnd != usedPromiseByInteger.end());
 		}
+        /// check whether the string is known and completed
+        bool isCompleted(const std::string& name)
+        {
+            std::lock_guard<std::mutex> lock(promiseLock);
+            auto fnd = usedPromiseByString.find(name);
+            return (fnd != usedPromiseByString.end());
+        }
+
+        /// For all remaining promises set them to a value of val
+        void fulfillAllPromises(const X& val)
+        {
+            std::lock_guard<std::mutex> lock(promiseLock);
+            for (auto& pr : promiseByInteger) {
+                pr.second.set_value(val);
+                usedPromiseByInteger[pr.first] = std::move(pr.second);
+            }
+            for (auto& pr : promiseByString) {
+                pr.second.set_value(val);
+                usedPromiseByString[pr.first] = std::move(pr.second);
+            }
+            promiseByInteger.clear();
+            promiseByString.clear();
+        }
 
         /// create a delayed object with an index
         std::future<X> getFuture(int index)
