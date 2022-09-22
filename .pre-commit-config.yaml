@@ -1,9 +1,33 @@
 
 repos:
-- repo: https://github.com/psf/black
-  rev: 19.3b0
+- repo: https://github.com/jumanjihouse/pre-commit-hooks
+  rev: 2.1.6
   hooks:
-  - id: black
+    - id: markdownlint
+      args: [-s, ./config/.markdownlintrc]
+     - id: script-must-have-extension
+- repo: https://github.com/cheshirekow/cmake-format-precommit
+  rev: v0.6.13
+  hooks:
+     - id: cmake-format
+- repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+  rev: v1.1.2
+  hooks:
+     - id: dockerfile_lint
+      args: [--rulefile, ./config/docker_rules.yml, --dockerfile]
+ - repo: https://github.com/pre-commit/mirrors-prettier
+  rev: v2.6.2
+   hooks:
+     - id: prettier
+- repo: https://github.com/Lucas-C/pre-commit-hooks
+  rev: v1.1.13
+  hooks:
+     - id: remove-tabs
+ - repo: https://github.com/codespell-project/codespell
+  rev: v2.1.0
+    hooks:
+    - id: codespell
+       exclude: ^(test/|units/|docs/reference/)
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v2.3.0
   hooks:
@@ -15,15 +39,17 @@ repos:
   - id: check-case-conflict
   - id: check-symlinks
   - id: check-yaml
+  - id: end-of-file-fixer
+- repo: https://github.com/pre-commit/mirrors-clang-format
+  rev: v13.0.1
+  hooks:
+  - id: clang-format
+      types:
+        - c++
 - repo: local
   hooks:
-  - id: docker-clang-format
-    name: Docker Clang Format
-    language: docker_image
-    exclude: ^ThirdParty/
-    types:
-    - c++
-    entry: unibeautify/clang-format:latest
-    args:
-    - -style=file
-    - -i
+    - id: disallow-caps
+      name: Disallow improper capitalization
+      language: pygrep
+      entry: PyBind|Numpy|Cmake|CCache|PyTest|Github
+      exclude: .pre-commit-config.yaml
