@@ -93,7 +93,7 @@ lock_handle<T, M> try_lock_handle_until(T* obj, M& gmutex, const TimePoint& tp)
 template<typename T>
 class is_shared_lockable {
     template<typename TT>
-    static auto test(int /*unused*/)
+    static auto test(int /*unused*/) /*NOLINT*/
         -> decltype(std::declval<TT>().lock_shared(), std::true_type{});
 
     template<typename, typename>
