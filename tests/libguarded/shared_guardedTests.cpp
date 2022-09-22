@@ -23,12 +23,8 @@ modified to use google test
 #include <atomic>
 #include <libguarded/shared_guarded.hpp>
 #include <thread>
-
-#ifndef HAVE_CXX14
-//#error This file requires the C++14 shared_mutex functionality
-#endif
-
 #include <shared_mutex>
+
 using shared_mutex = std::shared_timed_mutex;
 namespace chrono = std::chrono;
 

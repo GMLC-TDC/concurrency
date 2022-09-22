@@ -94,7 +94,7 @@ template<typename T>
 class is_shared_lockable {
     template<typename TT>
     static auto test(int /*unused*/)
-        -> decltype(std::declval<TT>().lock_shared(), std::true_type());
+        -> decltype(std::declval<TT>().lock_shared(), std::true_type{});
 
     template<typename, typename>
     static auto test(...) -> std::false_type;
