@@ -9,27 +9,32 @@
 
 cmake_minimum_required(VERSION 3.11...3.24)
 
-project (GMLC_CONCURRENCY VERSION 0.3.0)
+project(GMLC_CONCURRENCY VERSION 0.3.0)
 
 # -----------------------------------------------------------------------------
 # GMLC CONCURRENCY library Version number
-#-----------------------------------------------------------------------------
-set (GMLC_CONCURRENCY_VERSION_BUILD )
-set (GMLC_CONCURRENCY_DATE "2022-09-24")
+# -----------------------------------------------------------------------------
+set(GMLC_CONCURRENCY_VERSION_BUILD)
+set(GMLC_CONCURRENCY_DATE "2022-09-24")
 
-set(GMLC_CONCURRENCY_VERSION_STRING "${GMLC_CONCURRENCY_VERSION} (${GMLC_CONCURRENCY_DATE})")
+set(GMLC_CONCURRENCY_VERSION_STRING
+    "${GMLC_CONCURRENCY_VERSION} (${GMLC_CONCURRENCY_DATE})"
+)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # User settable
-    set(GMLC_CONCURRENCY_CXX_STD "17"  CACHE STRING "The CMake standard to require")
+    set(GMLC_CONCURRENCY_CXX_STD
+        "17"
+        CACHE STRING "The CMake standard to require"
+    )
 
-  #  set(CUR_PROJ ON)
+    # set(CUR_PROJ ON)
     set(CMAKE_CXX_STANDARD ${GMLC_CONCURRENCY_CXX_STD})
     set(CMAKE_CXX_EXTENSIONS OFF)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
-if (NOT CMAKE_CXX_STANDARD)
+if(NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 17)
 endif()
 # -----------------------------------------------------------------------------
@@ -43,10 +48,10 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Prohibit in-source build
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-  message(
-    FATAL_ERROR
-      "In-source build is not supported. Please, use an empty directory for building the project."
-  )
+    message(
+        FATAL_ERROR
+            "In-source build is not supported. Please, use an empty directory for building the project."
+    )
 endif()
 
 add_library(concurrency_base INTERFACE)
@@ -71,14 +76,14 @@ target_include_directories(concurrency_base INTERFACE ThirdParty)
 add_subdirectory(gmlc)
 
 option(GMLC_CONCURRENCY_TEST "Enable tests for the concurrency library" ON)
-#option(GMLC_CONCURRENCY_BENCHMARK "Enable benchmarks for the concurrency library" ON)
+# option(GMLC_CONCURRENCY_BENCHMARK "Enable benchmarks for the concurrency library" ON)
 
-if (GMLC_CONCURRENCY_TEST)
+if(GMLC_CONCURRENCY_TEST)
     enable_testing()
     add_subdirectory(tests)
 endif()
 
-if (GMLC_CONCURRENCY_BENCHMARK)
+if(GMLC_CONCURRENCY_BENCHMARK)
     add_subdirectory(benchmarks)
 endif()
 
@@ -93,21 +98,20 @@ if(GMLC_CONCURRENCY_GENERATE_DOXYGEN_DOC)
     find_package(Doxygen)
     if(DOXYGEN_FOUND)
 
-    show_variable(
-      DOXYGEN_OUTPUT_DIR
-      PATH
-      "location to put Doxygen docs"
-      "${PROJECT_BINARY_DIR}/docs"
-    )
-    configure_file(
-      ${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in
-      ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY
-    )
-    add_custom_target(
-      gmlc_concurrency_doc ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
+        show_variable(
+            DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs"
+            "${PROJECT_BINARY_DIR}/docs"
+        )
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in
+            ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY
+        )
+        add_custom_target(
+            gmlc_concurrency_doc
+            ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
             WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
-      COMMENT "Generating GMLC CONCURRENCY documentation with Doxygen"
-      VERBATIM
+            COMMENT "Generating GMLC CONCURRENCY documentation with Doxygen"
+            VERBATIM
         )
     endif(DOXYGEN_FOUND)
 endif(GMLC_CONCURRENCY_GENERATE_DOXYGEN_DOC)
