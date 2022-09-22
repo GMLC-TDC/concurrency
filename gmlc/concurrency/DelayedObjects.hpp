@@ -65,6 +65,27 @@ class DelayedObjects {
             promiseByString.erase(fnd);
         }
     }
+    void setDelayedValue(int index, X && val)
+    {
+        std::lock_guard<std::mutex> lock(promiseLock);
+        auto fnd = promiseByInteger.find(index);
+        if (fnd != promiseByInteger.end()) {
+            fnd->second.set_value(std::move(val));
+            usedPromiseByInteger[index] = std::move(fnd->second);
+            promiseByInteger.erase(fnd);
+        }
+    }
+    /// set the value for delayed named object
+    void setDelayedValue(const std::string& name, X && val)
+    {
+        std::lock_guard<std::mutex> lock(promiseLock);
+        auto fnd = promiseByString.find(name);
+        if (fnd != promiseByString.end()) {
+            fnd->second.set_value(std::move(val));
+            usedPromiseByString[name] = std::move(fnd->second);
+            promiseByString.erase(fnd);
+        }
+    }
     /// check whether the index is known (either fulfilled or unfulfilled)
     bool isRecognized(int index)
     {

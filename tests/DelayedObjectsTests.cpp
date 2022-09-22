@@ -61,6 +61,27 @@ TEST(DelayedObjects_tests, basic_tests)
 }
 
 /** test basic operations */
+TEST(DelayedObjects_tests, basic_move_tests)
+{
+    DelayedObjects<std::string> objs;
+
+    auto fut1 = objs.getFuture("string1");
+    auto fut2 = objs.getFuture(45);
+
+    std::string b1(600,'a');
+    objs.setDelayedValue("string1", std::move(b1));
+
+    auto str1 = fut1.get();
+    EXPECT_EQ(str1, std::string(600,'a'));
+
+    objs.setDelayedValue(45, std::move(str1));
+    auto str2 = fut2.get();
+    EXPECT_EQ(str2, std::string(600,'a'));
+
+}
+
+
+/** test basic operations */
 TEST(DelayedObjects_tests, all_fulfill)
 {
     DelayedObjects<int> objs;
