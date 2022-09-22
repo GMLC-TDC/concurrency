@@ -1,8 +1,8 @@
 /*
 Copyright (c) 2017-2022,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
-additional details. All rights reserved.
-SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include <atomic>
@@ -14,7 +14,7 @@ namespace gmlc {
 namespace concurrency {
     class TriggerVariable {
       public:
-        explicit TriggerVariable(bool active = false): activated(active){};
+        explicit TriggerVariable(bool active = false) : activated(active){};
         /** activate the trigger to the ready state
     @return true if the Trigger was activated false if it was already active
     */
@@ -68,7 +68,9 @@ namespace concurrency {
             }
             std::unique_lock<std::mutex> lk(triggerLock);
             if (!triggered) {
-                return cv_trigger.wait_for(lk, duration, [this] { return triggered.load(); });
+                return cv_trigger.wait_for(lk, duration, [this] {
+                    return triggered.load();
+                });
             }
             return true;
         }
@@ -85,7 +87,9 @@ namespace concurrency {
         {
             std::unique_lock<std::mutex> lk(activeLock);
             if (!activated) {
-                return cv_active.wait_for(lk, duration, [this] { return activated.load(); });
+                return cv_active.wait_for(lk, duration, [this] {
+                    return activated.load();
+                });
             }
             return true;
         }
@@ -109,14 +113,16 @@ namespace concurrency {
         bool isActive() const { return activated.load(); }
 
       private:
-        std::atomic_bool triggered{false}; //!< the state of the trigger
-        mutable std::mutex triggerLock; //!< mutex protecting the trigger
+        std::atomic_bool triggered{false};  //!< the state of the trigger
+        mutable std::mutex triggerLock;  //!< mutex protecting the trigger
         std::atomic_bool activated{
-            false}; //!< variable controlling if the trigger has been activated
-        mutable std::mutex activeLock; //!< mutex protecting the activation
-        mutable std::condition_variable cv_trigger; //!< semaphore for the trigger
-        mutable std::condition_variable cv_active; //!< semaphore for the activation
+            false};  //!< variable controlling if the trigger has been activated
+        mutable std::mutex activeLock;  //!< mutex protecting the activation
+        mutable std::condition_variable cv_trigger;  //!< semaphore for the
+                                                     //!< trigger
+        mutable std::condition_variable cv_active;  //!< semaphore for the
+                                                    //!< activation
     };
 
-} // namespace concurrency
-} // namespace gmlc
+}  // namespace concurrency
+}  // namespace gmlc

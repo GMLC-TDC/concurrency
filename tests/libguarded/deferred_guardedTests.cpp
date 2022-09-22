@@ -10,12 +10,12 @@
  *
  ***********************************************************************/
 
- /*
- Copyright (c) 2017-2022,
- Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
- additional details. All rights reserved.
- SPDX-License-Identifier: BSD-3-Clause
- */
+/*
+Copyright (c) 2017-2022,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+*/
 /*
 modified to use google test
 */
@@ -55,14 +55,16 @@ TEST(deferred_guarded, deferred_guarded_1)
         });
 
         std::thread th2([&data, &th2_ok]() {
-            auto data_handle2 = data.try_lock_shared_for(std::chrono::milliseconds(20));
+            auto data_handle2 =
+                data.try_lock_shared_for(std::chrono::milliseconds(20));
             if (!data_handle2) th2_ok = false;
             if (*data_handle2 != 1) th2_ok = false;
         });
 
         std::thread th3([&data, &th3_ok]() {
             auto data_handle2 = data.try_lock_shared_until(
-                std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
+                std::chrono::steady_clock::now() +
+                std::chrono::milliseconds(20));
             if (!data_handle2) th3_ok = false;
             if (*data_handle2 != 1) th3_ok = false;
         });

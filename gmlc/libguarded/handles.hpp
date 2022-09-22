@@ -1,8 +1,8 @@
 /*
 Copyright (c) 2017-2022,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
-additional details. All rights reserved.
-SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
@@ -19,11 +19,11 @@ namespace libguarded {
         using pointer = T*;
         using lock_type = std::unique_lock<M>;
 
-        lock_handle(pointer val, std::unique_lock<M> lock):
+        lock_handle(pointer val, std::unique_lock<M> lock) :
             data(val), m_handle_lock(std::move(lock))
         {
         }
-        lock_handle(pointer val, M& mut): data(val), m_handle_lock(mut) {}
+        lock_handle(pointer val, M& mut) : data(val), m_handle_lock(mut) {}
         lock_handle(lock_handle&&) = default;
         lock_handle& operator=(lock_handle&&) = default;
         lock_handle(const lock_handle&) = delete;
@@ -37,11 +37,11 @@ namespace libguarded {
             };
         }
         T* operator->() const noexcept
-        { // return pointer to class object
+        {  // return pointer to class object
             return data;
         }
         T& operator*() const noexcept
-        { // return pointer to class object
+        {  // return pointer to class object
             return *data;
         }
         operator bool() const noexcept { return (data != nullptr); }
@@ -77,7 +77,8 @@ namespace libguarded {
     }
 
     template<typename T, typename M, typename TimePoint>
-    lock_handle<T, M> try_lock_handle_until(T* obj, M& gmutex, const TimePoint& tp)
+    lock_handle<T, M>
+        try_lock_handle_until(T* obj, M& gmutex, const TimePoint& tp)
     {
         typename lock_handle<T, M>::lock_type glock(gmutex, tp);
         if (glock.owns_lock()) {
@@ -94,7 +95,8 @@ namespace libguarded {
     template<typename T>
     class is_shared_lockable {
         template<typename TT>
-        static auto test(int) -> decltype(std::declval<TT>().lock_shared(), std::true_type());
+        static auto test(int)
+            -> decltype(std::declval<TT>().lock_shared(), std::true_type());
 
         template<typename, typename>
         static auto test(...) -> std::false_type;
@@ -150,7 +152,10 @@ struct has_lock_shared
       public:
         using locker_type = std::unique_lock<std::mutex>;
 
-        static locker_type generate_lock(std::mutex& mut) { return locker_type(mut); }
+        static locker_type generate_lock(std::mutex& mut)
+        {
+            return locker_type(mut);
+        }
     };
 
     template<>
@@ -158,7 +163,10 @@ struct has_lock_shared
       public:
         using locker_type = std::unique_lock<std::timed_mutex>;
 
-        static locker_type generate_lock(std::timed_mutex& mut) { return locker_type(mut); }
+        static locker_type generate_lock(std::timed_mutex& mut)
+        {
+            return locker_type(mut);
+        }
     };
 
     template<typename T, typename M>
@@ -166,10 +174,14 @@ struct has_lock_shared
       public:
         using pointer = const T*;
         using lock_type = typename shared_locker<M>::locker_type;
-        shared_lock_handle(pointer val, lock_type lock): data(val), m_handle_lock(std::move(lock))
+        shared_lock_handle(pointer val, lock_type lock) :
+            data(val), m_handle_lock(std::move(lock))
         {
         }
-        shared_lock_handle(pointer val, M& smutex): data(val), m_handle_lock(smutex) {}
+        shared_lock_handle(pointer val, M& smutex) :
+            data(val), m_handle_lock(smutex)
+        {
+        }
         shared_lock_handle(shared_lock_handle&&) = default;
         shared_lock_handle& operator=(shared_lock_handle&&) = default;
         shared_lock_handle(const shared_lock_handle&) = delete;
@@ -183,11 +195,11 @@ struct has_lock_shared
             }
         }
         const T* operator->() const noexcept
-        { // return pointer to class object
+        {  // return pointer to class object
             return data;
         }
         const T& operator*() const noexcept
-        { // return pointer to class object
+        {  // return pointer to class object
             return *data;
         }
         /// bool operator to check if the data is valid and the locked
@@ -199,14 +211,15 @@ struct has_lock_shared
 
       private:
         // this is a non owning pointer
-        pointer data; //!< non-owning pointer to the data
-        lock_type m_handle_lock; //!< locking object
+        pointer data;  //!< non-owning pointer to the data
+        lock_type m_handle_lock;  //!< locking object
     };
 
     template<typename T, typename M>
     shared_lock_handle<T, M> try_lock_shared_handle(const T* obj, M& smutex)
     {
-        typename shared_lock_handle<T, M>::lock_type slock(smutex, std::try_to_lock);
+        typename shared_lock_handle<T, M>::lock_type slock(
+            smutex, std::try_to_lock);
         if (slock.owns_lock()) {
             return shared_lock_handle<T, M>(obj, std::move(slock));
         } else {
@@ -215,7 +228,8 @@ struct has_lock_shared
     }
 
     template<typename T, typename M, typename Duration>
-    shared_lock_handle<T, M> try_lock_shared_handle_for(const T* obj, M& smutex, const Duration& d)
+    shared_lock_handle<T, M>
+        try_lock_shared_handle_for(const T* obj, M& smutex, const Duration& d)
     {
         typename shared_lock_handle<T, M>::lock_type slock(smutex, d);
         if (slock.owns_lock()) {
@@ -226,8 +240,10 @@ struct has_lock_shared
     }
 
     template<typename T, typename M, typename TimePoint>
-    shared_lock_handle<T, M>
-        try_lock_shared_handle_until(const T* obj, M& smutex, const TimePoint& tp)
+    shared_lock_handle<T, M> try_lock_shared_handle_until(
+        const T* obj,
+        M& smutex,
+        const TimePoint& tp)
     {
         typename shared_lock_handle<T, M>::lock_type slock(smutex, tp);
         if (slock.owns_lock()) {
@@ -236,5 +252,5 @@ struct has_lock_shared
             return shared_lock_handle<T, M>(nullptr, std::move(slock));
         }
     }
-} // namespace libguarded
-} // namespace gmlc
+}  // namespace libguarded
+}  // namespace gmlc

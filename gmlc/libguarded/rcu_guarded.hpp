@@ -84,7 +84,9 @@ namespace libguarded {
             using pointer = const T*;
             using element_type = const T;
 
-            explicit read_handle(const T* ptr): m_ptr(ptr), m_accessed(false) {}
+            explicit read_handle(const T* ptr) : m_ptr(ptr), m_accessed(false)
+            {
+            }
 
             ~read_handle()
             {
@@ -125,7 +127,7 @@ namespace libguarded {
 
     template<typename T>
     template<typename... Us>
-    rcu_guarded<T>::rcu_guarded(Us&&... data): m_obj(std::forward<Us>(data)...)
+    rcu_guarded<T>::rcu_guarded(Us&&... data) : m_obj(std::forward<Us>(data)...)
     {
     }
 
@@ -142,9 +144,10 @@ namespace libguarded {
     }
 
     template<typename T>
-    rcu_guarded<T>::write_handle::write_handle(T* ptr): m_ptr(ptr), m_accessed(false)
+    rcu_guarded<T>::write_handle::write_handle(T* ptr) :
+        m_ptr(ptr), m_accessed(false)
     {
     }
-} // namespace libguarded
+}  // namespace libguarded
 
-} // namespace gmlc
+}  // namespace gmlc

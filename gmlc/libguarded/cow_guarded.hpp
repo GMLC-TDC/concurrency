@@ -144,7 +144,7 @@ namespace libguarded {
           public:
             using pointer = T*;
 
-            deleter(std::unique_lock<Mutex>&& lock, cow_guarded& guarded):
+            deleter(std::unique_lock<Mutex>&& lock, cow_guarded& guarded) :
                 m_lock(std::move(lock)), m_guarded(guarded), m_cancelled(false)
             {
             }
@@ -166,7 +166,9 @@ namespace libguarded {
                     std::shared_ptr<const T> newPtr(ptr);
 
                     m_guarded.m_data.modify(
-                        [newPtr](std::shared_ptr<const T>& sptr) { sptr = newPtr; });
+                        [newPtr](std::shared_ptr<const T>& sptr) {
+                            sptr = newPtr;
+                        });
                 }
 
                 if (m_lock.owns_lock()) {
@@ -184,7 +186,7 @@ namespace libguarded {
         /**
        The handle class for cow_guarded is moveable but not copyable.
      */
-        class handle: public std::unique_ptr<T, deleter> {
+        class handle : public std::unique_ptr<T, deleter> {
           public:
             using std::unique_ptr<T, deleter>::unique_ptr;
 
@@ -206,7 +208,7 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename... Us>
-    cow_guarded<T, M>::cow_guarded(Us&&... data):
+    cow_guarded<T, M>::cow_guarded(Us&&... data) :
         m_data(std::make_shared<T>(std::forward<Us>(data)...))
     {
     }
@@ -297,7 +299,8 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename Duration>
-    auto cow_guarded<T, M>::try_lock_shared_for(const Duration& duration) const -> shared_handle
+    auto cow_guarded<T, M>::try_lock_shared_for(const Duration& duration) const
+        -> shared_handle
     {
         shared_handle retval;
 
@@ -311,7 +314,8 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename TimePoint>
-    auto cow_guarded<T, M>::try_lock_shared_until(const TimePoint& timepoint) const -> shared_handle
+    auto cow_guarded<T, M>::try_lock_shared_until(
+        const TimePoint& timepoint) const -> shared_handle
     {
         shared_handle retval;
 
@@ -322,6 +326,6 @@ namespace libguarded {
 
         return retval;
     }
-} // namespace libguarded
+}  // namespace libguarded
 
-} // namespace gmlc
+}  // namespace gmlc

@@ -1,8 +1,8 @@
 /*
 Copyright (c) 2017-2022,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
-additional details. All rights reserved.
-SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
@@ -16,7 +16,7 @@ namespace concurrency {
 
     class Latch {
       public:
-        explicit Latch(int start): counter_{start} {}
+        explicit Latch(int start) : counter_{start} {}
         /** arrive at a synchronization point (non_blocking)*/
         void arrive()
         {
@@ -48,5 +48,5 @@ namespace concurrency {
         std::condition_variable cv;
         std::atomic<int> counter_;
     };
-} // namespace concurrency
-} // namespace gmlc
+}  // namespace concurrency
+}  // namespace gmlc

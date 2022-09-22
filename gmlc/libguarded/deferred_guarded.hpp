@@ -10,12 +10,12 @@
  *
  ***********************************************************************/
 
- /*
- Copyright (c) 2017-2022,
- Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
- additional details. All rights reserved.
- SPDX-License-Identifier: BSD-3-Clause
- */
+/*
+Copyright (c) 2017-2022,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+*/
 
 /*
 modified to use handle object instead of unique_ptr deleters
@@ -63,9 +63,11 @@ namespace libguarded {
     };
     /// class to contain a void packaged task
     template<typename T>
-    class void_runner: public task_runner<T> {
+    class void_runner : public task_runner<T> {
       public:
-        void_runner(std::packaged_task<void(T&)>&& tsk): task(std::move(tsk)) {}
+        void_runner(std::packaged_task<void(T&)>&& tsk) : task(std::move(tsk))
+        {
+        }
         virtual void run_task(T& obj) { task.lock()->operator()(obj); }
         std::future<void> get_future() { return task.lock()->get_future(); }
 
@@ -75,9 +77,9 @@ namespace libguarded {
 
     /// class to contain a typed return packaged task
     template<typename T, typename Ret>
-    class type_runner: public task_runner<T> {
+    class type_runner : public task_runner<T> {
       public:
-        type_runner(std::packaged_task<Ret(T&)>&& tsk): task(std::move(tsk)) {}
+        type_runner(std::packaged_task<Ret(T&)>&& tsk) : task(std::move(tsk)) {}
         virtual void run_task(T& obj) { task.lock()->operator()(obj); }
         std::future<Ret> get_future() { return task.lock()->get_future(); }
 
@@ -116,7 +118,7 @@ namespace libguarded {
         shared_handle try_lock_shared_until(const TimePoint& timepoint) const;
 
         /** generate a copy of the protected object
-     */
+         */
         std::enable_if_t<std::is_copy_constructible<T>::value, T> load() const
         {
             auto handle = lock_shared();
@@ -131,12 +133,13 @@ namespace libguarded {
         mutable M m_mutex;
 
         mutable std::atomic<bool> m_pendingWrites;
-        mutable guarded<std::vector<std::unique_ptr<task_runner<T>>>> m_pendingList;
+        mutable guarded<std::vector<std::unique_ptr<task_runner<T>>>>
+            m_pendingList;
     };
 
     template<typename T, typename M>
     template<typename... Us>
-    deferred_guarded<T, M>::deferred_guarded(Us&&... data):
+    deferred_guarded<T, M>::deferred_guarded(Us&&... data) :
         m_obj(std::forward<Us>(data)...), m_pendingWrites(false)
     {
     }
@@ -151,16 +154,16 @@ namespace libguarded {
             do_pending_writes_internal();
             func(m_obj);
         } else {
-            auto vtask = std::unique_ptr<void_runner<T>>(
-                new void_runner<T>(std::packaged_task<void(T&)>(std::forward<Func>(func))));
+            auto vtask = std::unique_ptr<void_runner<T>>(new void_runner<T>(
+                std::packaged_task<void(T&)>(std::forward<Func>(func))));
             m_pendingList.lock()->emplace_back(std::move(vtask));
             m_pendingWrites.store(true);
         }
     }
 
     template<typename Ret, typename Func, typename T>
-    auto call_returning_future(Func& func, T& data) ->
-        typename std::enable_if<!std::is_same<Ret, void>::value, std::future<Ret>>::type
+    auto call_returning_future(Func& func, T& data) -> typename std::
+        enable_if<!std::is_same<Ret, void>::value, std::future<Ret>>::type
     {
         std::promise<Ret> promise;
 
@@ -175,8 +178,8 @@ namespace libguarded {
     }
 
     template<typename Ret, typename Func, typename T>
-    auto call_returning_future(Func& func, T& data) ->
-        typename std::enable_if<std::is_same<Ret, void>::value, std::future<Ret>>::type
+    auto call_returning_future(Func& func, T& data) -> typename std::
+        enable_if<std::is_same<Ret, void>::value, std::future<Ret>>::type
     {
         std::promise<Ret> promise;
 
@@ -196,8 +199,8 @@ namespace libguarded {
         std::is_same<Ret, void>::value,
         std::pair<std::unique_ptr<task_runner<T>>, std::future<void>>>::type
     {
-        auto vtask = std::unique_ptr<void_runner<T>>(
-            new void_runner<T>(std::packaged_task<void(T&)>(std::forward<Func>(func))));
+        auto vtask = std::unique_ptr<void_runner<T>>(new void_runner<T>(
+            std::packaged_task<void(T&)>(std::forward<Func>(func))));
         std::future<void> task_future(vtask->get_future());
         return {std::move(vtask), std::move(task_future)};
     }
@@ -207,8 +210,9 @@ namespace libguarded {
         !std::is_same<Ret, void>::value,
         std::pair<std::unique_ptr<task_runner<T>>, std::future<Ret>>>::type
     {
-        auto ttask = std::unique_ptr<type_runner<T, Ret>>(
-            new type_runner<T, Ret>(std::packaged_task<Ret(T&)>(std::forward<Func>(func))));
+        auto ttask =
+            std::unique_ptr<type_runner<T, Ret>>(new type_runner<T, Ret>(
+                std::packaged_task<Ret(T&)>(std::forward<Func>(func))));
         std::future<Ret> task_future(ttask->get_future());
         return {std::move(ttask), std::move(task_future)};
     }
@@ -282,7 +286,8 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename Duration>
-    auto deferred_guarded<T, M>::try_lock_shared_for(const Duration& d) const -> shared_handle
+    auto deferred_guarded<T, M>::try_lock_shared_for(const Duration& d) const
+        -> shared_handle
     {
         do_pending_writes();
         return try_lock_shared_handle_for(&m_obj, m_mutex, d);
@@ -290,11 +295,13 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename TimePoint>
-    auto deferred_guarded<T, M>::try_lock_shared_until(const TimePoint& tp) const -> shared_handle
+    auto
+        deferred_guarded<T, M>::try_lock_shared_until(const TimePoint& tp) const
+        -> shared_handle
     {
         do_pending_writes();
         return try_lock_shared_handle_until(&m_obj, m_mutex, tp);
     }
-} // namespace libguarded
+}  // namespace libguarded
 
-} // namespace gmlc
+}  // namespace gmlc

@@ -1,8 +1,8 @@
 /*
 Copyright (c) 2017-2022,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
-additional details. All rights reserved.
-SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 /***********************************************************************
@@ -135,23 +135,26 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename... Us>
-    staged_guarded<T, M>::staged_guarded(Us&&... data): m_obj(std::forward<Us>(data)...)
+    staged_guarded<T, M>::staged_guarded(Us&&... data) :
+        m_obj(std::forward<Us>(data)...)
     {
     }
 
     template<typename T, typename M>
     auto staged_guarded<T, M>::lock() -> handle
     {
-        std::unique_lock<M> lock = (constant) ? std::unique_lock<M>(m_mutex, std::defer_lock) :
-                                                std::unique_lock<M>(m_mutex);
+        std::unique_lock<M> lock = (constant) ?
+            std::unique_lock<M>(m_mutex, std::defer_lock) :
+            std::unique_lock<M>(m_mutex);
         return handle(&m_obj, std::move(lock));
     }
 
     template<typename T, typename M>
     auto staged_guarded<T, M>::lock() const -> shared_handle
     {
-        std::unique_lock<M> lock = (constant) ? std::unique_lock<M>(m_mutex, std::defer_lock) :
-                                                std::unique_lock<M>(m_mutex);
+        std::unique_lock<M> lock = (constant) ?
+            std::unique_lock<M>(m_mutex, std::defer_lock) :
+            std::unique_lock<M>(m_mutex);
         return shared_handle(&m_obj, std::move(lock));
     }
 
@@ -159,7 +162,8 @@ namespace libguarded {
     auto staged_guarded<T, M>::lock_shared() const -> shared_handle
     {
         using locktype = typename shared_lock_handle<T, M>::locker_type;
-        auto lock = (constant) ? locktype(m_mutex, std::defer_lock) : locktype(m_mutex);
+        auto lock =
+            (constant) ? locktype(m_mutex, std::defer_lock) : locktype(m_mutex);
         return shared_handle(&m_obj, std::move(lock));
     }
 
@@ -169,7 +173,8 @@ namespace libguarded {
         if (!constant) {
             try_lock_handle(&m_obj, m_mutex);
         } else {
-            return handle(&m_obj, std::unique_lock<M>(m_mutex, std::defer_lock));
+            return handle(
+                &m_obj, std::unique_lock<M>(m_mutex, std::defer_lock));
         }
     }
 
@@ -191,7 +196,8 @@ namespace libguarded {
         if (!constant) {
             try_lock_handle_for(&m_obj, m_mutex, d);
         } else {
-            return handle(&m_obj, std::unique_lock<M>(m_mutex, std::defer_lock));
+            return handle(
+                &m_obj, std::unique_lock<M>(m_mutex, std::defer_lock));
         }
     }
 
@@ -202,13 +208,15 @@ namespace libguarded {
         if (!constant) {
             try_lock_handle_until(&m_obj, m_mutex, tp);
         } else {
-            return handle(&m_obj, std::unique_lock<M>(m_mutex, std::defer_lock));
+            return handle(
+                &m_obj, std::unique_lock<M>(m_mutex, std::defer_lock));
         }
     }
 
     template<typename T, typename M>
     template<typename Duration>
-    auto staged_guarded<T, M>::try_lock_shared_for(const Duration& d) const -> shared_handle
+    auto staged_guarded<T, M>::try_lock_shared_for(const Duration& d) const
+        -> shared_handle
     {
         if (!constant) {
             try_lock_shared_handle_for(&m_obj, m_mutex, d);
@@ -220,7 +228,8 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename TimePoint>
-    auto staged_guarded<T, M>::try_lock_shared_until(const TimePoint& tp) const -> shared_handle
+    auto staged_guarded<T, M>::try_lock_shared_until(const TimePoint& tp) const
+        -> shared_handle
     {
         if (!constant) {
             try_lock_shared_handle_until(&m_obj, m_mutex, tp);
@@ -230,6 +239,6 @@ namespace libguarded {
         }
     }
 
-} // namespace libguarded
+}  // namespace libguarded
 
-} // namespace gmlc
+}  // namespace gmlc

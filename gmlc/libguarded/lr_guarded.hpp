@@ -105,7 +105,10 @@ namespace libguarded {
             shared_deleter(const shared_deleter&) = delete;
             shared_deleter(shared_deleter&&) = default;
 
-            explicit shared_deleter(std::atomic<int>& readingCount): m_readingCount(readingCount) {}
+            explicit shared_deleter(std::atomic<int>& readingCount) :
+                m_readingCount(readingCount)
+            {
+            }
 
             void operator()(const T* ptr)
             {
@@ -129,7 +132,7 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename... Us>
-    lr_guarded<T, M>::lr_guarded(Us&&... data):
+    lr_guarded<T, M>::lr_guarded(Us&&... data) :
         m_left(std::forward<Us>(data)...), m_right(m_left), m_readingLeft(true),
         m_countingLeft(true), m_leftReadCount(0), m_rightReadCount(0)
     {
@@ -214,7 +217,8 @@ namespace libguarded {
             if (m_readingLeft) {
                 return shared_handle(&m_left, shared_deleter(m_rightReadCount));
             } else {
-                return shared_handle(&m_right, shared_deleter(m_rightReadCount));
+                return shared_handle(
+                    &m_right, shared_deleter(m_rightReadCount));
             }
         }
     }
@@ -227,17 +231,18 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename Duration>
-    auto lr_guarded<T, M>::try_lock_shared_for(const Duration& /*duration*/) const -> shared_handle
+    auto lr_guarded<T, M>::try_lock_shared_for(
+        const Duration& /*duration*/) const -> shared_handle
     {
         return lock_shared();
     }
 
     template<typename T, typename M>
     template<typename TimePoint>
-    auto lr_guarded<T, M>::try_lock_shared_until(const TimePoint& /*timepoint*/) const
-        -> shared_handle
+    auto lr_guarded<T, M>::try_lock_shared_until(
+        const TimePoint& /*timepoint*/) const -> shared_handle
     {
         return lock_shared();
     }
-} // namespace libguarded
-} // namespace gmlc
+}  // namespace libguarded
+}  // namespace gmlc

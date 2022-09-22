@@ -1,13 +1,13 @@
 /*
 Copyright (c) 2017-2022,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
-additional details. All rights reserved.
-SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 #ifdef ENABLE_TRIPWIRE
-#    include "TripWire.hpp"
+#include "TripWire.hpp"
 #endif
 
 #include <algorithm>
@@ -36,7 +36,8 @@ namespace concurrency {
 
       public:
         DelayedDestructor() = default;
-        explicit DelayedDestructor(std::function<void(std::shared_ptr<X>& ptr)> callFirst):
+        explicit DelayedDestructor(
+            std::function<void(std::shared_ptr<X>& ptr)> callFirst) :
             callBeforeDeleteFunction(std::move(callFirst))
         {
         }
@@ -59,7 +60,8 @@ namespace concurrency {
                             break;
                         }
                         if (ii % 2 == 0) {
-                            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                            std::this_thread::sleep_for(
+                                std::chrono::milliseconds(100));
                         } else {
                             std::this_thread::yield();
                         }
@@ -87,9 +89,9 @@ namespace concurrency {
                         }
                     }
                     if (!ename.empty()) {
-                        // so apparently remove_if can actually call the destructor
-                        // for shared_ptrs so the call function needs to be before
-                        // this call
+                        // so apparently remove_if can actually call the
+                        // destructor for shared_ptrs so the call function needs
+                        // to be before this call
                         auto loc = std::remove_if(
                             ElementsToBeDestroyed.begin(),
                             ElementsToBeDestroyed.end(),
@@ -97,22 +99,26 @@ namespace concurrency {
                                 return (
                                     (element.use_count() == 2) &&
                                     (std::find(
-                                         ename.begin(), ename.end(), element->getIdentifier()) !=
+                                         ename.begin(),
+                                         ename.end(),
+                                         element->getIdentifier()) !=
                                      ename.end()));
                             });
-                        ElementsToBeDestroyed.erase(loc, ElementsToBeDestroyed.end());
+                        ElementsToBeDestroyed.erase(
+                            loc, ElementsToBeDestroyed.end());
                         auto deleteFunc = callBeforeDeleteFunction;
                         lock.unlock();
-                        // this needs to be done after the lock, so a destructor can
-                        // never called while under the lock
+                        // this needs to be done after the lock, so a destructor
+                        // can never called while under the lock
                         if (deleteFunc) {
                             for (auto& element : ecall) {
                                 deleteFunc(element);
                             }
                         }
-                        ecall.clear(); // make sure the destructors get called
-                            // before returning.
-                        lock.lock(); // reengage the lock so the size is correct
+                        ecall.clear();  // make sure the destructors get called
+                                        // before returning.
+                        lock.lock();  // reengage the lock so the size is
+                                      // correct
                     }
                 }
             }
@@ -126,11 +132,12 @@ namespace concurrency {
             using namespace std::literals::chrono_literals;
             std::unique_lock<std::mutex> lock(destructionLock);
             auto delayTime = (delay < 100ms) ? delay : 50ms;
-            int delayCount = (delay < 100ms) ? 1 : static_cast<int>((delay / 50).count());
+            int delayCount =
+                (delay < 100ms) ? 1 : static_cast<int>((delay / 50).count());
 
             int cnt = 0;
             while ((!ElementsToBeDestroyed.empty()) && (cnt < delayCount)) {
-                if (cnt > 0) // don't sleep on the first loop
+                if (cnt > 0)  // don't sleep on the first loop
                 {
                     lock.unlock();
                     std::this_thread::sleep_for(delayTime);
@@ -156,5 +163,5 @@ namespace concurrency {
         }
     };
 
-} // namespace concurrency
-} // namespace gmlc
+}  // namespace concurrency
+}  // namespace gmlc

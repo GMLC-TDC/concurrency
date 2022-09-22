@@ -10,12 +10,12 @@
  *
  ***********************************************************************/
 
- /*
- Copyright (c) 2017-2022,
- Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
- additional details. All rights reserved.
- SPDX-License-Identifier: BSD-3-Clause
- */
+/*
+Copyright (c) 2017-2022,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+*/
 /*
 this file is not in the original libguarded
 */
@@ -45,15 +45,16 @@ namespace libguarded {
      constructor of T.
     */
         template<typename... Us>
-        explicit atomic_guarded(Us&&... data): m_obj(std::forward<Us>(data)...)
+        explicit atomic_guarded(Us&&... data) : m_obj(std::forward<Us>(data)...)
         {
             static_assert(
-                std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value,
+                std::is_copy_constructible<T>::value &&
+                    std::is_copy_assignable<T>::value,
                 "classes used must be copy constructible and assignable");
         }
 
         /** generate a copy of the protected object
-     */
+         */
         T load() const
         {
             std::lock_guard<M> glock(m_mutex);
@@ -63,7 +64,7 @@ namespace libguarded {
         /** store an updated value into the object*/
         template<typename objType>
         void store(objType&& newObj)
-        { // uses a forwarding reference
+        {  // uses a forwarding reference
             std::lock_guard<M> glock(m_mutex);
             m_obj = std::forward<objType>(newObj);
         }
@@ -71,7 +72,7 @@ namespace libguarded {
         /** store an updated value into the object*/
         template<typename objType>
         atomic_guarded& operator=(objType&& newObj)
-        { // uses a forwarding reference
+        {  // uses a forwarding reference
             std::lock_guard<M> glock(m_mutex);
             m_obj = std::forward<objType>(newObj);
             return *this;
@@ -84,7 +85,8 @@ namespace libguarded {
             return m_obj;
         }
 
-        /** exchange the current object and replace it with the specified object*/
+        /** exchange the current object and replace it with the specified
+         * object*/
         T exchange(T newValue)
         {
             std::lock_guard<M> glock(m_mutex);
@@ -110,9 +112,9 @@ namespace libguarded {
         }
 
       private:
-        T m_obj; //!< primary object
-        mutable M m_mutex; //!< mutex protecting object
+        T m_obj;  //!< primary object
+        mutable M m_mutex;  //!< mutex protecting object
     };
 
-} // namespace libguarded
-} // namespace gmlc
+}  // namespace libguarded
+}  // namespace gmlc

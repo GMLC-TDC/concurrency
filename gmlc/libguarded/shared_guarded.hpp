@@ -10,12 +10,12 @@
  *
  ***********************************************************************/
 
- /*
- Copyright (c) 2017-2022,
- Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
- additional details. All rights reserved.
- SPDX-License-Identifier: BSD-3-Clause
- */
+/*
+Copyright (c) 2017-2022,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+*/
 /*
 additions include overloads for std::mutex and std::timed_mutex
 */
@@ -85,7 +85,8 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename... Us>
-    shared_guarded<T, M>::shared_guarded(Us&&... data): m_obj(std::forward<Us>(data)...)
+    shared_guarded<T, M>::shared_guarded(Us&&... data) :
+        m_obj(std::forward<Us>(data)...)
     {
     }
 
@@ -116,7 +117,8 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename TimePoint>
-    auto shared_guarded<T, M>::try_lock_until(const TimePoint& timepoint) -> handle
+    auto shared_guarded<T, M>::try_lock_until(const TimePoint& timepoint)
+        -> handle
     {
         return try_lock_handle_until(&m_obj, m_mutex, timepoint);
     }
@@ -135,16 +137,18 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename Duration>
-    auto shared_guarded<T, M>::try_lock_shared_for(const Duration& d) const -> shared_handle
+    auto shared_guarded<T, M>::try_lock_shared_for(const Duration& d) const
+        -> shared_handle
     {
         return try_lock_shared_handle_for(&m_obj, m_mutex, d);
     }
 
     template<typename T, typename M>
     template<typename TimePoint>
-    auto shared_guarded<T, M>::try_lock_shared_until(const TimePoint& tp) const -> shared_handle
+    auto shared_guarded<T, M>::try_lock_shared_until(const TimePoint& tp) const
+        -> shared_handle
     {
         return try_lock_shared_handle_until(&m_obj, m_mutex, tp);
     }
-} // namespace libguarded
-} // namespace gmlc
+}  // namespace libguarded
+}  // namespace gmlc

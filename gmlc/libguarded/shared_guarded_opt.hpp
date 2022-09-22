@@ -10,12 +10,12 @@
  *
  ***********************************************************************/
 
- /*
- Copyright (c) 2017-2022,
- Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
- additional details. All rights reserved.
- SPDX-License-Identifier: BSD-3-Clause
- */
+/*
+Copyright (c) 2017-2022,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+*/
 
 /*
 this entire file was added to the library to meet a need of a shared type where
@@ -56,7 +56,10 @@ namespace libguarded {
         using shared_handle = shared_lock_handle<T, M>;
 
       public:
-        explicit shared_guarded_opt(bool enableLocking = true): enabled(enableLocking) {}
+        explicit shared_guarded_opt(bool enableLocking = true) :
+            enabled(enableLocking)
+        {
+        }
         template<typename... Us>
         shared_guarded_opt(bool enableLocking, Us&&... data);
 
@@ -89,33 +92,40 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename... Us>
-    shared_guarded_opt<T, M>::shared_guarded_opt(bool enableLocking, Us&&... data):
-        m_obj(std::forward<Us>(data)...), enabled(enableLocking)
+    shared_guarded_opt<T, M>::shared_guarded_opt(
+        bool enableLocking,
+        Us&&... data) :
+        m_obj(std::forward<Us>(data)...),
+        enabled(enableLocking)
     {
     }
 
     template<typename T, typename M>
     auto shared_guarded_opt<T, M>::lock() -> handle
     {
-        return (enabled) ? handle(&m_obj, m_mutex) : handle(&m_obj, std::unique_lock<M>());
+        return (enabled) ? handle(&m_obj, m_mutex) :
+                           handle(&m_obj, std::unique_lock<M>());
     }
 
     template<typename T, typename M>
     auto shared_guarded_opt<T, M>::lock() const -> shared_handle
     {
-        return (enabled) ? shared_handle(&m_obj, m_mutex) :
-                           shared_handle(&m_obj, shared_locker<M>::locker_type());
+        return (enabled) ?
+            shared_handle(&m_obj, m_mutex) :
+            shared_handle(&m_obj, shared_locker<M>::locker_type());
     }
 
     template<typename T, typename M>
     auto shared_guarded_opt<T, M>::try_lock() -> handle
     {
-        return (enabled) ? try_lock_handle(&m_obj, m_mutex) : handle(&m_obj, std::unique_lock<M>());
+        return (enabled) ? try_lock_handle(&m_obj, m_mutex) :
+                           handle(&m_obj, std::unique_lock<M>());
     }
 
     template<typename T, typename M>
     template<typename Duration>
-    auto shared_guarded_opt<T, M>::try_lock_for(const Duration& duration) -> handle
+    auto shared_guarded_opt<T, M>::try_lock_for(const Duration& duration)
+        -> handle
     {
         return (enabled) ? try_lock_handle_for(&m_obj, m_mutex, duration) :
                            handle(&m_obj, std::unique_lock<M>());
@@ -123,7 +133,8 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename TimePoint>
-    auto shared_guarded_opt<T, M>::try_lock_until(const TimePoint& timepoint) -> handle
+    auto shared_guarded_opt<T, M>::try_lock_until(const TimePoint& timepoint)
+        -> handle
     {
         return (enabled) ? try_lock_handle_until(&m_obj, m_mutex, timepoint) :
                            handle(&m_obj, std::unique_lock<M>());
@@ -132,31 +143,37 @@ namespace libguarded {
     template<typename T, typename M>
     auto shared_guarded_opt<T, M>::lock_shared() const -> shared_handle
     {
-        return (enabled) ? shared_handle(&m_obj, m_mutex) :
-                           shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
+        return (enabled) ?
+            shared_handle(&m_obj, m_mutex) :
+            shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
     }
 
     template<typename T, typename M>
     auto shared_guarded_opt<T, M>::try_lock_shared() const -> shared_handle
     {
-        return (enabled) ? try_lock_shared_handle(&m_obj, m_mutex) :
-                           shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
+        return (enabled) ?
+            try_lock_shared_handle(&m_obj, m_mutex) :
+            shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
     }
 
     template<typename T, typename M>
     template<typename Duration>
-    auto shared_guarded_opt<T, M>::try_lock_shared_for(const Duration& d) const -> shared_handle
+    auto shared_guarded_opt<T, M>::try_lock_shared_for(const Duration& d) const
+        -> shared_handle
     {
-        return (enabled) ? try_lock_shared_handle_for(&m_obj, m_mutex, d) :
-                           shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
+        return (enabled) ?
+            try_lock_shared_handle_for(&m_obj, m_mutex, d) :
+            shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
     }
 
     template<typename T, typename M>
     template<typename TimePoint>
-    auto shared_guarded_opt<T, M>::try_lock_shared_until(const TimePoint& tp) const -> shared_handle
+    auto shared_guarded_opt<T, M>::try_lock_shared_until(
+        const TimePoint& tp) const -> shared_handle
     {
-        return (enabled) ? try_lock_shared_handle_until(&m_obj, m_mutex, tp) :
-                           shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
+        return (enabled) ?
+            try_lock_shared_handle_until(&m_obj, m_mutex, tp) :
+            shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
     }
-} // namespace libguarded
-} // namespace gmlc
+}  // namespace libguarded
+}  // namespace gmlc

@@ -74,8 +74,8 @@ option(GMLC_CONCURRENCY_TEST "Enable tests for the concurrency library" ON)
 #option(GMLC_CONCURRENCY_BENCHMARK "Enable benchmarks for the concurrency library" ON)
 
 if (GMLC_CONCURRENCY_TEST)
-	enable_testing()
-	add_subdirectory(tests)
+    enable_testing()
+    add_subdirectory(tests)
 endif()
 
 if (GMLC_CONCURRENCY_BENCHMARK)
@@ -90,8 +90,8 @@ endif()
 option(GMLC_CONCURRENCY_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
 if(GMLC_CONCURRENCY_GENERATE_DOXYGEN_DOC)
-	find_package(Doxygen)
-	if(DOXYGEN_FOUND)
+    find_package(Doxygen)
+    if(DOXYGEN_FOUND)
 
     show_variable(
       DOXYGEN_OUTPUT_DIR
@@ -105,11 +105,9 @@ if(GMLC_CONCURRENCY_GENERATE_DOXYGEN_DOC)
     )
     add_custom_target(
       gmlc_concurrency_doc ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
-			WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
+            WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
       COMMENT "Generating GMLC CONCURRENCY documentation with Doxygen"
       VERBATIM
-		)
-	endif(DOXYGEN_FOUND)
+        )
+    endif(DOXYGEN_FOUND)
 endif(GMLC_CONCURRENCY_GENERATE_DOXYGEN_DOC)
-
-

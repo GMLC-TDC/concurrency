@@ -10,21 +10,21 @@
  *
  ***********************************************************************/
 
- /*
- Copyright (c) 2017-2022,
- Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
- additional details. All rights reserved.
- SPDX-License-Identifier: BSD-3-Clause
- */
+/*
+Copyright (c) 2017-2022,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+*/
 /*
 modified to use google test
 */
 #include "gtest/gtest.h"
+#include <algorithm>
 #include <iostream>
 #include <libguarded/rcu_guarded.hpp>
 #include <libguarded/rcu_list.hpp>
 #include <thread>
-#include <algorithm>
 
 using namespace gmlc::libguarded;
 
@@ -153,7 +153,7 @@ TEST(rcu_guarded, rcu_guarded_1)
 // allocation events recorded by mock_allocator
 struct event {
     size_t size;
-    bool allocated; // true for allocate(), false for deallocate()
+    bool allocated;  // true for allocate(), false for deallocate()
 };
 using event_log = std::vector<event>;
 
@@ -164,14 +164,14 @@ class mock_allocator {
   public:
     using value_type = T;
 
-    explicit mock_allocator(event_log* elog): log(elog) {}
-    mock_allocator(const mock_allocator& other): log(other.log) {}
+    explicit mock_allocator(event_log* elog) : log(elog) {}
+    mock_allocator(const mock_allocator& other) : log(other.log) {}
 
     // converting copy constructor (requires friend)
     template<typename>
     friend class mock_allocator;
     template<typename U>
-    explicit mock_allocator(const mock_allocator<U>& other): log(other.log)
+    explicit mock_allocator(const mock_allocator<U>& other) : log(other.log)
     {
     }
 
@@ -205,9 +205,9 @@ TEST(rcu_guarded, rcu_guarded_allocator)
         mock_allocator<T> alloc{&log};
         rcu_guarded<rcu_list<T, std::mutex, mock_allocator<T>>> my_list(alloc);
 
-        auto h = my_list.lock_write(); // allocates zombie
-        h->emplace_back(); // allocates node
-        h->erase(h->begin()); // allocates zombie
+        auto h = my_list.lock_write();  // allocates zombie
+        h->emplace_back();  // allocates node
+        h->erase(h->begin());  // allocates zombie
 
         // expect 3 allocations, two of which are zombies. just count events,
         // don't make assumptions about ordering

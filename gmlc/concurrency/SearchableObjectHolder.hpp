@@ -1,13 +1,13 @@
 /*
 Copyright (c) 2017-2022,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
-additional details. All rights reserved.
-SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 #ifdef ENABLE_TRIPWIRE
-#    include "TripWire.hpp"
+#include "TripWire.hpp"
 #endif
 #include <algorithm>
 #include <functional>
@@ -20,8 +20,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace gmlc {
 namespace concurrency {
-    /** helper class to contain a list of objects that need to be referencable at
- * some level the objects are stored through shared_ptrs*/
+    /** helper class to contain a list of objects that need to be referencable
+     * at some level the objects are stored through shared_ptrs*/
     template<class X, class Y = int>
     class SearchableObjectHolder {
       private:
@@ -35,7 +35,8 @@ namespace concurrency {
         SearchableObjectHolder() = default;
         // class is not movable
         SearchableObjectHolder(SearchableObjectHolder&&) noexcept = delete;
-        SearchableObjectHolder& operator=(SearchableObjectHolder&&) noexcept = delete;
+        SearchableObjectHolder&
+            operator=(SearchableObjectHolder&&) noexcept = delete;
         ~SearchableObjectHolder()
         {
 #ifdef ENABLE_TRIPWIRE
@@ -126,8 +127,9 @@ namespace concurrency {
         }
 
         /** remove an object if it matches a certain criteria as given by the
-     * function operator*/
-        bool removeObject(std::function<bool(const std::shared_ptr<X>&)> operand)
+         * function operator*/
+        bool
+            removeObject(std::function<bool(const std::shared_ptr<X>&)> operand)
         {
             std::lock_guard<std::mutex> lock(mapLock);
             for (auto obj = objectMap.begin(); obj != objectMap.end(); ++obj) {
@@ -143,13 +145,16 @@ namespace concurrency {
             return false;
         }
 
-        bool copyObject(const std::string& copyFromName, const std::string& copyToName)
+        bool copyObject(
+            const std::string& copyFromName,
+            const std::string& copyToName)
         {
             std::lock_guard<std::mutex> lock(mapLock);
             auto fnd = objectMap.find(copyFromName);
             if (fnd != objectMap.end()) {
                 auto newObjectPtr = fnd->second;
-                auto ret = objectMap.emplace(copyToName, std::move(newObjectPtr));
+                auto ret =
+                    objectMap.emplace(copyToName, std::move(newObjectPtr));
                 if (ret.second) {
                     auto fnd2 = typeMap.find(fnd->first);
                     if (fnd2 != typeMap.end()) {
@@ -162,19 +167,19 @@ namespace concurrency {
             return false;
         }
         /** check if an object is of a specific type*/
-        bool checkObjectType(const std::string& name, Y type) const {
+        bool checkObjectType(const std::string& name, Y type) const
+        {
             std::lock_guard<std::mutex> lock(mapLock);
             auto fnd = typeMap.find(name);
-			if (fnd != typeMap.end())
-			{
-				for (auto &stype:fnd->second) {
-                    if (stype==type) {
+            if (fnd != typeMap.end()) {
+                for (auto& stype : fnd->second) {
+                    if (stype == type) {
                         return true;
-					}
-				}
-			}
+                    }
+                }
+            }
             return false;
-		}
+        }
 
         std::shared_ptr<X> findObject(const std::string& name)
         {
@@ -191,38 +196,42 @@ namespace concurrency {
             return nullptr;
         }
 
-        std::shared_ptr<X> findObject(std::function<bool(const std::shared_ptr<X>&)> operand)
+        std::shared_ptr<X>
+            findObject(std::function<bool(const std::shared_ptr<X>&)> operand)
         {
             std::lock_guard<std::mutex> lock(mapLock);
-            auto obj = std::find_if(objectMap.begin(), objectMap.end(), [&operand](auto& val) {
-                return operand(val.second);
-            });
+            auto obj = std::find_if(
+                objectMap.begin(), objectMap.end(), [&operand](auto& val) {
+                    return operand(val.second);
+                });
             if (obj != objectMap.end()) {
                 return obj->second;
             }
             return nullptr;
         }
-        /** find an object whose operand evaluates to true and matches a specific type*/
-		std::shared_ptr<X> findObject(std::function<bool(const std::shared_ptr<X>&)> operand, Y type)
+        /** find an object whose operand evaluates to true and matches a
+         * specific type*/
+        std::shared_ptr<X> findObject(
+            std::function<bool(const std::shared_ptr<X>&)> operand,
+            Y type)
         {
             std::lock_guard<std::mutex> lock(mapLock);
-            auto obj = std::find_if(objectMap.begin(), objectMap.end(), [&operand,this,type](auto& val) {
-				if (operand(val.second))
-				{
-                    auto tfind = typeMap.find(val.first);
-					if (tfind != typeMap.end())
-					{
-						for (auto &t : tfind->second)
-						{
-							if (t == type)
-							{
-                                return true;
-							}
-						}
-					}
-				}
-                return false;
-            });
+            auto obj = std::find_if(
+                objectMap.begin(),
+                objectMap.end(),
+                [&operand, this, type](auto& val) {
+                    if (operand(val.second)) {
+                        auto tfind = typeMap.find(val.first);
+                        if (tfind != typeMap.end()) {
+                            for (auto& t : tfind->second) {
+                                if (t == type) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                });
             if (obj != objectMap.end()) {
                 return obj->second;
             }
@@ -230,5 +239,5 @@ namespace concurrency {
         }
     };
 
-} // namespace concurrency
-} // namespace gmlc
+}  // namespace concurrency
+}  // namespace gmlc

@@ -39,7 +39,10 @@ namespace libguarded {
    std::recursive_mutex, std::timed_mutex, and
    std::recursive_timed_mutex.
 */
-    template<typename T, typename M = std::mutex, typename Alloc = std::allocator<T>>
+    template<
+        typename T,
+        typename M = std::mutex,
+        typename Alloc = std::allocator<T>>
     class rcu_list {
       public:
         using value_type = T;
@@ -48,7 +51,8 @@ namespace libguarded {
         using reference = value_type&;
         using const_reference = const value_type&;
         using pointer = typename std::allocator_traits<Alloc>::pointer;
-        using const_pointer = typename std::allocator_traits<Alloc>::const_pointer;
+        using const_pointer =
+            typename std::allocator_traits<Alloc>::const_pointer;
 
         class iterator;
         class const_iterator;
@@ -110,7 +114,7 @@ namespace libguarded {
             node& operator=(node&&) = delete;
 
             template<typename... Us>
-            explicit node(Us&&... vs): data(std::forward<Us>(vs)...)
+            explicit node(Us&&... vs) : data(std::forward<Us>(vs)...)
             {
             }
 
@@ -121,9 +125,9 @@ namespace libguarded {
         };
 
         struct zombie_list_node {
-            explicit zombie_list_node(node* n) noexcept: zombie_node(n) {}
+            explicit zombie_list_node(node* n) noexcept : zombie_node(n) {}
 
-            explicit zombie_list_node(rcu_guard* g) noexcept: owner(g) {}
+            explicit zombie_list_node(rcu_guard* g) noexcept : owner(g) {}
 
             // uncopyable, unmoveable
             zombie_list_node(const zombie_list_node&) = delete;
@@ -139,7 +143,8 @@ namespace libguarded {
         using alloc_trait = std::allocator_traits<Alloc>;
         using node_alloc_t = typename alloc_trait::template rebind_alloc<node>;
         using node_alloc_trait = std::allocator_traits<node_alloc_t>;
-        using zombie_alloc_t = typename alloc_trait::template rebind_alloc<zombie_list_node>;
+        using zombie_alloc_t =
+            typename alloc_trait::template rebind_alloc<zombie_list_node>;
         using zombie_alloc_trait = std::allocator_traits<zombie_alloc_t>;
 
         std::atomic<node*> m_head{nullptr};
@@ -166,7 +171,10 @@ namespace libguarded {
             allocator_type alloc;
 
           public:
-            explicit deallocator(const allocator_type& allocr) noexcept: alloc(allocr) {}
+            explicit deallocator(const allocator_type& allocr) noexcept :
+                alloc(allocr)
+            {
+            }
 
             void operator()(pointer p)
             {
@@ -177,12 +185,14 @@ namespace libguarded {
 
         // unique_ptr counterpart for std::allocate_shared()
         template<typename T, typename Alloc, typename... Args>
-        std::unique_ptr<T, deallocator<Alloc>> allocate_unique(Alloc& alloc, Args&&... args)
+        std::unique_ptr<T, deallocator<Alloc>>
+            allocate_unique(Alloc& alloc, Args&&... args)
         {
             using allocator_traits = std::allocator_traits<Alloc>;
             auto p = allocator_traits::allocate(alloc, 1);
             try {
-                allocator_traits::construct(alloc, p, std::forward<Args>(args)...);
+                allocator_traits::construct(
+                    alloc, p, std::forward<Args>(args)...);
                 return {p, deallocator<Alloc>{alloc}};
             }
             catch (...) {
@@ -191,7 +201,7 @@ namespace libguarded {
             }
         }
 
-    } // namespace detail
+    }  // namespace detail
 
     /*----------------------------------------*/
 
@@ -214,13 +224,15 @@ namespace libguarded {
     };
 
     template<typename T, typename M, typename Alloc>
-    void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_lock(const rcu_list<T, M, Alloc>& list)
+    void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_lock(
+        const rcu_list<T, M, Alloc>& list)
 
     {
         m_list = &list;
         m_zombie = zombie_alloc_trait::allocate(list.m_zombie_alloc, 1);
         zombie_alloc_trait::construct(list.m_zombie_alloc, m_zombie, this);
-        zombie_list_node* oldNext = list.m_zombie_head.load(std::memory_order_relaxed);
+        zombie_list_node* oldNext =
+            list.m_zombie_head.load(std::memory_order_relaxed);
 
         do {
             m_zombie->next.store(oldNext, std::memory_order_relaxed);
@@ -228,7 +240,8 @@ namespace libguarded {
     }
 
     template<typename T, typename M, typename Alloc>
-    void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_unlock(const rcu_list<T, M, Alloc>&)
+    void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_unlock(
+        const rcu_list<T, M, Alloc>&)
     {
         unlock();
     }
@@ -261,7 +274,8 @@ namespace libguarded {
                 zombie_list_node* oldnode = n;
                 n = n->next.load();
                 zombie_alloc_trait::destroy(m_list->m_zombie_alloc, oldnode);
-                zombie_alloc_trait::deallocate(m_list->m_zombie_alloc, oldnode, 1);
+                zombie_alloc_trait::deallocate(
+                    m_list->m_zombie_alloc, oldnode, 1);
             }
 
             m_zombie->next.store(n);
@@ -271,13 +285,15 @@ namespace libguarded {
     }
 
     template<typename T, typename M, typename Alloc>
-    void rcu_list<T, M, Alloc>::rcu_guard::rcu_write_lock(const rcu_list<T, M, Alloc>& list)
+    void rcu_list<T, M, Alloc>::rcu_guard::rcu_write_lock(
+        const rcu_list<T, M, Alloc>& list)
     {
         rcu_read_lock(list);
     }
 
     template<typename T, typename M, typename Alloc>
-    void rcu_list<T, M, Alloc>::rcu_guard::rcu_write_unlock(const rcu_list<T, M, Alloc>& list)
+    void rcu_list<T, M, Alloc>::rcu_guard::rcu_write_unlock(
+        const rcu_list<T, M, Alloc>& list)
     {
         rcu_read_unlock(list);
     }
@@ -293,15 +309,21 @@ namespace libguarded {
         using reference = const T&;
         using difference_type = size_t;
 
-        iterator(): m_current(nullptr) {}
+        iterator() : m_current(nullptr) {}
 
         const T& operator*() const { return m_current->data; }
 
         const T* operator->() const { return &(m_current->data); }
 
-        bool operator==(const end_iterator&) const { return m_current == nullptr; }
+        bool operator==(const end_iterator&) const
+        {
+            return m_current == nullptr;
+        }
 
-        bool operator!=(const end_iterator&) const { return m_current != nullptr; }
+        bool operator!=(const end_iterator&) const
+        {
+            return m_current != nullptr;
+        }
 
         iterator& operator++()
         {
@@ -333,12 +355,13 @@ namespace libguarded {
         friend rcu_list<T, M, Alloc>;
         friend rcu_list<T, M, Alloc>::const_iterator;
 
-        explicit iterator(const typename rcu_list<T, M, Alloc>::const_iterator& it):
+        explicit iterator(
+            const typename rcu_list<T, M, Alloc>::const_iterator& it) :
             m_current(it.m_current)
         {
         }
 
-        explicit iterator(node* n): m_current(n) {}
+        explicit iterator(node* n) : m_current(n) {}
 
         node* m_current;
     };
@@ -354,18 +377,24 @@ namespace libguarded {
         using reference = const T&;
         using difference_type = size_t;
 
-        const_iterator(): m_current(nullptr){};
+        const_iterator() : m_current(nullptr){};
         /* implicit */
-        const_iterator(const typename rcu_list<T, M, Alloc>::iterator& it):
+        const_iterator(const typename rcu_list<T, M, Alloc>::iterator& it) :
             m_current(it.m_current){};
 
         const T& operator*() const { return m_current->data; }
 
         const T* operator->() const { return &(m_current->data); }
 
-        bool operator==(const end_iterator&) const { return m_current == nullptr; }
+        bool operator==(const end_iterator&) const
+        {
+            return m_current == nullptr;
+        }
 
-        bool operator!=(const end_iterator&) const { return m_current != nullptr; }
+        bool operator!=(const end_iterator&) const
+        {
+            return m_current != nullptr;
+        }
 
         const_iterator& operator++()
         {
@@ -396,7 +425,7 @@ namespace libguarded {
       private:
         friend rcu_list<T, M, Alloc>;
 
-        explicit const_iterator(node* n): m_current(n){};
+        explicit const_iterator(node* n) : m_current(n){};
 
         node* m_current;
     };
@@ -425,7 +454,8 @@ namespace libguarded {
     }
 
     template<typename T, typename M, typename Alloc>
-    rcu_list<T, M, Alloc>::rcu_list(const Alloc& alloc): m_node_alloc(alloc), m_zombie_alloc(alloc)
+    rcu_list<T, M, Alloc>::rcu_list(const Alloc& alloc) :
+        m_node_alloc(alloc), m_zombie_alloc(alloc)
     {
     }
 
@@ -484,7 +514,8 @@ namespace libguarded {
     void rcu_list<T, M, Alloc>::push_front(T data)
     {
         std::lock_guard<M> guard(m_write_mutex);
-        auto newNode = detail::allocate_unique<node>(m_node_alloc, std::move(data));
+        auto newNode =
+            detail::allocate_unique<node>(m_node_alloc, std::move(data));
 
         node* oldHead = m_head.load();
 
@@ -503,7 +534,8 @@ namespace libguarded {
     void rcu_list<T, M, Alloc>::emplace_front(Us&&... vs)
     {
         std::lock_guard<M> guard(m_write_mutex);
-        auto newNode = detail::allocate_unique<node>(m_node_alloc, std::forward<Us>(vs)...);
+        auto newNode = detail::allocate_unique<node>(
+            m_node_alloc, std::forward<Us>(vs)...);
 
         node* oldHead = m_head.load();
 
@@ -521,7 +553,8 @@ namespace libguarded {
     void rcu_list<T, M, Alloc>::push_back(T data)
     {
         std::lock_guard<M> guard(m_write_mutex);
-        auto newNode = detail::allocate_unique<node>(m_node_alloc, std::move(data));
+        auto newNode =
+            detail::allocate_unique<node>(m_node_alloc, std::move(data));
 
         node* oldTail = m_tail.load(std::memory_order_relaxed);
 
@@ -540,7 +573,8 @@ namespace libguarded {
     void rcu_list<T, M, Alloc>::emplace_back(Us&&... vs)
     {
         std::lock_guard<M> guard(m_write_mutex);
-        auto newNode = detail::allocate_unique<node>(m_node_alloc, std::forward<Us>(vs)...);
+        auto newNode = detail::allocate_unique<node>(
+            m_node_alloc, std::forward<Us>(vs)...);
 
         node* oldTail = m_tail.load(std::memory_order_relaxed);
 
@@ -581,13 +615,15 @@ namespace libguarded {
             }
 
             auto newZombie = zombie_alloc_trait::allocate(m_zombie_alloc, 1);
-            zombie_alloc_trait::construct(m_zombie_alloc, newZombie, iter.m_current);
+            zombie_alloc_trait::construct(
+                m_zombie_alloc, newZombie, iter.m_current);
 
             zombie_list_node* oldZombie = m_zombie_head.load();
 
             do {
                 newZombie->next = oldZombie;
-            } while (!m_zombie_head.compare_exchange_weak(oldZombie, newZombie));
+            } while (
+                !m_zombie_head.compare_exchange_weak(oldZombie, newZombie));
         }
 
         return iterator(oldNextOrig);
@@ -595,8 +631,8 @@ namespace libguarded {
 
     template<typename T>
     using SharedList = rcu_guarded<rcu_list<T>>;
-} // namespace libguarded
+}  // namespace libguarded
 
 namespace LibG = libguarded;
 
-} // namespace gmlc
+}  // namespace gmlc

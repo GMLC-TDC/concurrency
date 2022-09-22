@@ -10,12 +10,12 @@
  *
  ***********************************************************************/
 
- /*
- Copyright (c) 2017-2022,
- Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
- additional details. All rights reserved.
- SPDX-License-Identifier: BSD-3-Clause
- */
+/*
+Copyright (c) 2017-2022,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+*/
 /*
 this entire file is newly added to the library
 */
@@ -49,7 +49,7 @@ namespace libguarded {
         using handle = lock_handle<T, M>;
 
       public:
-        explicit guarded_opt(bool enableLocking): enabled(enableLocking){};
+        explicit guarded_opt(bool enableLocking) : enabled(enableLocking){};
         /**
      Construct a guarded object. This constructor will accept any
      number of parameters, all of which are forwarded to the
@@ -109,18 +109,20 @@ namespace libguarded {
         handle try_lock_until(const TimePoint& timepoint);
 
         /** generate a copy of the protected object
-     */
+         */
         std::conditional_t<std::is_copy_assignable<T>::value, T, void> load()
         {
             std::lock_guard<M> glock(m_mutex);
-            auto retObj = std::conditional_t<std::is_copy_assignable<T>::value, T, void>(m_obj);
+            auto retObj =
+                std::conditional_t<std::is_copy_assignable<T>::value, T, void>(
+                    m_obj);
             return retObj;
         }
 
         /** store an updated value into the object*/
         template<typename objType>
         void store(objType&& newObj)
-        { // uses a forwarding reference
+        {  // uses a forwarding reference
             std::lock_guard<M> glock(m_mutex);
             m_obj = std::forward<objType>(newObj);
         }
@@ -128,7 +130,7 @@ namespace libguarded {
         /** store an updated value into the object*/
         template<typename objType>
         guarded_opt& operator=(objType&& newObj)
-        { // uses a forwarding reference
+        {  // uses a forwarding reference
             std::lock_guard<M> glock(m_mutex);
             m_obj = std::forward<objType>(newObj);
             return *this;
@@ -149,7 +151,7 @@ namespace libguarded {
 
     template<typename T, typename M>
     template<typename... Us>
-    guarded_opt<T, M>::guarded_opt(bool enableLocking, Us&&... data):
+    guarded_opt<T, M>::guarded_opt(bool enableLocking, Us&&... data) :
         m_obj(std::forward<Us>(data)...), enabled(enableLocking)
     {
     }
@@ -157,13 +159,15 @@ namespace libguarded {
     template<typename T, typename M>
     auto guarded_opt<T, M>::lock() -> handle
     {
-        return (enabled) ? handle(&m_obj, m_mutex) : handle(&m_obj, std::unique_lock<M>());
+        return (enabled) ? handle(&m_obj, m_mutex) :
+                           handle(&m_obj, std::unique_lock<M>());
     }
 
     template<typename T, typename M>
     auto guarded_opt<T, M>::try_lock() -> handle
     {
-        return (enabled) ? try_lock_handle(&m_obj, m_mutex) : handle(&m_obj, std::unique_lock<M>());
+        return (enabled) ? try_lock_handle(&m_obj, m_mutex) :
+                           handle(&m_obj, std::unique_lock<M>());
     }
 
     template<typename T, typename M>
@@ -181,6 +185,6 @@ namespace libguarded {
         return (enabled) ? try_lock_handle_until(&m_obj, m_mutex, tp) :
                            handle(&m_obj, std::unique_lock<M>());
     }
-} // namespace libguarded
+}  // namespace libguarded
 
-} // namespace gmlc
+}  // namespace gmlc

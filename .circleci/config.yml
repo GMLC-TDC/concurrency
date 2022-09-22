@@ -1,6 +1,5 @@
 version: 2
 aliases:
-
   - &run_concurrency
     name: run_concurrency
     environment:

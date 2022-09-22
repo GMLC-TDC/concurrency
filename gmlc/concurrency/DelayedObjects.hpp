@@ -1,8 +1,8 @@
 /*
 Copyright (c) 2017-2022,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
-additional details. All rights reserved.
-SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace gmlc {
 namespace concurrency {
     /** class holding a set of delayed objects, the delayed object are held by
- * promises*/
+     * promises*/
     template<class X>
     class DelayedObjects {
       private:
@@ -64,7 +64,7 @@ namespace concurrency {
                 promiseByString.erase(fnd);
             }
         }
-		/// check whether the index is known (either fulfilled or unfulfilled)
+        /// check whether the index is known (either fulfilled or unfulfilled)
         bool isRecognized(int index)
         {
             std::lock_guard<std::mutex> lock(promiseLock);
@@ -93,13 +93,13 @@ namespace concurrency {
             return false;
         }
 
-		/// check whether the index is known and completed
+        /// check whether the index is known and completed
         bool isCompleted(int index)
-		{
+        {
             std::lock_guard<std::mutex> lock(promiseLock);
             auto fnd = usedPromiseByInteger.find(index);
             return (fnd != usedPromiseByInteger.end());
-		}
+        }
         /// check whether the string is known and completed
         bool isCompleted(const std::string& name)
         {
@@ -142,8 +142,8 @@ namespace concurrency {
             promiseByString[name] = std::move(V);
             return fut;
         }
-        /// Indicate that the user is finished accessing a value by index and it can
-        /// be deleted
+        /// Indicate that the user is finished accessing a value by index and it
+        /// can be deleted
         void finishedWithValue(int index)
         {
             std::lock_guard<std::mutex> lock(promiseLock);
@@ -152,8 +152,8 @@ namespace concurrency {
                 usedPromiseByInteger.erase(fnd);
             }
         }
-        /// Indicate that the user is finished accessing a value by string and it
-        /// can be deleted
+        /// Indicate that the user is finished accessing a value by string and
+        /// it can be deleted
         void finishedWithValue(const std::string& name)
         {
             std::lock_guard<std::mutex> lock(promiseLock);
@@ -164,5 +164,5 @@ namespace concurrency {
         }
     };
 
-} // namespace concurrency
-} // namespace gmlc
+}  // namespace concurrency
+}  // namespace gmlc
