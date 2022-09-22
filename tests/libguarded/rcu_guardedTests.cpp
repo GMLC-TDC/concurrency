@@ -182,8 +182,8 @@ class mock_allocator {
     }
     void deallocate(T* p, size_t n)
     {
-        std::allocator<T>{}.deallocate(p, n);
         if (p) {
+            std::allocator<T>{}.deallocate(p, n);
             log->emplace_back(event{n * sizeof(T), false});
         }
     }
