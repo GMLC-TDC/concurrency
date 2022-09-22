@@ -9,16 +9,26 @@ aliases:
       cd build
       eval cmake .. ${CMAKE_FLAGS}
       make -j 4
-      ctest --output-on-failure
+      ctest --verbose
 
 jobs:
-
-  concurrencyTSan:
+  concurrencygccTSan:
     docker:
       - image: helics/buildenv:builder
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "'
-      TSAN_OPTIONS: 'second_deadlock_stack=1'
+      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "  '
+      TSAN_OPTIONS: "second_deadlock_stack=1 suppressions=/root/project/.circleci/tsan_suppression.txt history_size=4"
+
+    steps:
+      - checkout
+      - run: *run_concurrency
+
+  concurrencyTSan:
+    docker:
+      - image: helics/clang-tsan:latest
+    environment:
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"  '
+      TSAN_OPTIONS: "second_deadlock_stack=1"
 
     steps:
       - checkout
@@ -29,14 +39,14 @@ jobs:
       - image: helics/buildenv:sanitizers
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -fsanitize-address-use-after-scope -stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  '
-      LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression.txt'
-      UBSAN_OPTIONS: 'print_stacktrace=1'
+      LSAN_OPTIONS: "suppressions=/root/project/.circleci/leak_suppression.txt"
+      UBSAN_OPTIONS: "print_stacktrace=1"
 
     steps:
       - checkout
       - run: *run_concurrency
 
-  concurrencyMSan:
+  containersMSan:
     docker:
       - image: helics/buildenv:sanitizers
     environment:
@@ -53,5 +63,4 @@ workflows:
       - concurrencyMSan
       - concurrencyASan
       - concurrencyTSan
-
-
+      - concurrencygccTSan

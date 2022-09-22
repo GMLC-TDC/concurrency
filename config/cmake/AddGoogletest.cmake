@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -13,6 +13,9 @@
 #
 
 set(gtest_version release-1.10.0)
+
+set(gtest_version_new aa533ab)
+
 set(gtest_vtype GIT_TAG)
 # depending on what the version is set to the git_clone command may need to change to
 # GIT_TAG||GIT_BRANCH|GIT_COMMIT
@@ -24,12 +27,12 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     mark_as_advanced(FETCHCONTENT_BASE_DIR)
     mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
     mark_as_advanced(FETCHCONTENT_QUIET)
-	mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
+    mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
 
     fetchcontent_declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG ${gtest_version}
+        GIT_TAG ${gtest_version_new}
     )
 
     fetchcontent_getproperties(googletest)
@@ -62,12 +65,24 @@ else() # cmake <3.11
 
 endif()
 
-set(gtest_force_shared_crt ON CACHE INTERNAL "")
+set(gtest_force_shared_crt
+    ON
+    CACHE INTERNAL ""
+)
 
-set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
-set(HAVE_STD_REGEX ON CACHE INTERNAL "" )
+set(BUILD_SHARED_LIBS
+    OFF
+    CACHE INTERNAL ""
+)
+set(HAVE_STD_REGEX
+    ON
+    CACHE INTERNAL ""
+)
 
-set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "")
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS
+    1
+    CACHE INTERNAL ""
+)
 add_subdirectory(${${gtName}_SOURCE_DIR} ${${gtName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 message(STATUS "loading google-test directory ${${gtName}_SOURCE_DIR}")
@@ -78,11 +93,7 @@ if(NOT MSVC)
 endif()
 
 if(GOOGLE_TEST_INDIVIDUAL)
-    if(NOT CMAKE_VERSION VERSION_LESS 3.9)
-        include(GoogleTest)
-    else()
-        set(GOOGLE_TEST_INDIVIDUAL OFF)
-    endif()
+    include(GoogleTest)
 endif()
 
 # Target must already exist
@@ -90,27 +101,11 @@ macro(add_gtest TESTNAME)
     target_link_libraries(${TESTNAME} PUBLIC gtest gmock gtest_main)
 
     if(GOOGLE_TEST_INDIVIDUAL)
-        if(CMAKE_VERSION VERSION_LESS 3.10)
-            gtest_add_tests(
-                TARGET
-                ${TESTNAME}
-                TEST_PREFIX
-                "${TESTNAME}."
-                TEST_LIST
-                TmpTestList
-            )
-            set_tests_properties(${TmpTestList} PROPERTIES FOLDER "Tests")
-        else()
-            gtest_discover_tests(
-                ${TESTNAME}
-                TEST_PREFIX
-                "${TESTNAME}."
-                PROPERTIES
-                FOLDER
-                "Tests"
-            )
-
-        endif()
+        gtest_discover_tests(
+            ${TESTNAME}
+            TEST_PREFIX "${TESTNAME}."
+            PROPERTIES FOLDER "Tests"
+        )
     else()
         add_test(${TESTNAME} ${TESTNAME})
         set_target_properties(${TESTNAME} PROPERTIES FOLDER "Tests")
@@ -131,14 +126,12 @@ set_target_properties(gtest gtest_main gmock gmock_main PROPERTIES FOLDER "Exter
 
 if(MSVC)
     # add_compile_options( /wd4459)
-    if(MSVC_VERSION GREATER_EQUAL 1900)
-        target_compile_definitions(gtest PUBLIC
-                                   _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-        target_compile_definitions(gtest_main PUBLIC
-                                   _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-        target_compile_definitions(gmock PUBLIC
-                                   _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-        target_compile_definitions(gmock_main PUBLIC
-                                   _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-    endif()
+    target_compile_definitions(gtest PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+    target_compile_definitions(
+        gtest_main PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
+    )
+    target_compile_definitions(gmock PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+    target_compile_definitions(
+        gmock_main PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
+    )
 endif()

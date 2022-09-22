@@ -10,12 +10,12 @@
  *
  ***********************************************************************/
 
-/*
-Copyright (c) 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
-for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
-All rights reserved. SPDX-License-Identifier: BSD-3-Clause
-*/
+ /*
+ Copyright (c) 2017-2022,
+ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
+ additional details. All rights reserved.
+ SPDX-License-Identifier: BSD-3-Clause
+ */
 /*
 modified to use google test
 */
@@ -24,6 +24,7 @@ modified to use google test
 #include <libguarded/rcu_guarded.hpp>
 #include <libguarded/rcu_list.hpp>
 #include <thread>
+#include <algorithm>
 
 using namespace gmlc::libguarded;
 
