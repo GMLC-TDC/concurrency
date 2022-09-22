@@ -1,0 +1,11 @@
+steps:
+  - task: CMake@1
+    inputs:
+      cmakeArgs: .. -DCMAKE_CXX_STANDARD=$(concurrency.std)  -DCMAKE_BUILD_TYPE=$(concurrency.build_type) $(concurrency.options)
+    displayName: "Configure"
+    env:
+      GIT_SSL_NO_VERIFY: 1
+
+  - script: cmake --build .
+    displayName: "Build"
+    workingDirectory: build
