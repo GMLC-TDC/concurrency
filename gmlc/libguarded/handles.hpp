@@ -86,14 +86,14 @@ lock_handle<T, M> try_lock_handle_until(T* obj, M& gmutex, const TimePoint& tp)
     }
 }
 
-// Check for streamability
+// Check for shared locking
 // Based on
 // https://stackoverflow.com/questions/22758291/how-can-i-detect-if-a-type-can-be-streamed-to-an-stdostream
 
 template<typename T>
 class is_shared_lockable {
     template<typename TT>
-    static auto test(int)
+    static auto test(int /*unused*/)
         -> decltype(std::declval<TT>().lock_shared(), std::true_type());
 
     template<typename, typename>
