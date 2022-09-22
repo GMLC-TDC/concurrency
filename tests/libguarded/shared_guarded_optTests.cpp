@@ -19,16 +19,13 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 /*
 modified to use google test
 */
+
 #include "gtest/gtest.h"
 #include <atomic>
 #include <libguarded/shared_guarded_opt.hpp>
 #include <thread>
-
-#ifndef HAVE_CXX14
-//#error This file requires the C++14 shared_mutex functionality
-#endif
-
 #include <shared_mutex>
+
 using shared_mutex = std::shared_timed_mutex;
 namespace chrono = std::chrono;
 
