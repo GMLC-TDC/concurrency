@@ -26,6 +26,7 @@ additions include load store operations and operator= functions
 #include <memory>
 #include <mutex>
 #include <type_traits>
+#include <utility>
 
 namespace gmlc::libguarded {
     /**

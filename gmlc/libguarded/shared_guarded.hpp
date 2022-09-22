@@ -26,6 +26,7 @@ additions include overloads for std::mutex and std::timed_mutex
 #include <memory>
 #include <shared_mutex>
 #include <type_traits>
+#include <utility>
 
 namespace gmlc::libguarded {
 /**

@@ -28,6 +28,7 @@ This file was not part of libguarded originally
 #include <memory>
 #include <mutex>
 #include <type_traits>
+#include <utility>
 
 namespace gmlc::libguarded {
     /**

@@ -114,7 +114,7 @@ TEST(rcu_guarded, rcu_guarded_1)
                 }
                 ++t_writers_done;
             });
-        };
+        }
 
         threads.emplace_back([&]() {
             while (t_writers_done.load() != num_writers) {
