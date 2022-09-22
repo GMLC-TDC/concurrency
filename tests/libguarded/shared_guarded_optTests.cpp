@@ -23,8 +23,8 @@ modified to use google test
 #include "gtest/gtest.h"
 #include <atomic>
 #include <libguarded/shared_guarded_opt.hpp>
-#include <thread>
 #include <shared_mutex>
+#include <thread>
 
 using shared_mutex = std::shared_timed_mutex;
 namespace chrono = std::chrono;
