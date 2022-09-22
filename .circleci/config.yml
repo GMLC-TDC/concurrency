@@ -46,7 +46,7 @@ jobs:
       - checkout
       - run: *run_concurrency
 
-  containersMSan:
+  concurrencyMSan:
     docker:
       - image: helics/buildenv:sanitizers
     environment:
