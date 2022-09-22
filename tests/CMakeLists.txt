@@ -25,7 +25,7 @@ add_executable(concurrencyTests ${CONCURRENCY_TEST_SOURCES})
 target_link_libraries(concurrencyTests PUBLIC concurrency)
 add_gtest(concurrencyTests)
 set_target_properties(concurrencyTests PROPERTIES FOLDER tests)
-   
+
 
 add_subdirectory(libguarded)
 

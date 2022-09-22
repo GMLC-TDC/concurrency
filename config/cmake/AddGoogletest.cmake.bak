@@ -1,4 +1,4 @@
-# 
+#
 #
 # Downloads GTest and provides a helper macro to add tests. Add make check, as well, which
 # gives output on failed tests without having to set an environment variable.
@@ -22,7 +22,7 @@ endif()
 # Target must already exist
 macro(add_gtest TESTNAME)
     target_link_libraries(${TESTNAME} PUBLIC gtest gmock gtest_main)
-    
+
     if(GOOGLE_TEST_INDIVIDUAL)
         if(CMAKE_VERSION VERSION_LESS 3.10)
             gtest_add_tests(TARGET ${TESTNAME}
@@ -33,7 +33,7 @@ macro(add_gtest TESTNAME)
             gtest_discover_tests(${TESTNAME}
                 TEST_PREFIX "${TESTNAME}."
                 PROPERTIES FOLDER "Tests")
-            
+
         endif()
     else()
         add_test(${TESTNAME} ${TESTNAME})
