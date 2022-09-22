@@ -9,39 +9,39 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <atomic>
 #include <memory>
 #include <stdexcept>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace gmlc::concurrency {
 
-    /** namespace for the global variable in tripwire*/
+/** namespace for the global variable in tripwire*/
 
-    /** the actual tripwire type*/
-    using TriplineType = std::shared_ptr<std::atomic<bool>>;
+/** the actual tripwire type*/
+using TriplineType = std::shared_ptr<std::atomic<bool>>;
 
-    /** singleton class containing the actual trip line*/
-    class TripWire {
-      private:
-        /** get the tripwire*/
-        static TriplineType getLine();
-        static TriplineType getIndexedLine(unsigned int index);
-        friend class TripWireDetector;
-        friend class TripWireTrigger;
-    };
+/** singleton class containing the actual trip line*/
+class TripWire {
+  private:
+    /** get the tripwire*/
+    static TriplineType getLine();
+    static TriplineType getIndexedLine(unsigned int index);
+    friend class TripWireDetector;
+    friend class TripWireTrigger;
+};
 
-    inline TriplineType make_tripline()
-    {
-        return std::make_shared<std::atomic<bool>>(false);
+inline TriplineType make_tripline()
+{
+    return std::make_shared<std::atomic<bool>>(false);
+}
+
+inline std::vector<TriplineType> make_triplines(int count)
+{
+    std::vector<TriplineType> lines(count);
+    for (auto& line : lines) {
+        line = std::make_shared<std::atomic<bool>>(false);
     }
-
-    inline std::vector<TriplineType> make_triplines(int count)
-    {
-        std::vector<TriplineType> lines(count);
-        for (auto& line : lines) {
-            line = std::make_shared<std::atomic<bool>>(false);
-        }
-        return lines;
-    }
+    return lines;
+}
 
 #define DECLARE_TRIPLINE()                                                     \
     namespace gmlc {                                                           \
@@ -70,57 +70,52 @@ namespace gmlc::concurrency {
         } /*namespace concurrency*/                                            \
     } /*namespace gmlc */
 
-    /** class to check if a trip line was tripped*/
-    class TripWireDetector {
-      public:
-        TripWireDetector() : lineDetector(TripWire::getLine()) {}
-        explicit TripWireDetector(unsigned int index) :
-            lineDetector(TripWire::getIndexedLine(index))
-        {
-        }
-        explicit TripWireDetector(TriplineType line) :
-            lineDetector(std::move(line))
-        {
-        }
-        /** check if the line was tripped*/
-        bool isTripped() const noexcept
-        {
-            return lineDetector->load(std::memory_order_acquire);
-        }
+/** class to check if a trip line was tripped*/
+class TripWireDetector {
+  public:
+    TripWireDetector() : lineDetector(TripWire::getLine()) {}
+    explicit TripWireDetector(unsigned int index) :
+        lineDetector(TripWire::getIndexedLine(index))
+    {
+    }
+    explicit TripWireDetector(TriplineType line) : lineDetector(std::move(line))
+    {
+    }
+    /** check if the line was tripped*/
+    bool isTripped() const noexcept
+    {
+        return lineDetector->load(std::memory_order_acquire);
+    }
 
-      private:
-        std::shared_ptr<const std::atomic<bool>>
-            lineDetector;  //!< const pointer to the tripwire
-    };
+  private:
+    std::shared_ptr<const std::atomic<bool>> lineDetector;  //!< const pointer
+                                                            //!< to the tripwire
+};
 
-    /** class to trigger a tripline on destruction */
-    class TripWireTrigger {
-      public:
-        /** default constructor*/
-        TripWireTrigger() : lineTrigger(TripWire::getLine()) {}
-        explicit TripWireTrigger(unsigned int index) :
-            lineTrigger(TripWire::getIndexedLine(index))
-        {
-        }
-        explicit TripWireTrigger(TriplineType line) :
-            lineTrigger(std::move(line))
-        {
-        }
-        /** destructor*/
-        ~TripWireTrigger()
-        {
-            lineTrigger->store(true, std::memory_order_release);
-        }
-        /** move constructor*/
-        TripWireTrigger(TripWireTrigger&& twt) = default;
-        /** deleted copy constructor*/
-        TripWireTrigger(const TripWireTrigger& twt) = delete;
-        /** move assignment*/
-        TripWireTrigger& operator=(TripWireTrigger&& twt) = default;
-        /** deleted copy assignment*/
-        TripWireTrigger& operator=(const TripWireTrigger& twt) = delete;
+/** class to trigger a tripline on destruction */
+class TripWireTrigger {
+  public:
+    /** default constructor*/
+    TripWireTrigger() : lineTrigger(TripWire::getLine()) {}
+    explicit TripWireTrigger(unsigned int index) :
+        lineTrigger(TripWire::getIndexedLine(index))
+    {
+    }
+    explicit TripWireTrigger(TriplineType line) : lineTrigger(std::move(line))
+    {
+    }
+    /** destructor*/
+    ~TripWireTrigger() { lineTrigger->store(true, std::memory_order_release); }
+    /** move constructor*/
+    TripWireTrigger(TripWireTrigger&& twt) = default;
+    /** deleted copy constructor*/
+    TripWireTrigger(const TripWireTrigger& twt) = delete;
+    /** move assignment*/
+    TripWireTrigger& operator=(TripWireTrigger&& twt) = default;
+    /** deleted copy assignment*/
+    TripWireTrigger& operator=(const TripWireTrigger& twt) = delete;
 
-      private:
-        TriplineType lineTrigger;  //!< the tripwire
-    };
-}  // namespace concurrency
+  private:
+    TriplineType lineTrigger;  //!< the tripwire
+};
+}  // namespace gmlc::concurrency
