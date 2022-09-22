@@ -45,25 +45,25 @@ inline std::vector<TriplineType> make_triplines(int count)
 
 #define DECLARE_TRIPLINE()                                                     \
     namespace gmlc::concurrency {                                              \
-            TriplineType TripWire::getLine()                                   \
-            {                                                                  \
-                static TriplineType staticline = make_tripline();              \
-                return staticline;                                             \
-            }                                                                  \
+        TriplineType TripWire::getLine()                                       \
+        {                                                                      \
+            static TriplineType staticline = make_tripline();                  \
+            return staticline;                                                 \
+        }                                                                      \
     } /*namespace gmlc::concurrency */
 
 #define DECLARE_INDEXED_TRIPLINES(COUNT)                                       \
     namespace gmlc::concurrency {                                              \
-            TriplineType TripWire::getIndexedLine(unsigned int index)          \
-            {                                                                  \
-                static const std::vector<TriplineType> triplines =             \
-                    make_triplines(COUNT);                                     \
-                return (index < COUNT) ?                                       \
-                    triplines[index] :                                         \
-                    (throw(std::out_of_range(                                  \
-                         "index exceeds the number of generated lines")),      \
-                     nullptr);                                                 \
-            }                                                                  \
+        TriplineType TripWire::getIndexedLine(unsigned int index)              \
+        {                                                                      \
+            static const std::vector<TriplineType> triplines =                 \
+                make_triplines(COUNT);                                         \
+            return (index < COUNT) ?                                           \
+                triplines[index] :                                             \
+                (throw(std::out_of_range(                                      \
+                     "index exceeds the number of generated lines")),          \
+                 nullptr);                                                     \
+        }                                                                      \
     } /*namespace gmlc */
 
 /** class to check if a trip line was tripped*/

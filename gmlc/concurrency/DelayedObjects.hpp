@@ -65,7 +65,7 @@ class DelayedObjects {
             promiseByString.erase(fnd);
         }
     }
-    void setDelayedValue(int index, X && val)
+    void setDelayedValue(int index, X&& val)
     {
         std::lock_guard<std::mutex> lock(promiseLock);
         auto fnd = promiseByInteger.find(index);
@@ -76,7 +76,7 @@ class DelayedObjects {
         }
     }
     /// set the value for delayed named object
-    void setDelayedValue(const std::string& name, X && val)
+    void setDelayedValue(const std::string& name, X&& val)
     {
         std::lock_guard<std::mutex> lock(promiseLock);
         auto fnd = promiseByString.find(name);
