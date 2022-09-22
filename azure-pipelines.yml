@@ -11,9 +11,9 @@ pr:
   - main
 
 variables:
-  containers.std: 17
-  containers.build_type: Debug
-  containers.options: -DCONTAINERS_ENABLE_TESTS=ON -DCONTAINERS_ENABLE_ERROR_ON_WARNINGS=ON
+  concurrency.std: 17
+  concurrency.build_type: Debug
+  concurrency.options: -DGMLC_CONCURRENCY_ENABLE_TESTS=ON -DMLC_CONCURRENCY_ENABLE_ERROR_ON_WARNINGS=ON
   CMAKE_BUILD_PARALLEL_LEVEL: 4
 
 jobs:
