@@ -12,9 +12,9 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 
-namespace gmlc {
-namespace libguarded {
+namespace gmlc::libguarded {
     /**
    \headerfile rcu_guarded.hpp <libguarded/rcu_guarded.hpp>
 
@@ -150,4 +150,3 @@ namespace libguarded {
     }
 }  // namespace libguarded
 
-}  // namespace gmlc

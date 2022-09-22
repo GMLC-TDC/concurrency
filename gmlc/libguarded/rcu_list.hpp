@@ -17,9 +17,9 @@
 #include <cstddef>
 #include <memory>
 #include <mutex>
+#include <utility>
 
-namespace gmlc {
-namespace libguarded {
+namespace gmlc::libguarded {
     /**
    \headerfile rcu_list.hpp <libguarded/rcu_list.hpp>
 
@@ -377,10 +377,10 @@ namespace libguarded {
         using reference = const T&;
         using difference_type = size_t;
 
-        const_iterator() : m_current(nullptr){};
+        const_iterator() : m_current(nullptr){}
         /* implicit */
         const_iterator(const typename rcu_list<T, M, Alloc>::iterator& it) :
-            m_current(it.m_current){};
+            m_current(it.m_current){}
 
         const T& operator*() const { return m_current->data; }
 
@@ -425,7 +425,7 @@ namespace libguarded {
       private:
         friend rcu_list<T, M, Alloc>;
 
-        explicit const_iterator(node* n) : m_current(n){};
+        explicit const_iterator(node* n) : m_current(n){}
 
         node* m_current;
     };
@@ -633,6 +633,5 @@ namespace libguarded {
     using SharedList = rcu_guarded<rcu_list<T>>;
 }  // namespace libguarded
 
-namespace LibG = libguarded;
+namespace LibG = gmlc::libguarded;
 
-}  // namespace gmlc

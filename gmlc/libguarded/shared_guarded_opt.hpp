@@ -28,8 +28,9 @@ the locking could be disabled at construction
 #include <memory>
 #include <shared_mutex>
 #include <type_traits>
-namespace gmlc {
-namespace libguarded {
+#include <utility>
+
+namespace gmlc::libguarded {
 /**
    \headerfile shared_guarded.hpp <libguarded/shared_guarded.hpp>
 
@@ -176,4 +177,3 @@ namespace libguarded {
             shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
     }
 }  // namespace libguarded
-}  // namespace gmlc

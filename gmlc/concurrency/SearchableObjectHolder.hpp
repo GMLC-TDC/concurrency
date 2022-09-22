@@ -17,9 +17,11 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <utility>
+#include <string>
 
-namespace gmlc {
-namespace concurrency {
+namespace gmlc::concurrency {
+
     /** helper class to contain a list of objects that need to be referencable
      * at some level the objects are stored through shared_ptrs*/
     template<class X, class Y = int>
@@ -240,4 +242,3 @@ namespace concurrency {
     };
 
 }  // namespace concurrency
-}  // namespace gmlc

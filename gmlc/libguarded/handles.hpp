@@ -11,8 +11,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <shared_mutex>
 #include <utility>
 
-namespace gmlc {
-namespace libguarded {
+namespace gmlc::libguarded {
     template<typename T, typename M>
     class lock_handle {
       public:
@@ -34,7 +33,7 @@ namespace libguarded {
             data = nullptr;
             if (m_handle_lock.owns_lock()) {
                 m_handle_lock.unlock();
-            };
+            }
         }
         T* operator->() const noexcept
         {  // return pointer to class object
@@ -253,4 +252,3 @@ struct has_lock_shared
         }
     }
 }  // namespace libguarded
-}  // namespace gmlc

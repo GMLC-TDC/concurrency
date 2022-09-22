@@ -27,8 +27,7 @@ additions include load store operations and operator= functions
 #include <mutex>
 #include <type_traits>
 
-namespace gmlc {
-namespace libguarded {
+namespace gmlc::libguarded {
     /**
    \headerfile guarded.hpp <libguarded/guarded.hpp>
 
@@ -181,4 +180,3 @@ namespace libguarded {
 
 }  // namespace libguarded
 
-}  // namespace gmlc

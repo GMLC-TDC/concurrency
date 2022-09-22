@@ -9,9 +9,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <map>
 #include <mutex>
+#include <utility>
+#include <string>
 
-namespace gmlc {
-namespace concurrency {
+namespace gmlc::concurrency {
     /** class holding a set of delayed objects, the delayed object are held by
      * promises*/
     template<class X>
@@ -165,4 +166,3 @@ namespace concurrency {
     };
 
 }  // namespace concurrency
-}  // namespace gmlc

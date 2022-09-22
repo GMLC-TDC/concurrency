@@ -27,9 +27,9 @@ additions include load store operations and use of handles.hpp
 #include <mutex>
 #include <shared_mutex>
 #include <type_traits>
+#include <utility>
 
-namespace gmlc {
-namespace libguarded {
+namespace gmlc::libguarded {
 /**
    \headerfile ordered_guarded.hpp <libguarded/ordered_guarded.hpp>
 
@@ -229,4 +229,3 @@ namespace libguarded {
     }
 
 }  // namespace libguarded
-}  // namespace gmlc

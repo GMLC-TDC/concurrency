@@ -15,9 +15,9 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <utility>
 
-namespace gmlc {
-namespace libguarded {
+namespace gmlc::libguarded {
     /**
    \headerfile lr_guarded.hpp <libguarded/lr_guarded.hpp>
 
@@ -245,4 +245,4 @@ namespace libguarded {
         return lock_shared();
     }
 }  // namespace libguarded
-}  // namespace gmlc
+

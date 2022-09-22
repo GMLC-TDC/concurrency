@@ -16,8 +16,7 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
-namespace gmlc {
-namespace libguarded {
+namespace gmlc::libguarded {
     /**
  \headerfile cow_guarded.hpp <libguarded/cow_guarded.hpp>
 
@@ -328,4 +327,3 @@ namespace libguarded {
     }
 }  // namespace libguarded
 
-}  // namespace gmlc

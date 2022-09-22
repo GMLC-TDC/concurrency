@@ -33,9 +33,9 @@ copyable and causing issues on some compilers
 #include <memory>
 #include <shared_mutex>
 #include <vector>
+#include <utility>
 
-namespace gmlc {
-namespace libguarded {
+namespace gmlc::libguarded {
     template<class T>
     typename std::add_lvalue_reference<T>::type declref();
 
@@ -304,4 +304,3 @@ namespace libguarded {
     }
 }  // namespace libguarded
 
-}  // namespace gmlc

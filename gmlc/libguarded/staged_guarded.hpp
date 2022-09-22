@@ -29,8 +29,7 @@ This file was not part of libguarded originally
 #include <mutex>
 #include <type_traits>
 
-namespace gmlc {
-namespace libguarded {
+namespace gmlc::libguarded {
     /**
    \headerfile staged_guarded.hpp <libguarded/staged_guarded.hpp>
 
@@ -241,4 +240,3 @@ namespace libguarded {
 
 }  // namespace libguarded
 
-}  // namespace gmlc

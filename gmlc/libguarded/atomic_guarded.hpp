@@ -24,8 +24,9 @@ this file is not in the original libguarded
 #include <memory>
 #include <mutex>
 #include <type_traits>
-namespace gmlc {
-namespace libguarded {
+#include <utility>
+
+namespace gmlc::libguarded {
     /**
    \headerfile atomic_guarded.hpp <libguarded/atomic_guarded.hpp>
 
@@ -117,4 +118,3 @@ namespace libguarded {
     };
 
 }  // namespace libguarded
-}  // namespace gmlc

@@ -10,9 +10,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <stdexcept>
 #include <vector>
+#include <utility>
 
-namespace gmlc {
-namespace concurrency {
+namespace gmlc::concurrency {
+
     /** namespace for the global variable in tripwire*/
 
     /** the actual tripwire type*/
@@ -123,4 +124,3 @@ namespace concurrency {
         TriplineType lineTrigger;  //!< the tripwire
     };
 }  // namespace concurrency
-}  // namespace gmlc

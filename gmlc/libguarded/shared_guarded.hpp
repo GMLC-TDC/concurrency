@@ -26,8 +26,8 @@ additions include overloads for std::mutex and std::timed_mutex
 #include <memory>
 #include <shared_mutex>
 #include <type_traits>
-namespace gmlc {
-namespace libguarded {
+
+namespace gmlc::libguarded {
 /**
    \headerfile shared_guarded.hpp <libguarded/shared_guarded.hpp>
 
@@ -151,4 +151,3 @@ namespace libguarded {
         return try_lock_shared_handle_until(&m_obj, m_mutex, tp);
     }
 }  // namespace libguarded
-}  // namespace gmlc

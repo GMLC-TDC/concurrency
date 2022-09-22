@@ -26,9 +26,9 @@ this entire file is newly added to the library
 #include <memory>
 #include <mutex>
 #include <type_traits>
+#include <utility>
 
-namespace gmlc {
-namespace libguarded {
+namespace gmlc::libguarded {
     /**
    \headerfile guarded.hpp <libguarded/guarded.hpp>
 
@@ -49,7 +49,7 @@ namespace libguarded {
         using handle = lock_handle<T, M>;
 
       public:
-        explicit guarded_opt(bool enableLocking) : enabled(enableLocking){};
+        explicit guarded_opt(bool enableLocking) : enabled(enableLocking){}
         /**
      Construct a guarded object. This constructor will accept any
      number of parameters, all of which are forwarded to the
@@ -187,4 +187,3 @@ namespace libguarded {
     }
 }  // namespace libguarded
 
-}  // namespace gmlc
