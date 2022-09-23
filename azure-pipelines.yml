@@ -25,7 +25,7 @@ jobs:
       CMAKE_BUILD_PARALLEL_LEVEL: 1
     pool:
       vmImage: "ubuntu-latest"
-    container: helics/buildenv:clang9-builder
+    container: helics/buildenv:clang14-builder
     steps:
       - template: .ci/azure-cmake.yml
       - template: .ci/azure-build.yml
