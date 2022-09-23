@@ -21,7 +21,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 using namespace gmlc::concurrency;
 
 /** test basic operations */
-TEST(SOH_tests, basic_tests)
+TEST(SOH, basic)
 {
     SearchableObjectHolder<std::string> SOH1;
     SOH1.addObject("test1", std::make_shared<std::string>("test_1"));
@@ -35,7 +35,7 @@ TEST(SOH_tests, basic_tests)
     EXPECT_FALSE(res2);
 }
 
-TEST(SOH_tests, contained_tests)
+TEST(SOH, contained)
 {
     SearchableObjectHolder<std::string> SOH1;
     EXPECT_TRUE(SOH1.empty());
@@ -51,7 +51,7 @@ TEST(SOH_tests, contained_tests)
     v.clear();
 }
 
-TEST(SOH_tests, contained_type_check)
+TEST(SOH, containedType)
 {
     SearchableObjectHolder<std::string, char> SOH1;
     EXPECT_TRUE(SOH1.empty());

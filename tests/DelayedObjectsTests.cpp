@@ -21,7 +21,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 using namespace gmlc::concurrency;
 
 /** test basic operations */
-TEST(DelayedObjects_tests, basic_tests)
+TEST(DelayedObjects, basic)
 {
     DelayedObjects<std::string> objs;
 
@@ -61,7 +61,7 @@ TEST(DelayedObjects_tests, basic_tests)
 }
 
 /** test basic operations */
-TEST(DelayedObjects_tests, basic_move_tests)
+TEST(DelayedObjects, basicMove)
 {
     DelayedObjects<std::string> objs;
 
@@ -80,7 +80,7 @@ TEST(DelayedObjects_tests, basic_move_tests)
 }
 
 /** test basic operations */
-TEST(DelayedObjects_tests, all_fulfill)
+TEST(DelayedObjects, allFulfill)
 {
     DelayedObjects<int> objs;
     auto fut1 = objs.getFuture("t1");

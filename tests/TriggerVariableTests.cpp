@@ -21,7 +21,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 using namespace gmlc::concurrency;
 
 /** test basic operations */
-TEST(triggervariable, basic_tests)
+TEST(triggervariable, basic)
 {
     TriggerVariable trigger;
 
