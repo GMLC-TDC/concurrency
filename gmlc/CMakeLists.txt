@@ -36,3 +36,7 @@ add_library(concurrency STATIC ${concurrency_sources} ${concurrency_headers})
 
 target_link_libraries(concurrency concurrency_base)
 target_include_directories(concurrency INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(GMLC_CONCURRENCY_CLANG_TIDY)
+        set_property(TARGET concurrency PROPERTY CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
+    endif()
