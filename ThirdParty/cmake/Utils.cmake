@@ -9,15 +9,9 @@ function(xor result)
     endforeach()
 
     if(NOT (${true_args_count} EQUAL 1))
-        set(${result}
-            FALSE
-            PARENT_SCOPE
-        )
+        set(${result} FALSE PARENT_SCOPE)
     else()
-        set(${result}
-            TRUE
-            PARENT_SCOPE
-        )
+        set(${result} TRUE PARENT_SCOPE)
     endif()
 endfunction()
 
@@ -31,14 +25,8 @@ function(at_most_one result)
     endforeach()
 
     if(${true_args_count} GREATER 1)
-        set(${result}
-            FALSE
-            PARENT_SCOPE
-        )
+        set(${result} FALSE PARENT_SCOPE)
     else()
-        set(${result}
-            TRUE
-            PARENT_SCOPE
-        )
+        set(${result} TRUE PARENT_SCOPE)
     endif()
 endfunction()
