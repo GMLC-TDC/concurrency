@@ -68,8 +68,8 @@ TEST(DelayedObjects, basicMove)
     auto fut1 = objs.getFuture("string1");
     auto fut2 = objs.getFuture(45);
 
-    std::string b1(600, 'a');
-    objs.setDelayedValue("string1", std::move(b1));
+    std::string basicString(600, 'a');
+    objs.setDelayedValue("string1", std::move(basicString));
 
     auto str1 = fut1.get();
     EXPECT_EQ(str1, std::string(600, 'a'));

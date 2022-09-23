@@ -27,7 +27,6 @@ jobs:
       vmImage: "ubuntu-latest"
     container: helics/buildenv:clang14-builder
     steps:
-      - template: .ci/azure-cmake.yml
       - template: .ci/azure-build.yml
       - script: git diff --exit-code --color
         displayName: Check tidy

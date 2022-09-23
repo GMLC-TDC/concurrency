@@ -21,20 +21,20 @@ using namespace gmlc::concurrency;
 
 TEST(barrier, basic)
 {
-    Barrier b1(2);
-    std::atomic<int> ct{0};
-    auto f1 = std::async(std::launch::async, [&b1, &ct]() {
-        b1.wait();
-        ++ct;
+    Barrier barrier1(2);
+    std::atomic<int> count{0};
+    auto fut1 = std::async(std::launch::async, [&barrier1, &count]() {
+        barrier1.wait();
+        ++count;
     });
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    EXPECT_EQ(ct.load(), 0);
-    auto f2 = std::async(std::launch::async, [&b1, &ct]() {
-        b1.wait();
-        ++ct;
+    EXPECT_EQ(count.load(), 0);
+    auto fut2 = std::async(std::launch::async, [&barrier1, &count]() {
+        barrier1.wait();
+        ++count;
     });
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    EXPECT_EQ(ct.load(), 2);
-    f2.get();
-    f1.get();
+    EXPECT_EQ(count.load(), 2);
+    fut2.get();
+    fut1.get();
 }
