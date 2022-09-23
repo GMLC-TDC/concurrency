@@ -175,17 +175,17 @@ class mock_allocator {
     {
     }
 
-    T* allocate(size_t n)
+    T* allocate(size_t size)
     {
-        auto p = std::allocator<T>{}.allocate(n);
-        log->emplace_back(event{n * sizeof(T), true});
+        auto p = std::allocator<T>{}.allocate(size);
+        log->emplace_back(event{size * sizeof(T), true});
         return p;
     }
-    void deallocate(T* p, size_t n)
+    void deallocate(T* p, size_t size)
     {
         if (p) {
-            std::allocator<T>{}.deallocate(p, n);
-            log->emplace_back(event{n * sizeof(T), false});
+            std::allocator<T>{}.deallocate(p, size);
+            log->emplace_back(event{size * sizeof(T), false});
         }
     }
 };

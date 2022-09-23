@@ -33,7 +33,7 @@ TEST(ordered_guarded, ordered_guarded_1)
 {
     ordered_guarded<int, shared_mutex> data(0);
 
-    data.modify([](int& x) { ++x; });
+    data.modify([](int& value) { ++value; });
 
     {
         auto data_handle = data.lock_shared();
@@ -47,23 +47,23 @@ TEST(ordered_guarded, ordered_guarded_1)
 
         std::thread th1([&data, &th1_ok]() {
             auto data_handle2 = data.try_lock_shared();
-            if (!data_handle2) th1_ok = false;
-            if (*data_handle2 != 1) th1_ok = false;
+            if (!data_handle2) { th1_ok = false; }
+            if (*data_handle2 != 1) { th1_ok = false; }
         });
 
         std::thread th2([&data, &th2_ok]() {
             auto data_handle2 =
                 data.try_lock_shared_for(std::chrono::milliseconds(20));
-            if (!data_handle2) th2_ok = false;
-            if (*data_handle2 != 1) th2_ok = false;
+            if (!data_handle2) { th2_ok = false; }
+            if (*data_handle2 != 1) { th2_ok = false; }
         });
 
         std::thread th3([&data, &th3_ok]() {
             auto data_handle2 = data.try_lock_shared_until(
                 std::chrono::steady_clock::now() +
                 std::chrono::milliseconds(20));
-            if (!data_handle2) th3_ok = false;
-            if (*data_handle2 != 1) th3_ok = false;
+            if (!data_handle2) { th3_ok = false; }
+            if (*data_handle2 != 1) { th3_ok = false; }
         });
 
         th1.join();
@@ -116,7 +116,7 @@ TEST(ordered_guarded, ordered_guarded_2)
     std::thread th4([&data, &th4_ok]() {
         int last_val = 0;
         while (last_val != 200000) {
-            int new_data = data.read([](const int& x) { return x; });
+            int new_data = data.read([](const int& value) { return value; });
             if (last_val > new_data) {
                 th4_ok = false;
             }
@@ -141,5 +141,5 @@ TEST(ordered_guarded, ordered_guarded_2)
     EXPECT_TRUE(th3_ok == true);
     EXPECT_TRUE(th4_ok == true);
 
-    EXPECT_EQ(data.modify([](const int& x) { return x; }), 200000);
+    EXPECT_EQ(data.modify([](const int& value) { return value; }), 200000);
 }
