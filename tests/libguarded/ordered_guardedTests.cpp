@@ -98,14 +98,14 @@ TEST(ordered_guarded, ordered_guarded_2)
 
     std::thread th1([&data]() {
         for (int i = 0; i < 100000; ++i) {
-            data.modify([](int& x) { ++x; });
+            data.modify([](int& value) { ++value; });
         }
     });
 
     std::thread th2([&data, &th2_ok]() {
         for (int i = 0; i < 100000; ++i) {
-            int check_i = data.modify([i](int& x) {
-                ++x;
+            int check_i = data.modify([i](int& value) {
+                ++value;
                 return i;
             });
             if (check_i != i) {
