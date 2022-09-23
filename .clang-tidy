@@ -8,6 +8,7 @@ Checks: "
   -google-runtime-references,
   -google-build-using-namespace,
   -google-default-arguments,
+  -google-readability-avoid-underscore-in-googletest-name,
   modernize*,
   -modernize-use-trailing-return-type,
   -modernize-use-override,
@@ -42,6 +43,7 @@ WarningsAsErrors: "
   -google-build-using-namespace,
   -google-default-arguments,
   -google-explicit-constructor,
+  -google-readability-avoid-underscore-in-googletest-name,
   modernize*,
   -modernize-use-trailing-return-type,
   -modernize-use-override,
@@ -68,8 +70,9 @@ WarningsAsErrors: "
   readability-*,
   -readability-magic-numbers,
   -readability-identifier-naming,
-  performance-*
-  -performance-unnecessary-value-param
+  performance-*,
+  -performance-unnecessary-value-param,
+  -readability-function-cognitive-complexity
   "
 
 HeaderFilterRegex: "src/helics/*.hp?p?"
@@ -180,6 +183,8 @@ CheckOptions:
     value: "4294967295"
   - key: readability-function-size.StatementThreshold
     value: "800"
+  - key: readability-function-cognitive-complexity.StatementThreshold
+    value: "150"
   - key: readability-identifier-naming.AbstractClassCase
     value: CamelCase
   - key: readability-identifier-naming.AbstractClassPrefix
