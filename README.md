@@ -1,7 +1,8 @@
-[![Build Status](https://travis-ci.com/GMLC-TDC/concurrency.svg?branch=master)](https://travis-ci.com/GMLC-TDC/concurrency)
 [![Build Status](https://dev.azure.com/phlptp/concurrency/_apis/build/status/GMLC-TDC.concurrency?branchName=master)](https://dev.azure.com/phlptp/concurrency/_build/latest?definitionId=2&branchName=master)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/GMLC-TDC/concurrency/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/GMLC-TDC/concurrency/tree/main)
 [![codecov](https://codecov.io/gh/GMLC-TDC/concurrency/branch/master/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/concurrency)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/357c0c3dfea243079af3e3a8faedea57)](https://www.codacy.com/app/GMLC-TDC/concurrency?utm_source=github.com&utm_medium=referral&utm_content=GMLC-TDC/concurrency&utm_campaign=Badge_Grade)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/GMLC-TDC/concurrency/main.svg)](https://results.pre-commit.ci/latest/github/GMLC-TDC/concurrency/main)
 [![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/concurrency/blob/master/LICENSE)
 
 # Concurrency
