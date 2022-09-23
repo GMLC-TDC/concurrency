@@ -26,6 +26,10 @@ target_link_libraries(concurrencyTests PUBLIC concurrency)
 add_gtest(concurrencyTests)
 set_target_properties(concurrencyTests PROPERTIES FOLDER tests)
 
+if(GMLC_CONCURRENCY_CLANG_TIDY)
+    set_property(TARGET concurrencyTests PROPERTY CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
+endif()
+
 add_subdirectory(libguarded)
 
 if(CMAKE_BUILD_TYPE STREQUAL Coverage)

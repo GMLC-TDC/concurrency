@@ -24,3 +24,7 @@ add_executable(libguarded_test ${LIBGUARDED_TEST_SOURCES})
 target_link_libraries(libguarded_test PUBLIC concurrency)
 add_gtest(libguarded_test)
 set_target_properties(libguarded_test PROPERTIES FOLDER tests)
+
+if(GMLC_CONCURRENCY_CLANG_TIDY)
+    set_property(TARGET libguarded_test PROPERTY CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
+endif()
