@@ -10,7 +10,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <stdexcept>
 #include <utility>
-#include <vector>
+#include <array>
 
 namespace gmlc::concurrency {
 
@@ -56,15 +56,11 @@ inline std::vector<TriplineType> make_triplines(int count)
     namespace gmlc::concurrency {                                              \
         TriplineType TripWire::getIndexedLine(unsigned int index)              \
         {                                                                      \
-            static const std::vector<TriplineType> triplines =                 \
+            static const std::array<TriplineType,COUNT> triplines =            \
                 make_triplines(COUNT);                                         \
-            return (index < COUNT) ?                                           \
-                triplines[index] :                                             \
-                (throw(std::out_of_range(                                      \
-                     "index exceeds the number of generated lines")),          \
-                 nullptr);                                                     \
+            return triplines.at(index);                                        \
         }                                                                      \
-    } /*namespace gmlc */
+    } /*namespace gmlc::concurrency */
 
 /** class to check if a trip line was tripped*/
 class TripWireDetector {
