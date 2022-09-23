@@ -23,10 +23,7 @@ set(GMLC_CONCURRENCY_VERSION_STRING
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # User settable
-    set(GMLC_CONCURRENCY_CXX_STD
-        "17"
-        CACHE STRING "The CMake standard to require"
-    )
+    set(GMLC_CONCURRENCY_CXX_STD "17" CACHE STRING "The CMake standard to require")
 
     # set(CUR_PROJ ON)
     set(CMAKE_CXX_STANDARD ${GMLC_CONCURRENCY_CXX_STD})
@@ -41,9 +38,9 @@ endif()
 # set the module path and include some common macros
 # -----------------------------------------------------------------------------
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/"
-                          "${PROJECT_SOURCE_DIR}/ThirdParty/cmake/"
-    )
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/"
+                      "${PROJECT_SOURCE_DIR}/ThirdParty/cmake/"
+)
 include(extraMacros)
 include(CMakeDependentOption)
 
