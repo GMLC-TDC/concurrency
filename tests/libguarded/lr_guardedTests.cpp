@@ -30,7 +30,7 @@ TEST(lr_guarded, lr_guarded_1)
     lr_guarded<int, std::timed_mutex> data(0);
 
     {
-        data.modify([](int& x) { ++x; });
+        data.modify([](int& value) { ++value; });
     }
 
     {
@@ -80,13 +80,13 @@ TEST(lr_guarded, lr_guarded_2)
 
     std::thread th1([&data]() {
         for (int i = 0; i < 100000; ++i) {
-            data.modify([](int& x) { ++x; });
+            data.modify([](int& value) { ++value; });
         }
     });
 
     std::thread th2([&data]() {
         for (int i = 0; i < 100000; ++i) {
-            data.modify([](int& x) { ++x; });
+            data.modify([](int& value) { ++value; });
         }
     });
 
