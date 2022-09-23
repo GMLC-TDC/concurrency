@@ -21,7 +21,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 using namespace gmlc::concurrency;
 
 /** test basic operations */
-TEST(triggervariable_tests, basic_tests)
+TEST(triggervariable, basic_tests)
 {
     TriggerVariable trigger;
 
@@ -41,7 +41,7 @@ TEST(triggervariable_tests, basic_tests)
 }
 
 /** test basic operations */
-TEST(triggervariable_tests, waitActivation)
+TEST(triggervariable, waitActivation)
 {
     TriggerVariable trigger;
     std::atomic<bool> started{false};
@@ -67,7 +67,7 @@ TEST(triggervariable_tests, waitActivation)
 }
 
 /** test basic operations */
-TEST(triggervariable_tests, waitTrigger)
+TEST(triggervariable, waitTrigger)
 {
     TriggerVariable trigger;
     trigger.activate();
@@ -94,7 +94,7 @@ TEST(triggervariable_tests, waitTrigger)
     EXPECT_TRUE(completed.load());
 }
 
-TEST(triggervariable_tests, reset1)
+TEST(triggervariable, reset1)
 {
     TriggerVariable trigger(true);
 
