@@ -109,14 +109,14 @@ template<typename T, typename M>
 auto shared_guarded_opt<T, M>::lock() const -> shared_handle
 {
     return (enabled) ? shared_handle(&m_obj, m_mutex) :
-                       shared_handle(&m_obj, shared_locker<M>::locker_type());
+        shared_handle(&m_obj, typename shared_locker<M>::locker_type{});
 }
 
 template<typename T, typename M>
 auto shared_guarded_opt<T, M>::try_lock() -> handle
 {
     return (enabled) ? try_lock_handle(&m_obj, m_mutex) :
-                       handle(&m_obj, std::unique_lock<M>());
+        handle(&m_obj, std::unique_lock<M>{});
 }
 
 template<typename T, typename M>
@@ -124,7 +124,7 @@ template<typename Duration>
 auto shared_guarded_opt<T, M>::try_lock_for(const Duration& duration) -> handle
 {
     return (enabled) ? try_lock_handle_for(&m_obj, m_mutex, duration) :
-                       handle(&m_obj, std::unique_lock<M>());
+        handle(&m_obj, std::unique_lock<M>{});
 }
 
 template<typename T, typename M>
@@ -133,7 +133,7 @@ auto shared_guarded_opt<T, M>::try_lock_until(const TimePoint& timepoint)
     -> handle
 {
     return (enabled) ? try_lock_handle_until(&m_obj, m_mutex, timepoint) :
-                       handle(&m_obj, std::unique_lock<M>());
+        handle(&m_obj, std::unique_lock<M>{});
 }
 
 template<typename T, typename M>

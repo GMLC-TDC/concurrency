@@ -217,3 +217,156 @@ TEST(shared_guarded_opt, shared_guarded_2)
 
     EXPECT_EQ(*data_handle, 200000);
 }
+
+
+TEST(shared_guarded_opt, shared_guarded_false)
+{
+    shared_guarded_opt<int, shared_mutex> data(false, 0);
+
+    {
+        auto data_handle = data.lock();
+
+        ++(*data_handle);
+    }
+
+    {
+        auto data_handle = data.try_lock();
+
+        EXPECT_TRUE(data_handle);
+        EXPECT_EQ(*data_handle, 1);
+
+        /* These tests must be done from another thread, because on
+        glibc std::mutex is actually a recursive mutex. */
+
+        std::atomic<bool> th1_ok(true);
+        std::atomic<bool> th2_ok(true);
+        std::atomic<bool> th3_ok(true);
+
+        std::thread th1([&]() {
+            auto data_handle2 = data.try_lock();
+            if (data_handle2) {
+                th1_ok = false;
+            }
+            });
+
+        std::thread th2([&]() {
+            auto data_handle2 =
+                data.try_lock_for(std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th2_ok = false;
+            }
+            });
+
+        std::thread th3([&]() {
+            auto data_handle2 = data.try_lock_until(
+                std::chrono::steady_clock::now() +
+                std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th3_ok = false;
+            }
+            });
+
+        th1.join();
+        th2.join();
+        th3.join();
+
+        EXPECT_FALSE(th1_ok);
+        EXPECT_FALSE(th2_ok);
+        EXPECT_FALSE(th3_ok);
+    }
+
+    {
+        auto data_handle = data.try_lock();
+
+        EXPECT_TRUE(data_handle);
+        EXPECT_EQ(*data_handle, 1);
+
+        std::atomic<bool> th1_ok(true);
+        std::atomic<bool> th2_ok(true);
+        std::atomic<bool> th3_ok(true);
+
+        std::thread th1([&]() {
+            auto data_handle2 = data.try_lock_shared();
+            if (data_handle2) {
+                th1_ok = false;
+            }
+            });
+
+        std::thread th2([&]() {
+            auto data_handle2 =
+                data.try_lock_shared_for(std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th2_ok = false;
+            }
+            });
+
+        std::thread th3([&]() {
+            auto data_handle2 = data.try_lock_shared_until(
+                std::chrono::steady_clock::now() +
+                std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th3_ok = false;
+            }
+            });
+
+        th1.join();
+        th2.join();
+        th3.join();
+
+        EXPECT_FALSE(th1_ok);
+        EXPECT_FALSE(th2_ok);
+        EXPECT_FALSE(th3_ok);
+    }
+
+    {
+        auto data_handle = data.lock_shared();
+
+        EXPECT_TRUE(data_handle);
+        EXPECT_EQ(*data_handle, 1);
+
+        std::atomic<bool> th1_ok(true);
+        std::atomic<bool> th2_ok(true);
+        std::atomic<bool> th3_ok(true);
+
+        std::thread th1([&]() {
+            auto data_handle2 = data.try_lock_shared();
+            if (!data_handle2) {
+                th1_ok = false;
+            }
+            if (*data_handle2 != 1) {
+                th1_ok = false;
+            }
+            });
+
+        std::thread th2([&]() {
+            auto data_handle2 =
+                data.try_lock_shared_for(std::chrono::milliseconds(20));
+            if (!data_handle2) {
+                th2_ok = false;
+            }
+            if (*data_handle2 != 1) {
+                th2_ok = false;
+            }
+            });
+
+        std::thread th3([&]() {
+            auto data_handle2 = data.try_lock_shared_until(
+                std::chrono::steady_clock::now() +
+                std::chrono::milliseconds(20));
+            if (!data_handle2) {
+                th3_ok = false;
+            }
+            if (*data_handle2 != 1) {
+                th3_ok = false;
+            }
+            });
+
+        th1.join();
+        th2.join();
+        th3.join();
+
+        EXPECT_TRUE(th1_ok);
+        EXPECT_TRUE(th2_ok);
+        EXPECT_TRUE(th3_ok);
+    }
+}
