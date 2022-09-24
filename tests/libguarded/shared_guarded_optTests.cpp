@@ -218,7 +218,6 @@ TEST(shared_guarded_opt, shared_guarded_2)
     EXPECT_EQ(*data_handle, 200000);
 }
 
-
 TEST(shared_guarded_opt, shared_guarded_false)
 {
     shared_guarded_opt<int, shared_mutex> data(false, 0);
@@ -247,7 +246,7 @@ TEST(shared_guarded_opt, shared_guarded_false)
             if (data_handle2) {
                 th1_ok = false;
             }
-            });
+        });
 
         std::thread th2([&]() {
             auto data_handle2 =
@@ -255,7 +254,7 @@ TEST(shared_guarded_opt, shared_guarded_false)
             if (data_handle2) {
                 th2_ok = false;
             }
-            });
+        });
 
         std::thread th3([&]() {
             auto data_handle2 = data.try_lock_until(
@@ -264,7 +263,7 @@ TEST(shared_guarded_opt, shared_guarded_false)
             if (data_handle2) {
                 th3_ok = false;
             }
-            });
+        });
 
         th1.join();
         th2.join();
@@ -290,7 +289,7 @@ TEST(shared_guarded_opt, shared_guarded_false)
             if (data_handle2) {
                 th1_ok = false;
             }
-            });
+        });
 
         std::thread th2([&]() {
             auto data_handle2 =
@@ -298,7 +297,7 @@ TEST(shared_guarded_opt, shared_guarded_false)
             if (data_handle2) {
                 th2_ok = false;
             }
-            });
+        });
 
         std::thread th3([&]() {
             auto data_handle2 = data.try_lock_shared_until(
@@ -307,7 +306,7 @@ TEST(shared_guarded_opt, shared_guarded_false)
             if (data_handle2) {
                 th3_ok = false;
             }
-            });
+        });
 
         th1.join();
         th2.join();
@@ -336,7 +335,7 @@ TEST(shared_guarded_opt, shared_guarded_false)
             if (*data_handle2 != 1) {
                 th1_ok = false;
             }
-            });
+        });
 
         std::thread th2([&]() {
             auto data_handle2 =
@@ -347,7 +346,7 @@ TEST(shared_guarded_opt, shared_guarded_false)
             if (*data_handle2 != 1) {
                 th2_ok = false;
             }
-            });
+        });
 
         std::thread th3([&]() {
             auto data_handle2 = data.try_lock_shared_until(
@@ -359,7 +358,7 @@ TEST(shared_guarded_opt, shared_guarded_false)
             if (*data_handle2 != 1) {
                 th3_ok = false;
             }
-            });
+        });
 
         th1.join();
         th2.join();
