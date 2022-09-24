@@ -69,8 +69,8 @@ TEST(rcu_guarded, rcu_guarded_1)
 
         int count = 0;
         volatile int escape;
-        for (int it:*handle) {
-            escape = it;
+        for (int value:*handle) {
+            escape = value;
             (void)escape;
             ++count;
         }
@@ -84,7 +84,7 @@ TEST(rcu_guarded, rcu_guarded_1)
         std::vector<std::thread> threads;
         for (int i = 0; i < num_writers; ++i) {
             threads.emplace_back([&]() {
-                while (!t_writers_done.load()) {
+                while (t_writers_done.load()==0) {
                     auto rHandle = my_list.lock_write();
                     volatile int escape;
                     //NOLINTNEXTLINE
@@ -152,7 +152,7 @@ TEST(rcu_guarded, rcu_guarded_1)
     }
 }
 
-// allocation events recorded by mock_allocator
+// allocation events recorded by MockAllocator
 struct event {
     size_t size;
     bool allocated;  // true for allocate(), false for deallocate()
@@ -160,20 +160,20 @@ struct event {
 using event_log = std::vector<event>;
 
 template<typename T>
-class mock_allocator {
+class MockAllocator {
     event_log* const log;
 
   public:
     using value_type = T;
 
-    explicit mock_allocator(event_log* elog) : log(elog) {}
-    mock_allocator(const mock_allocator& other) : log(other.log) {}
+    explicit MockAllocator(event_log* elog) : log(elog) {}
+    MockAllocator(const MockAllocator& other) : log(other.log) {}
 
     // converting copy constructor (requires friend)
     template<typename>
-    friend class mock_allocator;
+    friend class MockAllocator;
     template<typename U>
-    explicit mock_allocator(const mock_allocator<U>& other) : log(other.log)
+    explicit MockAllocator(const MockAllocator<U>& other) : log(other.log)
     {
     }
 
@@ -197,15 +197,15 @@ TEST(rcu_guarded, rcu_guarded_allocator)
     // large value type makes it easy to distinguish nodes from zombies
     // (this avoids any dependency on the private rcu_list node types)
     constexpr size_t value_size = 256;
-    auto is_zombie = [=](const event& e) { return e.size < value_size; };
-    auto is_alloc = [](const event& e) { return e.allocated; };
+    auto is_zombie = [=](const event& evnt) { return evnt.size < value_size; };
+    auto is_alloc = [](const event& evnt) { return evnt.allocated; };
 
     using T = std::aligned_storage<value_size>::type;
 
     event_log log;
     {
-        mock_allocator<T> alloc{&log};
-        rcu_guarded<rcu_list<T, std::mutex, mock_allocator<T>>> my_list(alloc);
+        MockAllocator<T> alloc{&log};
+        rcu_guarded<rcu_list<T, std::mutex, MockAllocator<T>>> my_list(alloc);
 
         auto handle = my_list.lock_write();  // allocates zombie
         handle->emplace_back();  // allocates node

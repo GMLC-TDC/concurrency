@@ -75,7 +75,7 @@ class rcu_guarded {
         }
 
         T* m_ptr;
-        mutable typename T::rcu_write_guard m_guard;
+        mutable typename T::rcu_write_guard m_guard{};
         mutable bool m_accessed;
     };
 
@@ -115,7 +115,7 @@ class rcu_guarded {
         }
 
         const T* m_ptr;
-        mutable typename T::rcu_read_guard m_guard;
+        mutable typename T::rcu_read_guard m_guard{};
         mutable bool m_accessed;
     };
 
