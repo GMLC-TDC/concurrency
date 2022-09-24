@@ -69,7 +69,7 @@ TEST(rcu_guarded, rcu_guarded_1)
 
         int count = 0;
         volatile int escape;
-        for (int value:*handle) {
+        for (int value : *handle) {
             escape = value;
             (void)escape;
             ++count;
@@ -84,7 +84,7 @@ TEST(rcu_guarded, rcu_guarded_1)
         std::vector<std::thread> threads;
         for (int i = 0; i < num_writers; ++i) {
             threads.emplace_back([&]() {
-                while (t_writers_done.load()==0) {
+                while (t_writers_done.load() == 0) {
                     auto rHandle = my_list.lock_write();
                     volatile int escape;
                     // NOLINTNEXTLINE
