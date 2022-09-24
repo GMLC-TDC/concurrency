@@ -11,7 +11,7 @@
  ***********************************************************************/
 
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
@@ -30,7 +30,7 @@ TEST(lr_guarded, lr_guarded_1)
     lr_guarded<int, std::timed_mutex> data(0);
 
     {
-        data.modify([](int& x) { ++x; });
+        data.modify([](int& value) { ++value; });
     }
 
     {
@@ -46,14 +46,16 @@ TEST(lr_guarded, lr_guarded_1)
         });
 
         std::thread th2([&data]() {
-            auto data_handle2 = data.try_lock_shared_for(std::chrono::milliseconds(20));
+            auto data_handle2 =
+                data.try_lock_shared_for(std::chrono::milliseconds(20));
             EXPECT_TRUE(data_handle2 != nullptr);
             EXPECT_EQ(*data_handle2, 1);
         });
 
         std::thread th3([&data]() {
             auto data_handle2 = data.try_lock_shared_until(
-                std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
+                std::chrono::steady_clock::now() +
+                std::chrono::milliseconds(20));
             EXPECT_TRUE(data_handle2 != nullptr);
             EXPECT_EQ(*data_handle2, 1);
         });
@@ -78,13 +80,13 @@ TEST(lr_guarded, lr_guarded_2)
 
     std::thread th1([&data]() {
         for (int i = 0; i < 100000; ++i) {
-            data.modify([](int& x) { ++x; });
+            data.modify([](int& value) { ++value; });
         }
     });
 
     std::thread th2([&data]() {
         for (int i = 0; i < 100000; ++i) {
-            data.modify([](int& x) { ++x; });
+            data.modify([](int& value) { ++value; });
         }
     });
 

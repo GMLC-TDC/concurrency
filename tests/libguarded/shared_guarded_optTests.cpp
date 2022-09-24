@@ -11,7 +11,7 @@
  ***********************************************************************/
 
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
@@ -19,18 +19,14 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 /*
 modified to use google test
 */
+
 #include "gtest/gtest.h"
 #include <atomic>
 #include <libguarded/shared_guarded_opt.hpp>
+#include <shared_mutex>
 #include <thread>
 
-#ifndef HAVE_CXX14
-//#error This file requires the C++14 shared_mutex functionality
-#endif
-
-#include <shared_mutex>
 using shared_mutex = std::shared_timed_mutex;
-namespace chrono = std::chrono;
 
 using namespace gmlc::libguarded;
 
@@ -59,18 +55,26 @@ TEST(shared_guarded_opt, shared_guarded_1)
 
         std::thread th1([&]() {
             auto data_handle2 = data.try_lock();
-            if (data_handle2) th1_ok = false;
+            if (data_handle2) {
+                th1_ok = false;
+            }
         });
 
         std::thread th2([&]() {
-            auto data_handle2 = data.try_lock_for(std::chrono::milliseconds(20));
-            if (data_handle2) th2_ok = false;
+            auto data_handle2 =
+                data.try_lock_for(std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th2_ok = false;
+            }
         });
 
         std::thread th3([&]() {
             auto data_handle2 = data.try_lock_until(
-                std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
-            if (data_handle2) th3_ok = false;
+                std::chrono::steady_clock::now() +
+                std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th3_ok = false;
+            }
         });
 
         th1.join();
@@ -94,18 +98,26 @@ TEST(shared_guarded_opt, shared_guarded_1)
 
         std::thread th1([&]() {
             auto data_handle2 = data.try_lock_shared();
-            if (data_handle2) th1_ok = false;
+            if (data_handle2) {
+                th1_ok = false;
+            }
         });
 
         std::thread th2([&]() {
-            auto data_handle2 = data.try_lock_shared_for(std::chrono::milliseconds(20));
-            if (data_handle2) th2_ok = false;
+            auto data_handle2 =
+                data.try_lock_shared_for(std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th2_ok = false;
+            }
         });
 
         std::thread th3([&]() {
             auto data_handle2 = data.try_lock_shared_until(
-                std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
-            if (data_handle2) th3_ok = false;
+                std::chrono::steady_clock::now() +
+                std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th3_ok = false;
+            }
         });
 
         th1.join();
@@ -129,21 +141,35 @@ TEST(shared_guarded_opt, shared_guarded_1)
 
         std::thread th1([&]() {
             auto data_handle2 = data.try_lock_shared();
-            if (!data_handle2) th1_ok = false;
-            if (*data_handle2 != 1) th1_ok = false;
+            if (!data_handle2) {
+                th1_ok = false;
+            }
+            if (*data_handle2 != 1) {
+                th1_ok = false;
+            }
         });
 
         std::thread th2([&]() {
-            auto data_handle2 = data.try_lock_shared_for(std::chrono::milliseconds(20));
-            if (!data_handle2) th2_ok = false;
-            if (*data_handle2 != 1) th2_ok = false;
+            auto data_handle2 =
+                data.try_lock_shared_for(std::chrono::milliseconds(20));
+            if (!data_handle2) {
+                th2_ok = false;
+            }
+            if (*data_handle2 != 1) {
+                th2_ok = false;
+            }
         });
 
         std::thread th3([&]() {
             auto data_handle2 = data.try_lock_shared_until(
-                std::chrono::steady_clock::now() + std::chrono::milliseconds(20));
-            if (!data_handle2) th3_ok = false;
-            if (*data_handle2 != 1) th3_ok = false;
+                std::chrono::steady_clock::now() +
+                std::chrono::milliseconds(20));
+            if (!data_handle2) {
+                th3_ok = false;
+            }
+            if (*data_handle2 != 1) {
+                th3_ok = false;
+            }
         });
 
         th1.join();
@@ -190,4 +216,156 @@ TEST(shared_guarded_opt, shared_guarded_2)
     auto data_handle = data.lock();
 
     EXPECT_EQ(*data_handle, 200000);
+}
+
+TEST(shared_guarded_opt, shared_guarded_false)
+{
+    shared_guarded_opt<int, shared_mutex> data(false, 0);
+
+    {
+        auto data_handle = data.lock();
+
+        ++(*data_handle);
+    }
+
+    {
+        auto data_handle = data.try_lock();
+
+        EXPECT_TRUE(data_handle);
+        EXPECT_EQ(*data_handle, 1);
+
+        /* These tests must be done from another thread, because on
+        glibc std::mutex is actually a recursive mutex. */
+
+        std::atomic<bool> th1_ok(true);
+        std::atomic<bool> th2_ok(true);
+        std::atomic<bool> th3_ok(true);
+
+        std::thread th1([&]() {
+            auto data_handle2 = data.try_lock();
+            if (data_handle2) {
+                th1_ok = false;
+            }
+        });
+
+        std::thread th2([&]() {
+            auto data_handle2 =
+                data.try_lock_for(std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th2_ok = false;
+            }
+        });
+
+        std::thread th3([&]() {
+            auto data_handle2 = data.try_lock_until(
+                std::chrono::steady_clock::now() +
+                std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th3_ok = false;
+            }
+        });
+
+        th1.join();
+        th2.join();
+        th3.join();
+
+        EXPECT_FALSE(th1_ok);
+        EXPECT_FALSE(th2_ok);
+        EXPECT_FALSE(th3_ok);
+    }
+
+    {
+        auto data_handle = data.try_lock();
+
+        EXPECT_TRUE(data_handle);
+        EXPECT_EQ(*data_handle, 1);
+
+        std::atomic<bool> th1_ok(true);
+        std::atomic<bool> th2_ok(true);
+        std::atomic<bool> th3_ok(true);
+
+        std::thread th1([&]() {
+            auto data_handle2 = data.try_lock_shared();
+            if (data_handle2) {
+                th1_ok = false;
+            }
+        });
+
+        std::thread th2([&]() {
+            auto data_handle2 =
+                data.try_lock_shared_for(std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th2_ok = false;
+            }
+        });
+
+        std::thread th3([&]() {
+            auto data_handle2 = data.try_lock_shared_until(
+                std::chrono::steady_clock::now() +
+                std::chrono::milliseconds(20));
+            if (data_handle2) {
+                th3_ok = false;
+            }
+        });
+
+        th1.join();
+        th2.join();
+        th3.join();
+
+        EXPECT_FALSE(th1_ok);
+        EXPECT_FALSE(th2_ok);
+        EXPECT_FALSE(th3_ok);
+    }
+
+    {
+        auto data_handle = data.lock_shared();
+
+        EXPECT_TRUE(data_handle);
+        EXPECT_EQ(*data_handle, 1);
+
+        std::atomic<bool> th1_ok(true);
+        std::atomic<bool> th2_ok(true);
+        std::atomic<bool> th3_ok(true);
+
+        std::thread th1([&]() {
+            auto data_handle2 = data.try_lock_shared();
+            if (!data_handle2) {
+                th1_ok = false;
+            }
+            if (*data_handle2 != 1) {
+                th1_ok = false;
+            }
+        });
+
+        std::thread th2([&]() {
+            auto data_handle2 =
+                data.try_lock_shared_for(std::chrono::milliseconds(20));
+            if (!data_handle2) {
+                th2_ok = false;
+            }
+            if (*data_handle2 != 1) {
+                th2_ok = false;
+            }
+        });
+
+        std::thread th3([&]() {
+            auto data_handle2 = data.try_lock_shared_until(
+                std::chrono::steady_clock::now() +
+                std::chrono::milliseconds(20));
+            if (!data_handle2) {
+                th3_ok = false;
+            }
+            if (*data_handle2 != 1) {
+                th3_ok = false;
+            }
+        });
+
+        th1.join();
+        th2.join();
+        th3.join();
+
+        EXPECT_TRUE(th1_ok);
+        EXPECT_TRUE(th2_ok);
+        EXPECT_TRUE(th3_ok);
+    }
 }

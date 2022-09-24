@@ -1,59 +1,61 @@
-# LLNS Copyright Start
-# Copyright (c) 2017, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
-# Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
-# Produced at the Lawrence Livermore National Laboratory.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# See the top-level NOTICE for additional details.
 # All rights reserved.
-# For details, see the LICENSE file.
-# LLNS Copyright End
+#
+# SPDX-License-Identifier: BSD-3-Clause
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+include(CheckCXXCompilerFlag)
 
-
-#check for clang 3.4 and the fact that CMAKE_CXX_STANDARD doesn't work yet for that compiler
-
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.5)
-	set(VERSION_OPTION -std=c++1y)
-  else ()
-		if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0)
-	if (ENABLE_CXX_17)
-				set(VERSION_OPTION -std=c++17)
-			else(ENABLE_CXX_17)
-				set(VERSION_OPTION -std=c++14)
-			endif(ENABLE_CXX_17)
-		else()
-			if (ENABLE_CXX_17)
-		set(VERSION_OPTION -std=c++1z)
-			else(ENABLE_CXX_17)
-				set(VERSION_OPTION -std=c++14)
-	endif(ENABLE_CXX_17)
-  endif()
-	endif()
-elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-  # c++14 becomes default in GCC 6.1
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.1)
-    set(VERSION_OPTION -std=c++1y)
-  else ()
-    if (ENABLE_CXX_17)
-		set(VERSION_OPTION -std=c++1z)
-	else(ENABLE_CXX_17)
-		set(VERSION_OPTION -std=c++14)
-	endif(ENABLE_CXX_17)
-  endif()
+if(NOT CMAKE_CXX_STANDARD)
+    if(${PROJECT_NAME}_CXX_STANDARD)
+        set(CMAKE_CXX_STANDARD ${PROJECT_NAME}_CXX_STANDARD)
+    else()
+        set(CMAKE_CXX_STANDARD 17)
+    endif()
 endif()
 
-#boost libraries don't compile under /std:c++latest flag 1.66 might solve this issue
-if (MSVC)
-	if (ENABLE_CXX_17)
-		set(VERSION_OPTION /std:c++latest)
-	else()
-		set(VERSION_OPTION /std:c++14)
-	endif(ENABLE_CXX_17)
+if(CMAKE_CXX_STANDARD LESS 17)
+    message(FATAL_ERROR "${PROJECT_NAME} requires C++17 or greater")
 endif()
 
-if (NOT VERSION_OPTION)
-   if (NOT WIN32)
-		set(VERSION_OPTION -std=c++14)
-	endif()
+if(MSVC)
+    if(CMAKE_CXX_STANDARD EQUAL 17)
+        check_cxx_compiler_flag(/std:c++17 has_std_17_flag)
+        if(has_std_17_flag)
+            set(CXX_STANDARD_FLAG /std:c++17)
+            set(has_std_1z_flag ON)
+        else()
+            set(CXX_STANDARD_FLAG /std:c++latest)
+        endif()
+    else()
+        set(CXX_STANDARD_FLAG /std:c++latest)
+    endif()
+else()
+
+    if(CMAKE_CXX_STANDARD GREATER_EQUAL 20)
+        check_cxx_compiler_flag(-std=c++20 has_std_20_flag)
+        if(has_std_20_flag)
+            set(CXX_STANDARD_FLAG -std=c++20)
+            set(has_std_2a_flag ON)
+        else()
+            check_cxx_compiler_flag(-std=c++2a has_std_2a_flag)
+            if(has_std_2a_flag)
+                set(CXX_STANDARD_FLAG -std=c++2a)
+            endif()
+        endif()
+    elseif(CMAKE_CXX_STANDARD EQUAL 17)
+        if(CYGWIN AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            set(CXX_STANDARD_FLAG -std=gnu++17)
+        else()
+            set(CXX_STANDARD_FLAG -std=c++17)
+        endif()
+
+    else()
+        message(FATAL_ERROR "HELICS requires C++17 or Higher")
+    endif()
+
 endif()
+# set(CMAKE_REQUIRED_FLAGS ${CXX_STANDARD_FLAG})

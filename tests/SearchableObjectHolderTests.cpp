@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
@@ -21,7 +21,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 using namespace gmlc::concurrency;
 
 /** test basic operations */
-TEST(SOH_tests, basic_tests)
+TEST(SOH, basic)
 {
     SearchableObjectHolder<std::string> SOH1;
     SOH1.addObject("test1", std::make_shared<std::string>("test_1"));
@@ -35,7 +35,7 @@ TEST(SOH_tests, basic_tests)
     EXPECT_FALSE(res2);
 }
 
-TEST(SOH_tests, contained_tests)
+TEST(SOH, contained)
 {
     SearchableObjectHolder<std::string> SOH1;
     EXPECT_TRUE(SOH1.empty());
@@ -43,15 +43,15 @@ TEST(SOH_tests, contained_tests)
     SOH1.addObject("test2", std::make_shared<std::string>("test_2"));
     SOH1.addObject("test3", std::make_shared<std::string>("test_3"));
 
-    auto v = SOH1.getObjects();
-    ASSERT_EQ(v.size(), 3u);
-    EXPECT_EQ(*(v[0]), "test_1");
-    EXPECT_EQ(*(v[1]), "test_2");
-    EXPECT_EQ(*(v[2]), "test_3");
-    v.clear();
+    auto objects = SOH1.getObjects();
+    ASSERT_EQ(objects.size(), 3U);
+    EXPECT_EQ(*(objects[0]), "test_1");
+    EXPECT_EQ(*(objects[1]), "test_2");
+    EXPECT_EQ(*(objects[2]), "test_3");
+    objects.clear();
 }
 
-TEST(SOH_tests, contained_type_check)
+TEST(SOH, containedType)
 {
     SearchableObjectHolder<std::string, char> SOH1;
     EXPECT_TRUE(SOH1.empty());
@@ -59,13 +59,13 @@ TEST(SOH_tests, contained_type_check)
     SOH1.addObject("test2", std::make_shared<std::string>("test_2"), '2');
     SOH1.addObject("test3", std::make_shared<std::string>("test_3"), '3');
 
-    auto v = SOH1.getObjects();
-    ASSERT_EQ(v.size(), 3u);
-    EXPECT_EQ(*(v[0]), "test_1");
-    EXPECT_EQ(*(v[1]), "test_2");
-    EXPECT_EQ(*(v[2]), "test_3");
+    auto objects = SOH1.getObjects();
+    ASSERT_EQ(objects.size(), 3U);
+    EXPECT_EQ(*(objects[0]), "test_1");
+    EXPECT_EQ(*(objects[1]), "test_2");
+    EXPECT_EQ(*(objects[2]), "test_3");
 
     EXPECT_TRUE(SOH1.checkObjectType("test1", '1'));
 
-    v.clear();
+    objects.clear();
 }

@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -52,15 +52,40 @@ else() # cmake <3.11
 
 endif()
 
-set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE INTERNAL "")
-set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "Suppressing benchmark's tests")
-set(BENCHMARK_ENABLE_INSTALL OFF CACHE INTERNAL "" )
-set(BENCHMARK_DOWNLOAD_DEPENDENCIES ON CACHE INTERNAL "")
-set(BENCHMARK_ENABLE_ASSEMBLY_TESTS OFF CACHE INTERNAL "")
-# tell google benchmarks to use std regex since we only compile on compilers with std regex
-set(HAVE_STD_REGEX ON CACHE INTERNAL "" )
-set(HAVE_POSIX_REGEX OFF CACHE INTERNAL "" )
-set(HAVE_GNU_POSIX_REGEX OFF CACHE INTERNAL "" )
+set(BENCHMARK_ENABLE_GTEST_TESTS
+    OFF
+    CACHE INTERNAL ""
+)
+set(BENCHMARK_ENABLE_TESTING
+    OFF
+    CACHE INTERNAL "Suppressing benchmark's tests"
+)
+set(BENCHMARK_ENABLE_INSTALL
+    OFF
+    CACHE INTERNAL ""
+)
+set(BENCHMARK_DOWNLOAD_DEPENDENCIES
+    ON
+    CACHE INTERNAL ""
+)
+set(BENCHMARK_ENABLE_ASSEMBLY_TESTS
+    OFF
+    CACHE INTERNAL ""
+)
+# tell google benchmarks to use std regex since we only compile on compilers with std
+# regex
+set(HAVE_STD_REGEX
+    ON
+    CACHE INTERNAL ""
+)
+set(HAVE_POSIX_REGEX
+    OFF
+    CACHE INTERNAL ""
+)
+set(HAVE_GNU_POSIX_REGEX
+    OFF
+    CACHE INTERNAL ""
+)
 add_subdirectory(${${gbName}_SOURCE_DIR} ${${gbName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 # Target must already exist
@@ -91,12 +116,16 @@ hide_variable(BENCHMARK_USE_LIBCXX)
 hide_variable(LIBRT)
 
 set_target_properties(benchmark benchmark_main PROPERTIES FOLDER "Extern")
-target_compile_options(benchmark_main PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4244 /wd4800>)
+target_compile_options(
+    benchmark_main PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4244 /wd4800>
+)
 target_compile_options(benchmark PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4244 /wd4800>)
 
 if(MSVC AND MSVC_VERSION GREATER_EQUAL 1900)
-    target_compile_definitions(benchmark PUBLIC
-                               _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-    target_compile_definitions(benchmark_main PUBLIC
-                               _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+    target_compile_definitions(
+        benchmark PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
+    )
+    target_compile_definitions(
+        benchmark_main PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
+    )
 endif()

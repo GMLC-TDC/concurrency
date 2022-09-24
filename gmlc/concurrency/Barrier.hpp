@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
@@ -14,7 +14,7 @@ namespace concurrency {
     /** class implementing a synchronization barrier*/
     class Barrier {
       public:
-        explicit Barrier(size_t count): threshold_(count), count_(count) {}
+        explicit Barrier(size_t count) : threshold_(count), count_(count) {}
         /// wait on the barrier
         void wait()
         {
@@ -44,11 +44,11 @@ namespace concurrency {
         }
 
       private:
-        std::mutex mtx; //!< mutex for protecting count_
-        std::condition_variable cv; //!< associated condition variable
+        std::mutex mtx;  //!< mutex for protecting count_
+        std::condition_variable cv;  //!< associated condition variable
         std::size_t threshold_;
         std::size_t count_;
         std::size_t generation_{0};
     };
-} // namespace concurrency
-} // namespace gmlc
+}  // namespace concurrency
+}  // namespace gmlc

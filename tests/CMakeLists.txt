@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -14,28 +14,32 @@ include(AddGoogletest)
 
 set(CONCURRENCY_TEST_SOURCES
     TriggerVariableTests.cpp
-	SearchableObjectHolderTests.cpp
-	TripWireTests.cpp
-	DelayedObjectsTests.cpp
-	BarrierTests.cpp
-	LatchTests.cpp
-    )
+    SearchableObjectHolderTests.cpp
+    TripWireTests.cpp
+    DelayedObjectsTests.cpp
+    BarrierTests.cpp
+    LatchTests.cpp
+)
 
 add_executable(concurrencyTests ${CONCURRENCY_TEST_SOURCES})
 target_link_libraries(concurrencyTests PUBLIC concurrency)
 add_gtest(concurrencyTests)
 set_target_properties(concurrencyTests PROPERTIES FOLDER tests)
-   
+
+if(GMLC_CONCURRENCY_CLANG_TIDY)
+    set_property(TARGET concurrencyTests PROPERTY CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
+endif()
 
 add_subdirectory(libguarded)
 
 if(CMAKE_BUILD_TYPE STREQUAL Coverage)
     include(CodeCoverage)
     setup_target_for_coverage(
-        NAME CONCURRENCY_coverage
-        EXECUTABLE ctest
+        NAME
+        CONCURRENCY_coverage
+        EXECUTABLE
+        ctest
         DEPENDENCIES
-          ${CONCURRENCY_TESTS}
-          )
+        ${CONCURRENCY_TESTS}
+    )
 endif()
-

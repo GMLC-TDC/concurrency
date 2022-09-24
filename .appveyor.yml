@@ -17,4 +17,3 @@ build_script:
 test_script:
   - cd build
   - ps: ctest --output-on-failure -C Debug
-
