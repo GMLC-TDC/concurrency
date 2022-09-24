@@ -27,7 +27,6 @@ modified to use google test
 #include <thread>
 
 using shared_mutex = std::shared_timed_mutex;
-namespace chrono = std::chrono;
 
 using namespace gmlc::libguarded;
 
