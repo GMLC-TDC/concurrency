@@ -41,7 +41,7 @@ TEST(rcu_guarded, rcu_guarded_1)
         auto handle = my_list.lock_read();
 
         int count = 0;
-        for (auto item:*handle) {
+        for (auto item : *handle) {
             ++count;
             EXPECT_EQ(item, 42);
         }
@@ -69,7 +69,7 @@ TEST(rcu_guarded, rcu_guarded_1)
 
         int count = 0;
         volatile int escape;
-        for (int it:*handle) {
+        for (int it : *handle) {
             escape = it;
             (void)escape;
             ++count;
@@ -87,8 +87,9 @@ TEST(rcu_guarded, rcu_guarded_1)
                 while (!t_writers_done.load()) {
                     auto rHandle = my_list.lock_write();
                     volatile int escape;
-                    //NOLINTNEXTLINE
-                    for (auto it = rHandle->begin(); it != rHandle->end(); ++it) {
+                    // NOLINTNEXTLINE
+                    for (auto it = rHandle->begin(); it != rHandle->end();
+                         ++it) {
                         escape = *it;
                         (void)escape;
                     }
@@ -97,11 +98,13 @@ TEST(rcu_guarded, rcu_guarded_1)
 
             threads.emplace_back([&]() {
                 int count = 0;
-                while (t_writers_done.load()==0 && count < 1000) {
+                while (t_writers_done.load() == 0 && count < 1000) {
                     auto writeHandle = my_list.lock_write();
                     volatile int escape;
-                    //NOLINTNEXTLINE
-                    for (auto it = writeHandle->begin(); it != writeHandle->end(); ++it) {
+                    // NOLINTNEXTLINE
+                    for (auto it = writeHandle->begin();
+                         it != writeHandle->end();
+                         ++it) {
                         escape = *it;
                         (void)escape;
                     }
@@ -120,14 +123,16 @@ TEST(rcu_guarded, rcu_guarded_1)
         threads.emplace_back([&]() {
             while (t_writers_done.load() != num_writers) {
                 auto writeHandle = my_list.lock_write();
-                for (auto iter = writeHandle->begin(); iter != writeHandle->end();) {
+                for (auto iter = writeHandle->begin();
+                     iter != writeHandle->end();) {
                     iter = writeHandle->erase(iter);
                 }
             }
 
             // Do one last time now that writers are finished
             auto writeHandle = my_list.lock_write();
-            for (auto iter = writeHandle->begin(); iter != writeHandle->end();) {
+            for (auto iter = writeHandle->begin();
+                 iter != writeHandle->end();) {
                 iter = writeHandle->erase(iter);
             }
         });
@@ -142,7 +147,7 @@ TEST(rcu_guarded, rcu_guarded_1)
 
         int count = 0;
         volatile int escape;
-        //NOLINTNEXTLINE
+        // NOLINTNEXTLINE
         for (auto it = handle->begin(); it != handle->end(); ++it) {
             escape = *it;
             (void)escape;
