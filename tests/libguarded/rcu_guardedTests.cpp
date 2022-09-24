@@ -33,16 +33,15 @@ TEST(rcu_guarded, rcu_guarded_1)
     rcu_guarded<rcu_list<int>> my_list;
 
     {
-        auto h = my_list.lock_write();
-        h->push_back(42);
+        auto handle = my_list.lock_write();
+        handle->push_back(42);
     }
 
     {
-        auto h = my_list.lock_read();
+        auto handle = my_list.lock_read();
 
         int count = 0;
-        for (auto it = h->begin(); it != h->end(); ++it) {
-            auto item = *it;
+        for (auto item:*handle) {
             ++count;
             EXPECT_EQ(item, 42);
         }
@@ -50,15 +49,15 @@ TEST(rcu_guarded, rcu_guarded_1)
     }
 
     {
-        auto rh = my_list.lock_read();
-        auto wh = my_list.lock_write();
+        auto readHandle = my_list.lock_read();
+        auto writeHandle = my_list.lock_write();
 
-        auto iter = rh->begin();
+        auto iter = readHandle->begin();
 
-        wh->erase(wh->begin());
+        writeHandle->erase(writeHandle->begin());
 
         int count = 0;
-        for (; iter != rh->end(); ++iter) {
+        for (; iter != readHandle->end(); ++iter) {
             ++count;
             EXPECT_EQ(*iter, 42);
         }
@@ -66,12 +65,12 @@ TEST(rcu_guarded, rcu_guarded_1)
     }
 
     {
-        auto h = my_list.lock_read();
+        auto handle = my_list.lock_read();
 
         int count = 0;
         volatile int escape;
-        for (auto it = h->begin(); it != h->end(); ++it) {
-            escape = *it;
+        for (int it:*handle) {
+            escape = it;
             (void)escape;
             ++count;
         }
@@ -86,9 +85,10 @@ TEST(rcu_guarded, rcu_guarded_1)
         for (int i = 0; i < num_writers; ++i) {
             threads.emplace_back([&]() {
                 while (!t_writers_done.load()) {
-                    auto rh = my_list.lock_write();
+                    auto rHandle = my_list.lock_write();
                     volatile int escape;
-                    for (auto it = rh->begin(); it != rh->end(); ++it) {
+                    //NOLINTNEXTLINE
+                    for (auto it = rHandle->begin(); it != rHandle->end(); ++it) {
                         escape = *it;
                         (void)escape;
                     }
@@ -97,18 +97,19 @@ TEST(rcu_guarded, rcu_guarded_1)
 
             threads.emplace_back([&]() {
                 int count = 0;
-                while (!t_writers_done.load() && count < 1000) {
-                    auto wh = my_list.lock_write();
+                while (t_writers_done.load()==0 && count < 1000) {
+                    auto writeHandle = my_list.lock_write();
                     volatile int escape;
-                    for (auto it = wh->begin(); it != wh->end(); ++it) {
+                    //NOLINTNEXTLINE
+                    for (auto it = writeHandle->begin(); it != writeHandle->end(); ++it) {
                         escape = *it;
                         (void)escape;
                     }
                     for (int ii = 0; ii < 2; ++ii) {
-                        wh->emplace_back(ii);
-                        wh->emplace_front(ii - 1);
-                        wh->push_back(ii + 4);
-                        wh->push_front(ii - 7);
+                        writeHandle->emplace_back(ii);
+                        writeHandle->emplace_front(ii - 1);
+                        writeHandle->push_back(ii + 4);
+                        writeHandle->push_front(ii - 7);
                     }
                     ++count;
                 }
@@ -118,16 +119,16 @@ TEST(rcu_guarded, rcu_guarded_1)
 
         threads.emplace_back([&]() {
             while (t_writers_done.load() != num_writers) {
-                auto wh = my_list.lock_write();
-                for (auto iter = wh->begin(); iter != wh->end();) {
-                    iter = wh->erase(iter);
+                auto writeHandle = my_list.lock_write();
+                for (auto iter = writeHandle->begin(); iter != writeHandle->end();) {
+                    iter = writeHandle->erase(iter);
                 }
             }
 
             // Do one last time now that writers are finished
-            auto wh = my_list.lock_write();
-            for (auto iter = wh->begin(); iter != wh->end();) {
-                iter = wh->erase(iter);
+            auto writeHandle = my_list.lock_write();
+            for (auto iter = writeHandle->begin(); iter != writeHandle->end();) {
+                iter = writeHandle->erase(iter);
             }
         });
 
@@ -137,11 +138,12 @@ TEST(rcu_guarded, rcu_guarded_1)
     }
 
     {
-        auto h = my_list.lock_read();
+        auto handle = my_list.lock_read();
 
         int count = 0;
         volatile int escape;
-        for (auto it = h->begin(); it != h->end(); ++it) {
+        //NOLINTNEXTLINE
+        for (auto it = handle->begin(); it != handle->end(); ++it) {
             escape = *it;
             (void)escape;
             ++count;
@@ -177,14 +179,14 @@ class mock_allocator {
 
     T* allocate(size_t size)
     {
-        auto p = std::allocator<T>{}.allocate(size);
+        auto memory = std::allocator<T>{}.allocate(size);
         log->emplace_back(event{size * sizeof(T), true});
-        return p;
+        return memory;
     }
-    void deallocate(T* p, size_t size)
+    void deallocate(T* memory, size_t size)
     {
-        if (p) {
-            std::allocator<T>{}.deallocate(p, size);
+        if (memory) {
+            std::allocator<T>{}.deallocate(memory, size);
             log->emplace_back(event{size * sizeof(T), false});
         }
     }
@@ -205,9 +207,9 @@ TEST(rcu_guarded, rcu_guarded_allocator)
         mock_allocator<T> alloc{&log};
         rcu_guarded<rcu_list<T, std::mutex, mock_allocator<T>>> my_list(alloc);
 
-        auto h = my_list.lock_write();  // allocates zombie
-        h->emplace_back();  // allocates node
-        h->erase(h->begin());  // allocates zombie
+        auto handle = my_list.lock_write();  // allocates zombie
+        handle->emplace_back();  // allocates node
+        handle->erase(handle->begin());  // allocates zombie
 
         // expect 3 allocations, two of which are zombies. just count events,
         // don't make assumptions about ordering
