@@ -86,7 +86,7 @@ class DelayedDestructor {
             if (!lock.try_lock_for(wait)) {
                 return elementSize;
             }
-            std::size_t elementSize = ElementsToBeDestroyed.size();
+            elementSize = ElementsToBeDestroyed.size();
             if (elementSize > 0) {
                 std::vector<std::shared_ptr<X>> ecall;
                 std::vector<std::string> ename;
