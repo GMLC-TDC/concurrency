@@ -22,7 +22,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 namespace gmlc::concurrency {
 
-/** helper class to contain a list of objects that need to be referencable
+/** helper class to contain a list of objects that need to be referenceable
  * at some level the objects are stored through shared_ptrs*/
 template<class X, class Y = int>
 class SearchableObjectHolder {
