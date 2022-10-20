@@ -76,9 +76,10 @@ namespace gmlc::concurrency {
         DelayedDestructor& operator=(DelayedDestructor&&) noexcept = delete;
 
         /** destroy objects that are no longer used*/
-        size_t destroyObjects(std::chrono::milliseconds wait) noexcept
+        size_t destroyObjects() noexcept
         {
             std::size_t elementSize{static_cast<std::size_t>(-1)};
+            std::chrono::milliseconds wait(std::chrono::milliseconds(50));
             try {
                 std::unique_lock<std::timed_mutex> lock(destructionLock,std::defer_lock);
                 if (!lock.try_lock_for(wait))
