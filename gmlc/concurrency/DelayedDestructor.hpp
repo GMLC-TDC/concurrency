@@ -21,15 +21,14 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-namespace gmlc {
-namespace concurrency {
+namespace gmlc::concurrency {
     /** helper class to destroy objects at a late time when it is convenient and
  * there are no more possibilities of threading issues
  @details this is essentially a delayed garbage collector based on shared_ptrs*/
     template<class X>
     class DelayedDestructor {
       private:
-        std::mutex destructionLock;
+        std::timed_mutex destructionLock;
         std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
         std::function<void(std::shared_ptr<X>& ptr)> callBeforeDeleteFunction;
 #ifdef ENABLE_TRIPWIRE
@@ -77,11 +76,17 @@ namespace concurrency {
         DelayedDestructor& operator=(DelayedDestructor&&) noexcept = delete;
 
         /** destroy objects that are no longer used*/
-        size_t destroyObjects() noexcept
+        size_t destroyObjects(std::chrono::milliseconds wait) noexcept
         {
+            std::size_t elementSize{static_cast<std::size_t>(-1)};
             try {
-                std::unique_lock<std::mutex> lock(destructionLock);
-                if (!ElementsToBeDestroyed.empty()) {
+                std::unique_lock<std::timed_mutex> lock(destructionLock,std::defer_lock);
+                if (!lock.try_lock_for(wait))
+                {
+                    return elementSize;
+                }
+                std::size_t elementSize=ElementsToBeDestroyed.size();
+                if (elementSize>0) {
                     std::vector<std::shared_ptr<X>> ecall;
                     std::vector<std::string> ename;
                     for (auto& element : ElementsToBeDestroyed) {
@@ -108,6 +113,7 @@ namespace concurrency {
                             });
                         ElementsToBeDestroyed.erase(
                             loc, ElementsToBeDestroyed.end());
+                        elementSize=ElementsToBeDestroyed.size();
                         auto deleteFunc = callBeforeDeleteFunction;
                         lock.unlock();
                         // this needs to be done after the lock, so a destructor
@@ -119,40 +125,56 @@ namespace concurrency {
                         }
                         ecall.clear();  // make sure the destructors get called
                                         // before returning.
-                        lock.lock();  // reengage the lock so the size is
-                                      // correct
+                        // reengage the lock so the size is correct
+                        if (!lock.try_lock_for(wait))
+                        {
+                            return elementSize;
+                        }
                     }
                 }
+                return ElementsToBeDestroyed.size();
             }
             catch (...) {
             }
-            return ElementsToBeDestroyed.size();
+            return elementSize;
         }
 
         size_t destroyObjects(std::chrono::milliseconds delay)
         {
             using namespace std::literals::chrono_literals;
-            std::unique_lock<std::mutex> lock(destructionLock);
+            std::unique_lock<std::timed_mutex> lock(destructionLock,std::defer_lock);
+            if (!lock.try_lock_for(delay))
+            {
+                return static_cast<size_t>(-1);
+            }
             auto delayTime = (delay < 100ms) ? delay : 50ms;
             int delayCount =
-                (delay < 100ms) ? 1 : static_cast<int>((delay / 50).count());
+                (delay < 100ms) ? 1 : static_cast<int>((delay.count() / 50));
 
             int cnt = 0;
-            while ((!ElementsToBeDestroyed.empty()) && (cnt < delayCount)) {
+            auto elementSize=ElementsToBeDestroyed.size();
+            while (elementSize>0 && (cnt < delayCount)) {
                 if (cnt > 0)  // don't sleep on the first loop
                 {
-                    lock.unlock();
-                    std::this_thread::sleep_for(delayTime);
-                    ++cnt;
-                    lock.lock();
-                } else {
-                    ++cnt;
+                    if (delay > 4ms)
+                    {
+                        lock.unlock();
+                        std::this_thread::sleep_for(delayTime);
+                        if (!lock.try_lock_for(delayTime))
+                        {
+                            return elementSize;
+                        }
+                    }
                 }
-
-                if (!ElementsToBeDestroyed.empty()) {
+                ++cnt;
+                elementSize=ElementsToBeDestroyed.size();
+                if (elementSize>0) {
                     lock.unlock();
                     destroyObjects();
-                    lock.lock();
+                    if (!lock.try_lock_for(delayTime))
+                    {
+                        return elementSize;
+                    }
                 }
             }
             return ElementsToBeDestroyed.size();
@@ -160,10 +182,9 @@ namespace concurrency {
 
         void addObjectsToBeDestroyed(std::shared_ptr<X> obj)
         {
-            std::lock_guard<std::mutex> lock(destructionLock);
+            std::lock_guard<std::timed_mutex> lock(destructionLock);
             ElementsToBeDestroyed.push_back(std::move(obj));
         }
     };
 
 }  // namespace concurrency
-}  // namespace gmlc
