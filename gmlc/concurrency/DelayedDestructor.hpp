@@ -79,7 +79,7 @@ namespace gmlc::concurrency {
         size_t destroyObjects() noexcept
         {
             std::size_t elementSize{static_cast<std::size_t>(-1)};
-            std::chrono::milliseconds wait(std::chrono::milliseconds(50));
+            std::chrono::milliseconds wait(std::chrono::milliseconds(200));
             try {
                 std::unique_lock<std::timed_mutex> lock(destructionLock,std::defer_lock);
                 if (!lock.try_lock_for(wait))
@@ -144,7 +144,8 @@ namespace gmlc::concurrency {
         {
             using namespace std::literals::chrono_literals;
             std::unique_lock<std::timed_mutex> lock(destructionLock,std::defer_lock);
-            if (!lock.try_lock_for(delay))
+            auto minDelay=(delay > 200ms) ? minDelay : 200ms;
+            if (!lock.try_lock_for(minDelay))
             {
                 return static_cast<size_t>(-1);
             }
