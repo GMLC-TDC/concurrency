@@ -143,8 +143,8 @@ class DelayedDestructor {
         using namespace std::literals::chrono_literals;
         std::unique_lock<std::timed_mutex> lock(
             destructionLock, std::defer_lock);
-        auto minDelay=(delay > 200ms) ? delay : 200ms;
-        if (!lock.try_lock_for(minDelay)){
+        auto minDelay = (delay > 200ms) ? delay : 200ms;
+        if (!lock.try_lock_for(minDelay)) {
             return static_cast<size_t>(-1);
         }
         auto delayTime = (delay < 100ms) ? delay : 50ms;
