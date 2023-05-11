@@ -13,7 +13,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test data_block and data_view objects
  */
 
-#include "concurrency/SearchableObjectHolder.hpp"
+#include "concurrency/DelayedDestructor.hpp"
 
 #include "gtest/gtest.h"
 #include <iostream>
@@ -21,51 +21,25 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 using namespace gmlc::concurrency;
 
 /** test basic operations */
-TEST(SOH, basic)
+TEST(DelayedDestr, basic)
 {
-    SearchableObjectHolder<std::string> SOH1;
-    SOH1.addObject("test1", std::make_shared<std::string>("test_1"));
+    DelayedDestructor<std::string> DD1;
+    DD1.addObjectsToBeDestroyed(std::make_shared<std::string>("test_1"));
 
-    auto res = SOH1.findObject("test1");
-    ASSERT_TRUE(res);
-    EXPECT_EQ(*res, "test_1");
+    EXPECT_EQ(DD1.size(),1U);
 
-    SOH1.removeObject("test1");
-    auto res2 = SOH1.findObject("test1");
-    EXPECT_FALSE(res2);
+    DD1.destroyObjects();
+    EXPECT_EQ(DD1.size(),0U);
 }
 
-TEST(SOH, contained)
+
+TEST(DelayedDestrSS, basic)
 {
-    SearchableObjectHolder<std::string> SOH1;
-    EXPECT_TRUE(SOH1.empty());
-    SOH1.addObject("test1", std::make_shared<std::string>("test_1"));
-    SOH1.addObject("test2", std::make_shared<std::string>("test_2"));
-    SOH1.addObject("test3", std::make_shared<std::string>("test_3"));
+    DelayedDestructorSingleThread<std::string> DD1;
+    DD1.addObjectsToBeDestroyed(std::make_shared<std::string>("test_1"));
 
-    auto objects = SOH1.getObjects();
-    ASSERT_EQ(objects.size(), 3U);
-    EXPECT_EQ(*(objects[0]), "test_1");
-    EXPECT_EQ(*(objects[1]), "test_2");
-    EXPECT_EQ(*(objects[2]), "test_3");
-    objects.clear();
-}
+    EXPECT_EQ(DD1.size(),1U);
 
-TEST(SOH, containedType)
-{
-    SearchableObjectHolder<std::string, char> SOH1;
-    EXPECT_TRUE(SOH1.empty());
-    SOH1.addObject("test1", std::make_shared<std::string>("test_1"), '1');
-    SOH1.addObject("test2", std::make_shared<std::string>("test_2"), '2');
-    SOH1.addObject("test3", std::make_shared<std::string>("test_3"), '3');
-
-    auto objects = SOH1.getObjects();
-    ASSERT_EQ(objects.size(), 3U);
-    EXPECT_EQ(*(objects[0]), "test_1");
-    EXPECT_EQ(*(objects[1]), "test_2");
-    EXPECT_EQ(*(objects[2]), "test_3");
-
-    EXPECT_TRUE(SOH1.checkObjectType("test1", '1'));
-
-    objects.clear();
+    DD1.destroyObjects();
+    EXPECT_EQ(DD1.size(),0U);
 }

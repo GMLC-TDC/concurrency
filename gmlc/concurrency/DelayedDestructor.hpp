@@ -89,27 +89,27 @@ class DelayedDestructor {
             elementSize = ElementsToBeDestroyed.size();
             if (elementSize > 0) {
                 std::vector<std::shared_ptr<X>> ecall;
-                std::vector<std::string> ename;
+                std::vector<void *> epointers;
                 for (auto& element : ElementsToBeDestroyed) {
                     if (element.use_count() == 1) {
                         ecall.push_back(element);
-                        ename.push_back(element->getIdentifier());
+                        epointers.emplace_back(element.get());
                     }
                 }
-                if (!ename.empty()) {
+                if (!epointers.empty()) {
                     // so apparently remove_if can actually call the
                     // destructor for shared_ptrs so the call function needs
                     // to be before this call
                     auto loc = std::remove_if(
                         ElementsToBeDestroyed.begin(),
                         ElementsToBeDestroyed.end(),
-                        [&ename](const auto& element) {
+                        [&epointers](const auto& element) {
                             return (
                                 (element.use_count() == 2) &&
                                 (std::find(
-                                     ename.begin(),
-                                     ename.end(),
-                                     element->getIdentifier()) != ename.end()));
+                                     epointers.begin(),
+                                    epointers.end(),
+                                     static_cast<void *>(element.get())) != epointers.end()));
                         });
                     ElementsToBeDestroyed.erase(
                         loc, ElementsToBeDestroyed.end());
@@ -173,6 +173,13 @@ class DelayedDestructor {
                 }
             }
         }
+        return ElementsToBeDestroyed.size();
+    }
+    /// @brief  get the number of elements waiting to be destroyed
+    /// @return number of objects
+    auto size()
+    {
+        std::lock_guard<std::timed_mutex> lock(destructionLock);
         return ElementsToBeDestroyed.size();
     }
 
@@ -243,27 +250,27 @@ public:
             elementSize = ElementsToBeDestroyed.size();
             if (elementSize > 0) {
                 std::vector<std::shared_ptr<X>> ecall;
-                std::vector<std::string> ename;
+                std::vector<void *> epointers;
                 for (auto& element : ElementsToBeDestroyed) {
                     if (element.use_count() == 1) {
                         ecall.push_back(element);
-                        ename.push_back(element->getIdentifier());
+                        epointers.emplace_back(element.get());
                     }
                 }
-                if (!ename.empty()) {
+                if (!epointers.empty()) {
                     // so apparently remove_if can actually call the
                     // destructor for shared_ptrs so the call function needs
                     // to be before this call
                     auto loc = std::remove_if(
                         ElementsToBeDestroyed.begin(),
                         ElementsToBeDestroyed.end(),
-                        [&ename](const auto& element) {
+                        [&epointers](const auto& element) {
                             return (
                                 (element.use_count() == 2) &&
                                 (std::find(
-                                    ename.begin(),
-                                    ename.end(),
-                                    element->getIdentifier()) != ename.end()));
+                                    epointers.begin(),
+                                    epointers.end(),
+                                    static_cast<void *>(element.get())) != epointers.end()));
                         });
                     ElementsToBeDestroyed.erase(
                         loc, ElementsToBeDestroyed.end());
@@ -311,6 +318,13 @@ public:
                 destroyObjects();
             }
         }
+        return ElementsToBeDestroyed.size();
+    }
+
+    /// @brief  get the number of elements waiting to be destroyed
+    /// @return number of objects
+    auto size()
+    {
         return ElementsToBeDestroyed.size();
     }
 
