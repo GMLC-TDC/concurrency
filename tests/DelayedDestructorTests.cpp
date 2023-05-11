@@ -26,20 +26,19 @@ TEST(DelayedDestr, basic)
     DelayedDestructor<std::string> DD1;
     DD1.addObjectsToBeDestroyed(std::make_shared<std::string>("test_1"));
 
-    EXPECT_EQ(DD1.size(),1U);
+    EXPECT_EQ(DD1.size(), 1U);
 
     DD1.destroyObjects();
-    EXPECT_EQ(DD1.size(),0U);
+    EXPECT_EQ(DD1.size(), 0U);
 }
-
 
 TEST(DelayedDestrSS, basic)
 {
     DelayedDestructorSingleThread<std::string> DD1;
     DD1.addObjectsToBeDestroyed(std::make_shared<std::string>("test_1"));
 
-    EXPECT_EQ(DD1.size(),1U);
+    EXPECT_EQ(DD1.size(), 1U);
 
     DD1.destroyObjects();
-    EXPECT_EQ(DD1.size(),0U);
+    EXPECT_EQ(DD1.size(), 0U);
 }

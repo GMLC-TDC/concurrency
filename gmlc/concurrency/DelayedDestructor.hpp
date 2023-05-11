@@ -89,7 +89,7 @@ class DelayedDestructor {
             elementSize = ElementsToBeDestroyed.size();
             if (elementSize > 0) {
                 std::vector<std::shared_ptr<X>> ecall;
-                std::vector<void *> epointers;
+                std::vector<void*> epointers;
                 for (auto& element : ElementsToBeDestroyed) {
                     if (element.use_count() == 1) {
                         ecall.push_back(element);
@@ -108,8 +108,9 @@ class DelayedDestructor {
                                 (element.use_count() == 2) &&
                                 (std::find(
                                      epointers.begin(),
-                                    epointers.end(),
-                                     static_cast<void *>(element.get())) != epointers.end()));
+                                     epointers.end(),
+                                     static_cast<void*>(element.get())) !=
+                                 epointers.end()));
                         });
                     ElementsToBeDestroyed.erase(
                         loc, ElementsToBeDestroyed.end());
@@ -190,18 +191,19 @@ class DelayedDestructor {
     }
 };
 
-/// @brief  handle the delayed destructor as a single thread so no locks, possible use with thread local structure
+/// @brief  handle the delayed destructor as a single thread so no locks,
+/// possible use with thread local structure
 /// @tparam X the class of object to be destroyed
 template<class X>
 class DelayedDestructorSingleThread {
-private:
+  private:
     std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
     std::function<void(std::shared_ptr<X>& ptr)> callBeforeDeleteFunction;
 #ifdef ENABLE_TRIPWIRE
     TripWireDetector tripDetect;
 #endif
 
-public:
+  public:
     DelayedDestructorSingleThread() = default;
     explicit DelayedDestructorSingleThread(
         std::function<void(std::shared_ptr<X>& ptr)> callFirst) :
@@ -238,8 +240,10 @@ public:
         catch (...) {
         }
     }
-    DelayedDestructorSingleThread(DelayedDestructorSingleThread&&) noexcept = delete;
-    DelayedDestructorSingleThread& operator=(DelayedDestructorSingleThread&&) noexcept = delete;
+    DelayedDestructorSingleThread(DelayedDestructorSingleThread&&) noexcept =
+        delete;
+    DelayedDestructorSingleThread&
+        operator=(DelayedDestructorSingleThread&&) noexcept = delete;
 
     /** destroy objects that are no longer used*/
     size_t destroyObjects() noexcept
@@ -250,7 +254,7 @@ public:
             elementSize = ElementsToBeDestroyed.size();
             if (elementSize > 0) {
                 std::vector<std::shared_ptr<X>> ecall;
-                std::vector<void *> epointers;
+                std::vector<void*> epointers;
                 for (auto& element : ElementsToBeDestroyed) {
                     if (element.use_count() == 1) {
                         ecall.push_back(element);
@@ -268,9 +272,10 @@ public:
                             return (
                                 (element.use_count() == 2) &&
                                 (std::find(
-                                    epointers.begin(),
-                                    epointers.end(),
-                                    static_cast<void *>(element.get())) != epointers.end()));
+                                     epointers.begin(),
+                                     epointers.end(),
+                                     static_cast<void*>(element.get())) !=
+                                 epointers.end()));
                         });
                     ElementsToBeDestroyed.erase(
                         loc, ElementsToBeDestroyed.end());
@@ -298,7 +303,7 @@ public:
     size_t destroyObjects(std::chrono::milliseconds delay)
     {
         using namespace std::literals::chrono_literals;
-       
+
         auto delayTime = (delay < 100ms) ? delay : 50ms;
         int delayCount =
             (delay < 100ms) ? 1 : static_cast<int>((delay.count() / 50));
