@@ -329,10 +329,7 @@ class DelayedDestructorSingleThread {
 
     /// @brief  get the number of elements waiting to be destroyed
     /// @return number of objects
-    auto size()
-    {
-        return ElementsToBeDestroyed.size();
-    }
+    auto size() { return ElementsToBeDestroyed.size(); }
 
     void addObjectsToBeDestroyed(std::shared_ptr<X> obj)
     {
