@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -15,7 +15,7 @@ project(GMLC_CONCURRENCY VERSION 0.3.0)
 # GMLC CONCURRENCY library Version number
 # -----------------------------------------------------------------------------
 set(GMLC_CONCURRENCY_VERSION_BUILD)
-set(GMLC_CONCURRENCY_DATE "2022-09-24")
+set(GMLC_CONCURRENCY_DATE "2023-09-24")
 
 set(GMLC_CONCURRENCY_VERSION_STRING
     "${GMLC_CONCURRENCY_VERSION} (${GMLC_CONCURRENCY_DATE})"
