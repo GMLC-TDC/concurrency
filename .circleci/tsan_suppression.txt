@@ -2,3 +2,6 @@
 
 # potential race condition from
 race:cxa_at_exit_wrapper
+
+# false positive https://github.com/google/sanitizers/issues/1620
+mutex:DelayedDestructor::destroyObjects
