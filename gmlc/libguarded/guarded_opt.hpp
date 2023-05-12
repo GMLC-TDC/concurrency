@@ -49,7 +49,7 @@ class guarded_opt {
     using handle = lock_handle<T, M>;
 
   public:
-    explicit guarded_opt(bool enableLocking) : enabled(enableLocking) {}
+    explicit guarded_opt(bool enableLocking): enabled(enableLocking) {}
     /**
  Construct a guarded object. This constructor will accept any
  number of parameters, all of which are forwarded to the
@@ -151,7 +151,7 @@ class guarded_opt {
 
 template<typename T, typename M>
 template<typename... Us>
-guarded_opt<T, M>::guarded_opt(bool enableLocking, Us&&... data) :
+guarded_opt<T, M>::guarded_opt(bool enableLocking, Us&&... data):
     m_obj(std::forward<Us>(data)...), enabled(enableLocking)
 {
 }

@@ -39,10 +39,9 @@ by default. Other classes which are useful for the mutex type are
 std::recursive_mutex, std::timed_mutex, and
 std::recursive_timed_mutex.
 */
-template<
-    typename T,
-    typename M = std::mutex,
-    typename Alloc = std::allocator<T>>
+template<typename T,
+         typename M = std::mutex,
+         typename Alloc = std::allocator<T>>
 class rcu_list {
   public:
     using value_type = T;
@@ -113,7 +112,7 @@ class rcu_list {
         node& operator=(node&&) = delete;
 
         template<typename... Us>
-        explicit node(Us&&... vs) : data(std::forward<Us>(vs)...)
+        explicit node(Us&&... vs): data(std::forward<Us>(vs)...)
         {
         }
 
@@ -124,9 +123,9 @@ class rcu_list {
     };
 
     struct zombie_list_node {
-        explicit zombie_list_node(node* n) noexcept : zombie_node(n) {}
+        explicit zombie_list_node(node* n) noexcept: zombie_node(n) {}
 
-        explicit zombie_list_node(rcu_guard* g) noexcept : owner(g) {}
+        explicit zombie_list_node(rcu_guard* g) noexcept: owner(g) {}
 
         // uncopyable, unmoveable
         zombie_list_node(const zombie_list_node&) = delete;
@@ -170,7 +169,7 @@ namespace detail {
         allocator_type alloc;
 
       public:
-        explicit deallocator(const allocator_type& allocr) noexcept :
+        explicit deallocator(const allocator_type& allocr) noexcept:
             alloc(allocr)
         {
         }
@@ -184,8 +183,8 @@ namespace detail {
 
     // unique_ptr counterpart for std::allocate_shared()
     template<typename T, typename Alloc, typename... Args>
-    std::unique_ptr<T, deallocator<Alloc>>
-        allocate_unique(Alloc& alloc, Args&&... args)
+    std::unique_ptr<T, deallocator<Alloc>> allocate_unique(Alloc& alloc,
+                                                           Args&&... args)
     {
         using allocator_traits = std::allocator_traits<Alloc>;
         auto p = allocator_traits::allocate(alloc, 1);
@@ -306,7 +305,7 @@ class rcu_list<T, M, Alloc>::iterator {
     using reference = const T&;
     using difference_type = size_t;
 
-    iterator() : m_current(nullptr) {}
+    iterator(): m_current(nullptr) {}
 
     const T& operator*() const { return m_current->data; }
 
@@ -346,13 +345,12 @@ class rcu_list<T, M, Alloc>::iterator {
     friend rcu_list<T, M, Alloc>;
     friend rcu_list<T, M, Alloc>::const_iterator;
 
-    explicit iterator(
-        const typename rcu_list<T, M, Alloc>::const_iterator& it) :
+    explicit iterator(const typename rcu_list<T, M, Alloc>::const_iterator& it):
         m_current(it.m_current)
     {
     }
 
-    explicit iterator(node* n) : m_current(n) {}
+    explicit iterator(node* n): m_current(n) {}
 
     node* m_current;
 };
@@ -368,9 +366,9 @@ class rcu_list<T, M, Alloc>::const_iterator {
     using reference = const T&;
     using difference_type = size_t;
 
-    const_iterator() : m_current(nullptr) {}
+    const_iterator(): m_current(nullptr) {}
     /* implicit */
-    const_iterator(const typename rcu_list<T, M, Alloc>::iterator& it) :
+    const_iterator(const typename rcu_list<T, M, Alloc>::iterator& it):
         m_current(it.m_current)
     {
     }
@@ -412,7 +410,7 @@ class rcu_list<T, M, Alloc>::const_iterator {
   private:
     friend rcu_list<T, M, Alloc>;
 
-    explicit const_iterator(node* n) : m_current(n) {}
+    explicit const_iterator(node* n): m_current(n) {}
 
     node* m_current;
 };
@@ -441,7 +439,7 @@ rcu_list<T, M, Alloc>::rcu_list()
 }
 
 template<typename T, typename M, typename Alloc>
-rcu_list<T, M, Alloc>::rcu_list(const Alloc& alloc) :
+rcu_list<T, M, Alloc>::rcu_list(const Alloc& alloc):
     m_node_alloc(alloc), m_zombie_alloc(alloc)
 {
 }
@@ -600,8 +598,9 @@ auto rcu_list<T, M, Alloc>::erase(const_iterator iter) -> iterator
         }
 
         auto newZombie = zombie_alloc_trait::allocate(m_zombie_alloc, 1);
-        zombie_alloc_trait::construct(
-            m_zombie_alloc, newZombie, iter.m_current);
+        zombie_alloc_trait::construct(m_zombie_alloc,
+                                      newZombie,
+                                      iter.m_current);
 
         zombie_list_node* oldZombie = m_zombie_head.load();
 

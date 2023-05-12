@@ -1,6 +1,6 @@
 ---
 AccessModifierOffset: "-2"
-AlignAfterOpenBracket: AlwaysBreak
+AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: "false"
 AlignConsecutiveDeclarations: "false"
 #AlignConsecutiveMacros: 'true'
@@ -28,7 +28,7 @@ BraceWrapping:
   BeforeCatch: true
 BreakBeforeTernaryOperators: "false"
 BreakConstructorInitializers: AfterColon
-#BreakInheritanceList: AfterColon
+BreakInheritanceList: AfterColon
 BreakStringLiterals: "false"
 ColumnLimit: 80
 CompactNamespaces: "false"
@@ -39,8 +39,9 @@ Cpp11BracedListStyle: "true"
 DerivePointerAlignment: "false"
 DisableFormat: "false"
 FixNamespaceComments: "true"
-#IncludeBlocks: Regroup
+IncludeBlocks: Regroup
 IndentCaseLabels: "true"
+IndentPPDirectives: AfterHash
 IndentWidth: "4"
 IndentWrappedFunctionNames: "true"
 JavaScriptQuotes: Double
@@ -50,8 +51,8 @@ MaxEmptyLinesToKeep: "1"
 NamespaceIndentation: Inner
 ObjCSpaceAfterProperty: "true"
 ObjCSpaceBeforeProtocolList: "true"
-PenaltyBreakBeforeFirstCallParameter: "90"
-PenaltyBreakComment: "100"
+PenaltyBreakBeforeFirstCallParameter: "120"
+PenaltyBreakComment: "300"
 PenaltyBreakFirstLessLess: "30"
 PenaltyBreakString: "1000"
 PenaltyExcessCharacter: "1000000"
@@ -64,10 +65,11 @@ SpaceAfterCStyleCast: "false"
 #SpaceAfterLogicalNot: 'false'
 SpaceAfterTemplateKeyword: "false"
 SpaceBeforeAssignmentOperators: "true"
-#SpaceBeforeCpp11BracedList: 'false'
-#SpaceBeforeCtorInitializerColon: 'false'
+SpaceBeforeCpp11BracedList: "false"
+SpaceBeforeCtorInitializerColon: "false"
+SpaceBeforeInheritanceColon: "false"
 SpaceBeforeParens: ControlStatements
-#SpaceBeforeRangeBasedForLoopColon: 'true'
+SpaceBeforeRangeBasedForLoopColon: "true"
 SpaceInEmptyParentheses: "false"
 SpacesBeforeTrailingComments: "2"
 SpacesInAngles: "false"

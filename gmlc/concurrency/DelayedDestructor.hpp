@@ -7,7 +7,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #ifdef ENABLE_TRIPWIRE
-#include "TripWire.hpp"
+#    include "TripWire.hpp"
 #endif
 
 #include <algorithm>
@@ -38,7 +38,7 @@ class DelayedDestructor {
   public:
     DelayedDestructor() = default;
     explicit DelayedDestructor(
-        std::function<void(std::shared_ptr<X>& ptr)> callFirst) :
+        std::function<void(std::shared_ptr<X>& ptr)> callFirst):
         callBeforeDeleteFunction(std::move(callFirst))
     {
     }
@@ -81,8 +81,8 @@ class DelayedDestructor {
         std::size_t elementSize{static_cast<std::size_t>(-1)};
         std::chrono::milliseconds wait(std::chrono::milliseconds(200));
         try {
-            std::unique_lock<std::timed_mutex> lock(
-                destructionLock, std::defer_lock);
+            std::unique_lock<std::timed_mutex> lock(destructionLock,
+                                                    std::defer_lock);
             if (!lock.try_lock_for(wait)) {
                 return elementSize;
             }
@@ -100,20 +100,20 @@ class DelayedDestructor {
                     // so apparently remove_if can actually call the
                     // destructor for shared_ptrs so the call function needs
                     // to be before this call
-                    auto loc = std::remove_if(
-                        ElementsToBeDestroyed.begin(),
-                        ElementsToBeDestroyed.end(),
-                        [&epointers](const auto& element) {
-                            return (
-                                (element.use_count() == 2) &&
-                                (std::find(
-                                     epointers.begin(),
-                                     epointers.end(),
-                                     static_cast<void*>(element.get())) !=
-                                 epointers.end()));
-                        });
-                    ElementsToBeDestroyed.erase(
-                        loc, ElementsToBeDestroyed.end());
+                    auto loc =
+                        std::remove_if(ElementsToBeDestroyed.begin(),
+                                       ElementsToBeDestroyed.end(),
+                                       [&epointers](const auto& element) {
+                                           return (
+                                               (element.use_count() == 2) &&
+                                               (std::find(epointers.begin(),
+                                                          epointers.end(),
+                                                          static_cast<void*>(
+                                                              element.get())) !=
+                                                epointers.end()));
+                                       });
+                    ElementsToBeDestroyed.erase(loc,
+                                                ElementsToBeDestroyed.end());
                     elementSize = ElementsToBeDestroyed.size();
                     auto deleteFunc = callBeforeDeleteFunction;
                     lock.unlock();
@@ -142,8 +142,8 @@ class DelayedDestructor {
     size_t destroyObjects(std::chrono::milliseconds delay)
     {
         using namespace std::literals::chrono_literals;
-        std::unique_lock<std::timed_mutex> lock(
-            destructionLock, std::defer_lock);
+        std::unique_lock<std::timed_mutex> lock(destructionLock,
+                                                std::defer_lock);
         auto minDelay = (delay > 200ms) ? delay : 200ms;
         if (!lock.try_lock_for(minDelay)) {
             return static_cast<size_t>(-1);
@@ -207,7 +207,7 @@ class DelayedDestructorSingleThread {
   public:
     DelayedDestructorSingleThread() = default;
     explicit DelayedDestructorSingleThread(
-        std::function<void(std::shared_ptr<X>& ptr)> callFirst) :
+        std::function<void(std::shared_ptr<X>& ptr)> callFirst):
         callBeforeDeleteFunction(std::move(callFirst))
     {
     }
@@ -266,20 +266,20 @@ class DelayedDestructorSingleThread {
                     // so apparently remove_if can actually call the
                     // destructor for shared_ptrs so the call function needs
                     // to be before this call
-                    auto loc = std::remove_if(
-                        ElementsToBeDestroyed.begin(),
-                        ElementsToBeDestroyed.end(),
-                        [&epointers](const auto& element) {
-                            return (
-                                (element.use_count() == 2) &&
-                                (std::find(
-                                     epointers.begin(),
-                                     epointers.end(),
-                                     static_cast<void*>(element.get())) !=
-                                 epointers.end()));
-                        });
-                    ElementsToBeDestroyed.erase(
-                        loc, ElementsToBeDestroyed.end());
+                    auto loc =
+                        std::remove_if(ElementsToBeDestroyed.begin(),
+                                       ElementsToBeDestroyed.end(),
+                                       [&epointers](const auto& element) {
+                                           return (
+                                               (element.use_count() == 2) &&
+                                               (std::find(epointers.begin(),
+                                                          epointers.end(),
+                                                          static_cast<void*>(
+                                                              element.get())) !=
+                                                epointers.end()));
+                                       });
+                    ElementsToBeDestroyed.erase(loc,
+                                                ElementsToBeDestroyed.end());
                     elementSize = ElementsToBeDestroyed.size();
                     auto deleteFunc = callBeforeDeleteFunction;
 

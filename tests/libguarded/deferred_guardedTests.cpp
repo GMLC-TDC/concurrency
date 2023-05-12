@@ -22,9 +22,8 @@ modified to use google test
 
 #include "gtest/gtest.h"
 #include <libguarded/deferred_guarded.hpp>
-#include <thread>
-
 #include <shared_mutex>
+#include <thread>
 using shared_mutex = std::shared_timed_mutex;
 
 using namespace gmlc::libguarded;
@@ -67,9 +66,9 @@ TEST(deferred_guarded, deferred_guarded_1)
         });
 
         std::thread th3([&data, &th3_ok]() {
-            auto data_handle2 = data.try_lock_shared_until(
-                std::chrono::steady_clock::now() +
-                std::chrono::milliseconds(20));
+            auto data_handle2 =
+                data.try_lock_shared_until(std::chrono::steady_clock::now() +
+                                           std::chrono::milliseconds(20));
             if (!data_handle2) {
                 th3_ok = false;
             }

@@ -145,7 +145,7 @@ class cow_guarded {
       public:
         using pointer = T*;
 
-        deleter(std::unique_lock<Mutex>&& lock, cow_guarded& guarded) :
+        deleter(std::unique_lock<Mutex>&& lock, cow_guarded& guarded):
             m_lock(std::move(lock)), m_guarded(guarded), m_cancelled(false)
         {
         }
@@ -187,7 +187,7 @@ class cow_guarded {
     /**
    The handle class for cow_guarded is moveable but not copyable.
  */
-    class handle : public std::unique_ptr<T, deleter> {
+    class handle: public std::unique_ptr<T, deleter> {
       public:
         using std::unique_ptr<T, deleter>::unique_ptr;
 
@@ -209,7 +209,7 @@ class cow_guarded {
 
 template<typename T, typename M>
 template<typename... Us>
-cow_guarded<T, M>::cow_guarded(Us&&... data) :
+cow_guarded<T, M>::cow_guarded(Us&&... data):
     m_data(std::make_shared<T>(std::forward<Us>(data)...))
 {
 }

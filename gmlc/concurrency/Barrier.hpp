@@ -14,7 +14,7 @@ namespace concurrency {
     /** class implementing a synchronization barrier*/
     class Barrier {
       public:
-        explicit Barrier(size_t count) : threshold_(count), count_(count) {}
+        explicit Barrier(size_t count): threshold_(count), count_(count) {}
         /// wait on the barrier
         void wait()
         {
