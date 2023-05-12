@@ -57,7 +57,7 @@ class shared_guarded_opt
     using shared_handle = shared_lock_handle<T, M>;
 
   public:
-    explicit shared_guarded_opt(bool enableLocking = true) :
+    explicit shared_guarded_opt(bool enableLocking = true):
         enabled(enableLocking)
     {
     }
@@ -93,7 +93,7 @@ class shared_guarded_opt
 
 template<typename T, typename M>
 template<typename... Us>
-shared_guarded_opt<T, M>::shared_guarded_opt(bool enableLocking, Us&&... data) :
+shared_guarded_opt<T, M>::shared_guarded_opt(bool enableLocking, Us&&... data):
     m_obj(std::forward<Us>(data)...), enabled(enableLocking)
 {
 }

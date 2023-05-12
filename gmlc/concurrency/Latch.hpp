@@ -16,7 +16,7 @@ namespace concurrency {
 
     class Latch {
       public:
-        explicit Latch(int start) : counter_{start} {}
+        explicit Latch(int start): counter_{start} {}
         /** arrive at a synchronization point (non_blocking)*/
         void arrive()
         {

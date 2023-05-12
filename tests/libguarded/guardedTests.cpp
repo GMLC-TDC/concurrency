@@ -66,9 +66,9 @@ TEST(guarded, guarded_1)
         });
 
         std::thread th3([&data, &th3_ok]() {
-            auto data_handle2 = data.try_lock_until(
-                std::chrono::steady_clock::now() +
-                std::chrono::milliseconds(20));
+            auto data_handle2 =
+                data.try_lock_until(std::chrono::steady_clock::now() +
+                                    std::chrono::milliseconds(20));
             if (data_handle2) {
                 th3_ok = false;
             }

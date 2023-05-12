@@ -135,7 +135,7 @@ class staged_guarded {
 
 template<typename T, typename M>
 template<typename... Us>
-staged_guarded<T, M>::staged_guarded(Us&&... data) :
+staged_guarded<T, M>::staged_guarded(Us&&... data):
     m_obj(std::forward<Us>(data)...)
 {
 }

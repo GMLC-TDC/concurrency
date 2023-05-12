@@ -86,7 +86,7 @@ class shared_guarded
 
 template<typename T, typename M>
 template<typename... Us>
-shared_guarded<T, M>::shared_guarded(Us&&... data) :
+shared_guarded<T, M>::shared_guarded(Us&&... data):
     m_obj(std::forward<Us>(data)...)
 {
 }
