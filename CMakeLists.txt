@@ -7,15 +7,15 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.11...3.24)
+cmake_minimum_required(VERSION 3.11...3.25)
 
-project(GMLC_CONCURRENCY VERSION 0.3.0)
+project(GMLC_CONCURRENCY VERSION 0.4.0)
 
 # -----------------------------------------------------------------------------
 # GMLC CONCURRENCY library Version number
 # -----------------------------------------------------------------------------
 set(GMLC_CONCURRENCY_VERSION_BUILD)
-set(GMLC_CONCURRENCY_DATE "2023-09-24")
+set(GMLC_CONCURRENCY_DATE "2023-05-11")
 
 set(GMLC_CONCURRENCY_VERSION_STRING
     "${GMLC_CONCURRENCY_VERSION} (${GMLC_CONCURRENCY_DATE})"
