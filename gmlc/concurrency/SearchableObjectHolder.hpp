@@ -7,7 +7,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #ifdef ENABLE_TRIPWIRE
-#include "TripWire.hpp"
+#    include "TripWire.hpp"
 #endif
 #include <algorithm>
 #include <functional>
@@ -146,9 +146,8 @@ object otherwise the results are not totally reliable upon return
         return false;
     }
 
-    bool copyObject(
-        const std::string& copyFromName,
-        const std::string& copyToName)
+    bool copyObject(const std::string& copyFromName,
+                    const std::string& copyToName)
     {
         std::lock_guard<std::mutex> lock(mapLock);
         auto fnd = objectMap.find(copyFromName);
@@ -200,10 +199,10 @@ object otherwise the results are not totally reliable upon return
         findObject(std::function<bool(const std::shared_ptr<X>&)> operand)
     {
         std::lock_guard<std::mutex> lock(mapLock);
-        auto obj = std::find_if(
-            objectMap.begin(), objectMap.end(), [&operand](auto& val) {
-                return operand(val.second);
-            });
+        auto obj =
+            std::find_if(objectMap.begin(),
+                         objectMap.end(),
+                         [&operand](auto& val) { return operand(val.second); });
         if (obj != objectMap.end()) {
             return obj->second;
         }
@@ -211,27 +210,26 @@ object otherwise the results are not totally reliable upon return
     }
     /** find an object whose operand evaluates to true and matches a
      * specific type*/
-    std::shared_ptr<X> findObject(
-        std::function<bool(const std::shared_ptr<X>&)> operand,
-        Y type)
+    std::shared_ptr<X>
+        findObject(std::function<bool(const std::shared_ptr<X>&)> operand,
+                   Y type)
     {
         std::lock_guard<std::mutex> lock(mapLock);
-        auto obj = std::find_if(
-            objectMap.begin(),
-            objectMap.end(),
-            [&operand, this, type](auto& val) {
-                if (operand(val.second)) {
-                    auto tfind = typeMap.find(val.first);
-                    if (tfind != typeMap.end()) {
-                        for (auto& t : tfind->second) {
-                            if (t == type) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-                return false;
-            });
+        auto obj = std::find_if(objectMap.begin(),
+                                objectMap.end(),
+                                [&operand, this, type](auto& val) {
+                                    if (operand(val.second)) {
+                                        auto tfind = typeMap.find(val.first);
+                                        if (tfind != typeMap.end()) {
+                                            for (auto& t : tfind->second) {
+                                                if (t == type) {
+                                                    return true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    return false;
+                                });
         if (obj != objectMap.end()) {
             return obj->second;
         }

@@ -46,12 +46,11 @@ class atomic_guarded {
  constructor of T.
 */
     template<typename... Us>
-    explicit atomic_guarded(Us&&... data) : m_obj(std::forward<Us>(data)...)
+    explicit atomic_guarded(Us&&... data): m_obj(std::forward<Us>(data)...)
     {
-        static_assert(
-            std::is_copy_constructible<T>::value &&
-                std::is_copy_assignable<T>::value,
-            "classes used must be copy constructible and assignable");
+        static_assert(std::is_copy_constructible<T>::value &&
+                          std::is_copy_assignable<T>::value,
+                      "classes used must be copy constructible and assignable");
     }
 
     /** generate a copy of the protected object

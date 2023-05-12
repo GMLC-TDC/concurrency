@@ -64,32 +64,29 @@ class ordered_guarded
 
     template<typename Func>
     typename std::enable_if<
-        std::is_same<decltype(std::declval<Func>()(std::declval<T&>())), void>::
-            value,
+        std::is_same<decltype(std::declval<Func>()(std::declval<T&>())),
+                     void>::value,
         void>::type
         modify(Func&& func);
 
     template<typename Func>
     typename std::enable_if<
-        !std::is_same<
-            decltype(std::declval<Func>()(std::declval<T&>())),
-            void>::value,
+        !std::is_same<decltype(std::declval<Func>()(std::declval<T&>())),
+                      void>::value,
         decltype(std::declval<Func>()(std::declval<T&>()))>::type
         modify(Func&& func);
 
     template<typename Func>
     typename std::enable_if<
-        std::is_same<
-            decltype(std::declval<Func>()(std::declval<const T&>())),
-            void>::value,
+        std::is_same<decltype(std::declval<Func>()(std::declval<const T&>())),
+                     void>::value,
         void>::type
         read(Func&& func) const;
 
     template<typename Func>
     typename std::enable_if<
-        !std::is_same<
-            decltype(std::declval<Func>()(std::declval<const T&>())),
-            void>::value,
+        !std::is_same<decltype(std::declval<Func>()(std::declval<const T&>())),
+                      void>::value,
         decltype(std::declval<Func>()(std::declval<const T&>()))>::type
         read(Func&& func) const;
 
@@ -141,7 +138,7 @@ class ordered_guarded
 
 template<typename T, typename M>
 template<typename... Us>
-ordered_guarded<T, M>::ordered_guarded(Us&&... data) :
+ordered_guarded<T, M>::ordered_guarded(Us&&... data):
     m_obj(std::forward<Us>(data)...)
 {
 }
@@ -149,8 +146,8 @@ ordered_guarded<T, M>::ordered_guarded(Us&&... data) :
 template<typename T, typename M>
 template<typename Func>
 typename std::enable_if<
-    std::is_same<decltype(std::declval<Func>()(std::declval<T&>())), void>::
-        value,
+    std::is_same<decltype(std::declval<Func>()(std::declval<T&>())),
+                 void>::value,
     void>::type
     ordered_guarded<T, M>::modify(Func&& func)
 {
@@ -161,8 +158,8 @@ typename std::enable_if<
 template<typename T, typename M>
 template<typename Func>
 typename std::enable_if<
-    !std::is_same<decltype(std::declval<Func>()(std::declval<T&>())), void>::
-        value,
+    !std::is_same<decltype(std::declval<Func>()(std::declval<T&>())),
+                  void>::value,
     decltype(std::declval<Func>()(std::declval<T&>()))>::type
     ordered_guarded<T, M>::modify(Func&& func)
 {
@@ -174,9 +171,8 @@ typename std::enable_if<
 template<typename T, typename M>
 template<typename Func>
 typename std::enable_if<
-    std::is_same<
-        decltype(std::declval<Func>()(std::declval<const T&>())),
-        void>::value,
+    std::is_same<decltype(std::declval<Func>()(std::declval<const T&>())),
+                 void>::value,
     void>::type
     ordered_guarded<T, M>::read(Func&& func) const
 {
@@ -187,9 +183,8 @@ typename std::enable_if<
 template<typename T, typename M>
 template<typename Func>
 typename std::enable_if<
-    !std::is_same<
-        decltype(std::declval<Func>()(std::declval<const T&>())),
-        void>::value,
+    !std::is_same<decltype(std::declval<Func>()(std::declval<const T&>())),
+                  void>::value,
     decltype(std::declval<Func>()(std::declval<const T&>()))>::type
     ordered_guarded<T, M>::read(Func&& func) const
 {

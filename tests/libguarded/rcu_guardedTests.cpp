@@ -171,14 +171,14 @@ class MockAllocator {
   public:
     using value_type = T;
 
-    explicit MockAllocator(event_log* elog) : log(elog) {}
-    MockAllocator(const MockAllocator& other) : log(other.log) {}
+    explicit MockAllocator(event_log* elog): log(elog) {}
+    MockAllocator(const MockAllocator& other): log(other.log) {}
 
     // converting copy constructor (requires friend)
     template<typename>
     friend class MockAllocator;
     template<typename U>
-    explicit MockAllocator(const MockAllocator<U>& other) : log(other.log)
+    explicit MockAllocator(const MockAllocator<U>& other): log(other.log)
     {
     }
 

@@ -63,9 +63,9 @@ class task_runner {
 };
 /// class to contain a void packaged task
 template<typename T>
-class void_runner : public task_runner<T> {
+class void_runner: public task_runner<T> {
   public:
-    void_runner(std::packaged_task<void(T&)>&& tsk) : task(std::move(tsk)) {}
+    void_runner(std::packaged_task<void(T&)>&& tsk): task(std::move(tsk)) {}
     virtual void run_task(T& obj) { task.lock()->operator()(obj); }
     std::future<void> get_future() { return task.lock()->get_future(); }
 
@@ -75,9 +75,9 @@ class void_runner : public task_runner<T> {
 
 /// class to contain a typed return packaged task
 template<typename T, typename Ret>
-class type_runner : public task_runner<T> {
+class type_runner: public task_runner<T> {
   public:
-    type_runner(std::packaged_task<Ret(T&)>&& tsk) : task(std::move(tsk)) {}
+    type_runner(std::packaged_task<Ret(T&)>&& tsk): task(std::move(tsk)) {}
     virtual void run_task(T& obj) { task.lock()->operator()(obj); }
     std::future<Ret> get_future() { return task.lock()->get_future(); }
 
@@ -136,7 +136,7 @@ class deferred_guarded
 
 template<typename T, typename M>
 template<typename... Us>
-deferred_guarded<T, M>::deferred_guarded(Us&&... data) :
+deferred_guarded<T, M>::deferred_guarded(Us&&... data):
     m_obj(std::forward<Us>(data)...), m_pendingWrites(false)
 {
 }
@@ -159,8 +159,9 @@ void deferred_guarded<T, M>::modify_detach(Func&& func)
 }
 
 template<typename Ret, typename Func, typename T>
-auto call_returning_future(Func& func, T& data) -> typename std::
-    enable_if<!std::is_same<Ret, void>::value, std::future<Ret>>::type
+auto call_returning_future(Func& func, T& data) ->
+    typename std::enable_if<!std::is_same<Ret, void>::value,
+                            std::future<Ret>>::type
 {
     std::promise<Ret> promise;
 
@@ -175,8 +176,9 @@ auto call_returning_future(Func& func, T& data) -> typename std::
 }
 
 template<typename Ret, typename Func, typename T>
-auto call_returning_future(Func& func, T& data) -> typename std::
-    enable_if<std::is_same<Ret, void>::value, std::future<Ret>>::type
+auto call_returning_future(Func& func, T& data) ->
+    typename std::enable_if<std::is_same<Ret, void>::value,
+                            std::future<Ret>>::type
 {
     std::promise<Ret> promise;
 

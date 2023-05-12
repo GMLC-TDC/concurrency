@@ -13,7 +13,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 namespace gmlc::concurrency {
 class TriggerVariable {
   public:
-    explicit TriggerVariable(bool active = false) : activated(active) {}
+    explicit TriggerVariable(bool active = false): activated(active) {}
     /** activate the trigger to the ready state
 @return true if the Trigger was activated false if it was already active
 */

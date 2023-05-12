@@ -18,11 +18,11 @@ class lock_handle {
     using pointer = T*;
     using lock_type = std::unique_lock<M>;
 
-    lock_handle(pointer val, std::unique_lock<M> lock) :
+    lock_handle(pointer val, std::unique_lock<M> lock):
         data(val), m_handle_lock(std::move(lock))
     {
     }
-    lock_handle(pointer val, M& mut) : data(val), m_handle_lock(mut) {}
+    lock_handle(pointer val, M& mut): data(val), m_handle_lock(mut) {}
     lock_handle(lock_handle&&) = default;
     lock_handle& operator=(lock_handle&&) = default;
     lock_handle(const lock_handle&) = delete;
@@ -172,12 +172,11 @@ class shared_lock_handle {
   public:
     using pointer = const T*;
     using lock_type = typename shared_locker<M>::locker_type;
-    shared_lock_handle(pointer val, lock_type lock) :
+    shared_lock_handle(pointer val, lock_type lock):
         data(val), m_handle_lock(std::move(lock))
     {
     }
-    shared_lock_handle(pointer val, M& smutex) :
-        data(val), m_handle_lock(smutex)
+    shared_lock_handle(pointer val, M& smutex): data(val), m_handle_lock(smutex)
     {
     }
     shared_lock_handle(shared_lock_handle&&) = default;
@@ -216,8 +215,8 @@ class shared_lock_handle {
 template<typename T, typename M>
 shared_lock_handle<T, M> try_lock_shared_handle(const T* obj, M& smutex)
 {
-    typename shared_lock_handle<T, M>::lock_type slock(
-        smutex, std::try_to_lock);
+    typename shared_lock_handle<T, M>::lock_type slock(smutex,
+                                                       std::try_to_lock);
     if (slock.owns_lock()) {
         return shared_lock_handle<T, M>(obj, std::move(slock));
     } else {

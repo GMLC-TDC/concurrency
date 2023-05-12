@@ -149,7 +149,7 @@ class guarded {
 
 template<typename T, typename M>
 template<typename... Us>
-guarded<T, M>::guarded(Us&&... data) : m_obj(std::forward<Us>(data)...)
+guarded<T, M>::guarded(Us&&... data): m_obj(std::forward<Us>(data)...)
 {
 }
 

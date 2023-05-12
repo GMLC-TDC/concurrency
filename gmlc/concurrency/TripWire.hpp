@@ -66,12 +66,12 @@ inline std::vector<TriplineType> make_triplines(int count)
 /** class to check if a trip line was tripped*/
 class TripWireDetector {
   public:
-    TripWireDetector() : lineDetector(TripWire::getLine()) {}
-    explicit TripWireDetector(unsigned int index) :
+    TripWireDetector(): lineDetector(TripWire::getLine()) {}
+    explicit TripWireDetector(unsigned int index):
         lineDetector(TripWire::getIndexedLine(index))
     {
     }
-    explicit TripWireDetector(TriplineType line) : lineDetector(std::move(line))
+    explicit TripWireDetector(TriplineType line): lineDetector(std::move(line))
     {
     }
     /** check if the line was tripped*/
@@ -89,14 +89,12 @@ class TripWireDetector {
 class TripWireTrigger {
   public:
     /** default constructor*/
-    TripWireTrigger() : lineTrigger(TripWire::getLine()) {}
-    explicit TripWireTrigger(unsigned int index) :
+    TripWireTrigger(): lineTrigger(TripWire::getLine()) {}
+    explicit TripWireTrigger(unsigned int index):
         lineTrigger(TripWire::getIndexedLine(index))
     {
     }
-    explicit TripWireTrigger(TriplineType line) : lineTrigger(std::move(line))
-    {
-    }
+    explicit TripWireTrigger(TriplineType line): lineTrigger(std::move(line)) {}
     /** destructor*/
     ~TripWireTrigger() { lineTrigger->store(true, std::memory_order_release); }
     /** move constructor*/

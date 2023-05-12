@@ -55,9 +55,9 @@ TEST(cow_guarded, cow_guarded_1)
         });
 
         std::thread th3([&data]() {
-            auto data_handle2 = data.try_lock_shared_until(
-                std::chrono::steady_clock::now() +
-                std::chrono::milliseconds(20));
+            auto data_handle2 =
+                data.try_lock_shared_until(std::chrono::steady_clock::now() +
+                                           std::chrono::milliseconds(20));
             EXPECT_TRUE(data_handle2 != nullptr);
             EXPECT_EQ(*data_handle2, 1);
         });
