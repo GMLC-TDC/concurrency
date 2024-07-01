@@ -194,9 +194,10 @@ auto call_returning_future(Func& func, T& data) ->
 }
 
 template<typename Ret, typename T, typename Func>
-auto package_task_void(Func&& func) -> typename std::enable_if<
-    std::is_same<Ret, void>::value,
-    std::pair<std::unique_ptr<task_runner<T>>, std::future<void>>>::type
+auto package_task_void(Func&& func) ->
+    typename std::enable_if<
+        std::is_same<Ret, void>::value,
+        std::pair<std::unique_ptr<task_runner<T>>, std::future<void>>>::type
 {
     auto vtask = std::unique_ptr<void_runner<T>>(new void_runner<T>(
         std::packaged_task<void(T&)>(std::forward<Func>(func))));
@@ -205,9 +206,10 @@ auto package_task_void(Func&& func) -> typename std::enable_if<
 }
 
 template<typename Ret, typename T, typename Func>
-auto package_task_void(Func&& func) -> typename std::enable_if<
-    !std::is_same<Ret, void>::value,
-    std::pair<std::unique_ptr<task_runner<T>>, std::future<Ret>>>::type
+auto package_task_void(Func&& func) ->
+    typename std::enable_if<
+        !std::is_same<Ret, void>::value,
+        std::pair<std::unique_ptr<task_runner<T>>, std::future<Ret>>>::type
 {
     auto ttask = std::unique_ptr<type_runner<T, Ret>>(new type_runner<T, Ret>(
         std::packaged_task<Ret(T&)>(std::forward<Func>(func))));
