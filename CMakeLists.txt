@@ -7,15 +7,15 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.11...3.25)
+cmake_minimum_required(VERSION 3.22...3.30)
 
-project(GMLC_CONCURRENCY VERSION 0.4.0)
+project(GMLC_CONCURRENCY VERSION 0.5.0)
 
 # -----------------------------------------------------------------------------
 # GMLC CONCURRENCY library Version number
 # -----------------------------------------------------------------------------
 set(GMLC_CONCURRENCY_VERSION_BUILD)
-set(GMLC_CONCURRENCY_DATE "2023-05-11")
+set(GMLC_CONCURRENCY_DATE "2024-09-30")
 
 set(GMLC_CONCURRENCY_VERSION_STRING
     "${GMLC_CONCURRENCY_VERSION} (${GMLC_CONCURRENCY_DATE})"
@@ -99,7 +99,11 @@ option(GMLC_CONCURRENCY_TEST "Enable tests for the concurrency library" ON)
 # option(GMLC_CONCURRENCY_BENCHMARK "Enable benchmarks for the concurrency library" ON)
 
 if(GMLC_CONCURRENCY_TEST)
+    include(updateGitSubmodules)
     enable_testing()
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/CMakeLists.txt")
+        submod_update(ThirdParty/googletest)
+    endif()
     add_subdirectory(tests)
 endif()
 
