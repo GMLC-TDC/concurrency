@@ -7,10 +7,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
+#include <iterator>
 #include <mutex>
 #include <shared_mutex>
 #include <utility>
-#include <iterator>
 
 namespace gmlc::libguarded {
 template<typename T, typename M>
