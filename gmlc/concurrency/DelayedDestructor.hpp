@@ -250,7 +250,6 @@ class DelayedDestructorSingleThread {
     size_t destroyObjects() noexcept
     {
         std::size_t elementSize{static_cast<std::size_t>(-1)};
-        std::chrono::milliseconds wait(std::chrono::milliseconds(50));
         try {
             elementSize = ElementsToBeDestroyed.size();
             if (elementSize > 0) {
