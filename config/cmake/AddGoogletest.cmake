@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2024, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -8,37 +8,9 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #
-# Downloads GTest and provides a helper macro to add tests. Add make check, as well, which gives
-# output on failed tests without having to set an environment variable.
+# Add make check, as well, which gives output on failed tests without having to set an environment
+# variable.
 #
-
-set(gtest_version release-1.12.1)
-
-string(TOLOWER "googletest" gtName)
-
-include(FetchContent)
-mark_as_advanced(FETCHCONTENT_BASE_DIR)
-mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
-mark_as_advanced(FETCHCONTENT_QUIET)
-mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
-
-fetchcontent_declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG ${gtest_version}
-    GIT_SHALLOW 1
-    UPDATE_COMMAND ""
-)
-
-fetchcontent_getproperties(googletest)
-
-if(NOT ${gtName}_POPULATED)
-    # Fetch the content using previously declared details
-    fetchcontent_populate(googletest)
-
-endif()
-hide_variable(FETCHCONTENT_SOURCE_DIR_GOOGLETEST)
-hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_GOOGLETEST)
 
 set(gtest_force_shared_crt ON CACHE INTERNAL "")
 
@@ -46,9 +18,12 @@ set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 set(HAVE_STD_REGEX ON CACHE INTERNAL "")
 
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "")
-add_subdirectory(${${gtName}_SOURCE_DIR} ${${gtName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
-message(STATUS "loading google-test directory ${${gtName}_SOURCE_DIR}")
+add_subdirectory(
+    ${CMAKE_SOURCE_DIR}/ThirdParty/googletest ${CMAKE_BINARY_DIR}/ThirdParty/googletest
+    EXCLUDE_FROM_ALL
+)
+
 if(NOT MSVC)
     # target_Compile_options(gtest PRIVATE "-Wno-undef") target_Compile_options(gmock PRIVATE
     # "-Wno-undef") target_Compile_options(gtest_main PRIVATE "-Wno-undef")
@@ -80,6 +55,7 @@ hide_variable(gtest_hide_internal_symbols)
 hide_variable(BUILD_GMOCK)
 hide_variable(BUILD_GTEST)
 hide_variable(INSTALL_GTEST)
+hide_variable(GTEST_HAS_ABSL)
 
 set_target_properties(gtest gtest_main gmock gmock_main PROPERTIES FOLDER "Extern")
 
