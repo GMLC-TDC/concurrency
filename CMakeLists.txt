@@ -99,7 +99,11 @@ option(GMLC_CONCURRENCY_TEST "Enable tests for the concurrency library" ON)
 # option(GMLC_CONCURRENCY_BENCHMARK "Enable benchmarks for the concurrency library" ON)
 
 if(GMLC_CONCURRENCY_TEST)
+    include(updateGitSubmodules)
     enable_testing()
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/CMakeLists.txt")
+        submod_update(ThirdParty/googletest)
+    endif()
     add_subdirectory(tests)
 endif()
 
