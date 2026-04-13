@@ -24,9 +24,9 @@ modified to use google test
 #include <iostream>
 #include <libguarded/rcu_guarded.hpp>
 #include <libguarded/rcu_list.hpp>
+#include <memory>
 #include <thread>
 #include <vector>
-#include <memory>
 
 using namespace gmlc::libguarded;
 
