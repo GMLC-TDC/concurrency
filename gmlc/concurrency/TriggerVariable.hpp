@@ -51,7 +51,7 @@ been activated yet*/
     [[nodiscard]] bool wait() const
     {
         if (!activated.load()) {
-            return true;
+            return false;
         }
         std::unique_lock<std::mutex> lk(triggerLock);
         if (!triggered) {
