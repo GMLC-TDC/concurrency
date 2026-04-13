@@ -66,7 +66,8 @@ class SearchableObjectHolder {
         }
     }
     /** add and object to container*/
-    [[nodiscard]] bool addObject(const std::string& name, std::shared_ptr<X> obj)
+    [[nodiscard]] bool addObject(const std::string& name,
+                                 std::shared_ptr<X> obj)
     {
         std::lock_guard<std::mutex> lock(mapLock);
         auto res = objectMap.emplace(name, std::move(obj));
@@ -74,7 +75,8 @@ class SearchableObjectHolder {
     }
 
     /** add and object to container*/
-    [[nodiscard]] bool addObject(const std::string& name, std::shared_ptr<X> obj, Y type)
+    [[nodiscard]] bool
+        addObject(const std::string& name, std::shared_ptr<X> obj, Y type)
     {
         std::lock_guard<std::mutex> lock(mapLock);
         auto res = objectMap.emplace(name, std::move(obj));

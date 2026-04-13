@@ -88,14 +88,16 @@ class lr_guarded {
  blocking.
 */
     template<class Duration>
-    [[nodiscard]] shared_handle try_lock_shared_for(const Duration& duration) const;
+    [[nodiscard]] shared_handle
+        try_lock_shared_for(const Duration& duration) const;
 
     /**
  Acquire a shared_handle to the protected object. Always succeeds without
  blocking.
 */
     template<class TimePoint>
-    [[nodiscard]] shared_handle try_lock_shared_until(const TimePoint& timepoint) const;
+    [[nodiscard]] shared_handle
+        try_lock_shared_until(const TimePoint& timepoint) const;
 
   private:
     class shared_deleter {

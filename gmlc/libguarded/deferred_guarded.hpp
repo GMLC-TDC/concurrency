@@ -110,10 +110,12 @@ class deferred_guarded
     [[nodiscard]] shared_handle try_lock_shared() const;
 
     template<class Duration>
-    [[nodiscard]] shared_handle try_lock_shared_for(const Duration& duration) const;
+    [[nodiscard]] shared_handle
+        try_lock_shared_for(const Duration& duration) const;
 
     template<class TimePoint>
-    [[nodiscard]] shared_handle try_lock_shared_until(const TimePoint& timepoint) const;
+    [[nodiscard]] shared_handle
+        try_lock_shared_until(const TimePoint& timepoint) const;
 
     /** generate a copy of the protected object
      */
