@@ -29,7 +29,7 @@ TEST(tripwire, basic)
     trig = nullptr;
     EXPECT_TRUE(detect.isTripped());
 }
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 DECLARE_INDEXED_TRIPLINES(10)
 
 TEST(tripwire, indexed)
