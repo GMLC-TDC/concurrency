@@ -63,7 +63,7 @@ class guarded {
  thread. The lock will be automatically released when the handle
  is destroyed.
 */
-    handle lock();
+    [[nodiscard]] handle lock();
 
     /**
  Attempt to acquire a handle to the protected object. Returns a
@@ -72,7 +72,7 @@ class guarded {
  thread. The lock will be automatically released when the handle
  is destroyed.
 */
-    handle try_lock();
+    [[nodiscard]] handle try_lock();
 
     /**
  Attempt to acquire a handle to the protected object. As a side
@@ -89,7 +89,7 @@ class guarded {
  default std::mutex.
 */
     template<class Duration>
-    handle try_lock_for(const Duration& duration);
+    [[nodiscard]] handle try_lock_for(const Duration& duration);
 
     /**
  Attempt to acquire a handle to the protected object.  As a side
@@ -105,7 +105,7 @@ class guarded {
  default std::mutex.
 */
     template<class TimePoint>
-    handle try_lock_until(const TimePoint& timepoint);
+    [[nodiscard]] handle try_lock_until(const TimePoint& timepoint);
 
     /** generate a copy of the protected object
      */

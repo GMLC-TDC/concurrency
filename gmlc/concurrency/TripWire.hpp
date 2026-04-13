@@ -75,7 +75,7 @@ class TripWireDetector {
     {
     }
     /** check if the line was tripped*/
-    bool isTripped() const noexcept
+    [[nodiscard]] bool isTripped() const noexcept
     {
         return lineDetector->load(std::memory_order_acquire);
     }

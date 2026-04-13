@@ -66,7 +66,7 @@ class SearchableObjectHolder {
         }
     }
     /** add and object to container*/
-    bool addObject(const std::string& name, std::shared_ptr<X> obj)
+    [[nodiscard]] bool addObject(const std::string& name, std::shared_ptr<X> obj)
     {
         std::lock_guard<std::mutex> lock(mapLock);
         auto res = objectMap.emplace(name, std::move(obj));
@@ -74,7 +74,7 @@ class SearchableObjectHolder {
     }
 
     /** add and object to container*/
-    bool addObject(const std::string& name, std::shared_ptr<X> obj, Y type)
+    [[nodiscard]] bool addObject(const std::string& name, std::shared_ptr<X> obj, Y type)
     {
         std::lock_guard<std::mutex> lock(mapLock);
         auto res = objectMap.emplace(name, std::move(obj));
@@ -94,7 +94,7 @@ class SearchableObjectHolder {
 @details this is really only useful if there is only one thread adding
 object otherwise the results are not totally reliable upon return
 */
-    bool empty()
+    [[nodiscard]] bool empty()
     {
         std::lock_guard<std::mutex> lock(mapLock);
         return objectMap.empty();
@@ -112,7 +112,7 @@ object otherwise the results are not totally reliable upon return
     }
 
     /** remove an object from the object holder by name*/
-    bool removeObject(const std::string& name)
+    [[nodiscard]] bool removeObject(const std::string& name)
     {
         std::lock_guard<std::mutex> lock(mapLock);
         auto fnd = objectMap.find(name);

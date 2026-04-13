@@ -17,7 +17,7 @@ class TriggerVariable {
     /** activate the trigger to the ready state
 @return true if the Trigger was activated false if it was already active
 */
-    bool activate()
+    [[nodiscard]] bool activate()
     {
         if (activated.load()) {
             return false;
@@ -34,7 +34,7 @@ class TriggerVariable {
     /** trigger the variable
 @return true if the trigger was successful, false if the trigger has not
 been activated yet*/
-    bool trigger()
+    [[nodiscard]] bool trigger()
     {
         if (!activated.load()) {
             return false;
@@ -46,9 +46,9 @@ been activated yet*/
     }
 
     /** check if the variable has been triggered after the last activation*/
-    bool isTriggered() const { return triggered.load(); }
+    [[nodiscard]] bool isTriggered() const { return triggered.load(); }
     /** wait for the variable to trigger*/
-    bool wait() const
+    [[nodiscard]] bool wait() const
     {
         if (!activated.load()) {
             return true;
@@ -60,7 +60,7 @@ been activated yet*/
         return true;
     }
     /** wait for a period of time for the value to trigger*/
-    bool wait_for(const std::chrono::milliseconds& duration) const
+    [[nodiscard]] bool wait_for(const std::chrono::milliseconds& duration) const
     {
         if (!isActive()) {
             return true;
@@ -82,7 +82,7 @@ been activated yet*/
         }
     }
     /** wait for a period of time for the value to trigger*/
-    bool wait_forActivation(const std::chrono::milliseconds& duration) const
+    [[nodiscard]] bool wait_forActivation(const std::chrono::milliseconds& duration) const
     {
         std::unique_lock<std::mutex> lk(activeLock);
         if (!activated) {
@@ -109,7 +109,7 @@ trigger to occur and then be reset
         }
     }
     /** check if the variable is active*/
-    bool isActive() const { return activated.load(); }
+    [[nodiscard]] bool isActive() const { return activated.load(); }
 
   private:
     std::atomic_bool triggered{false};  //!< the state of the trigger

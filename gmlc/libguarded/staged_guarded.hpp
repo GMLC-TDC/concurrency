@@ -63,8 +63,8 @@ class staged_guarded {
  thread. The lock will be automatically released when the handle
  is destroyed.
 */
-    handle lock();
-    shared_handle lock() const;
+    [[nodiscard]] handle lock();
+    [[nodiscard]] shared_handle lock() const;
 
     /**
  Attempt to acquire a handle to the protected object. Returns a
@@ -73,7 +73,7 @@ class staged_guarded {
  thread. The lock will be automatically released when the handle
  is destroyed.
 */
-    handle try_lock();
+    [[nodiscard]] handle try_lock();
 
     /**
  Attempt to acquire a handle to the protected object. As a side
@@ -90,7 +90,7 @@ class staged_guarded {
  default std::mutex.
 */
     template<class Duration>
-    handle try_lock_for(const Duration& duration);
+    [[nodiscard]] handle try_lock_for(const Duration& duration);
 
     /**
  Attempt to acquire a handle to the protected object.  As a side
@@ -106,17 +106,17 @@ class staged_guarded {
  default std::mutex.
 */
     template<class TimePoint>
-    handle try_lock_until(const TimePoint& timepoint);
+    [[nodiscard]] handle try_lock_until(const TimePoint& timepoint);
 
     // shared access, note "shared" in method names
-    shared_handle lock_shared() const;
-    shared_handle try_lock_shared() const;
+    [[nodiscard]] shared_handle lock_shared() const;
+    [[nodiscard]] shared_handle try_lock_shared() const;
 
     template<class Duration>
-    shared_handle try_lock_shared_for(const Duration& duration) const;
+    [[nodiscard]] shared_handle try_lock_shared_for(const Duration& duration) const;
 
     template<class TimePoint>
-    shared_handle try_lock_shared_until(const TimePoint& timepoint) const;
+    [[nodiscard]] shared_handle try_lock_shared_until(const TimePoint& timepoint) const;
 
     void transition()
     {

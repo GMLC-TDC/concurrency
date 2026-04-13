@@ -55,7 +55,7 @@ class lock_handle {
 };
 
 template<typename T, typename M>
-lock_handle<T, M> try_lock_handle(T* obj, M& gmutex)
+[[nodiscard]] lock_handle<T, M> try_lock_handle(T* obj, M& gmutex)
 {
     typename lock_handle<T, M>::lock_type glock(gmutex, std::try_to_lock);
     if (glock.owns_lock()) {
@@ -66,7 +66,7 @@ lock_handle<T, M> try_lock_handle(T* obj, M& gmutex)
 }
 
 template<typename T, typename M, typename Duration>
-lock_handle<T, M> try_lock_handle_for(T* obj, M& gmutex, const Duration& d)
+[[nodiscard]] lock_handle<T, M> try_lock_handle_for(T* obj, M& gmutex, const Duration& d)
 {
     typename lock_handle<T, M>::lock_type glock(gmutex, d);
     if (glock.owns_lock()) {
@@ -77,7 +77,7 @@ lock_handle<T, M> try_lock_handle_for(T* obj, M& gmutex, const Duration& d)
 }
 
 template<typename T, typename M, typename TimePoint>
-lock_handle<T, M> try_lock_handle_until(T* obj, M& gmutex, const TimePoint& tp)
+[[nodiscard]] lock_handle<T, M> try_lock_handle_until(T* obj, M& gmutex, const TimePoint& tp)
 {
     typename lock_handle<T, M>::lock_type glock(gmutex, tp);
     if (glock.owns_lock()) {
