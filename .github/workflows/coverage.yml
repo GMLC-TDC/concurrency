@@ -1,0 +1,63 @@
+name: Coverage
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        std: ["23", "20"]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+
+      - name: Get LCov
+        run: |
+          sudo apt-get install ca-certificates lcov
+          #wget https://github.com/linux-test-project/lcov/releases/download/v2.2/lcov-2.2.tar.gz
+          #tar -xzf lcov-2.2.tar.gz
+          #cd lcov-2.2
+          #sudo make install
+
+      - name: Configure
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_CXX_STANDARD=${{matrix.std}} \
+            -DGMLC_CONCURRENCY_TEST=ON \
+            -DCMAKE_BUILD_TYPE=Coverage
+
+      - name: Build
+        run: cmake --build build -j4
+
+      - name: Test
+        run: |
+          cd build
+          ctest --output-on-failure
+
+      - name: Prepare coverage
+        run: |
+          lcov --ignore-errors gcov,mismatch --directory . --capture --output-file coverage.info
+          lcov --remove coverage.info '*/tests/*' '*gtest*' --output-file coverage.info
+          lcov --list coverage.info
+        working-directory: build
+
+      - uses: codecov/codecov-action@v5
+        with:
+          files: build/coverage.info
+          fail_ci_if_error: true
+          functionalities: fixes
+          token: ${{ secrets.CODECOV_TOKEN }} # required
