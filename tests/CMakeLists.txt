@@ -41,6 +41,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Coverage)
         EXECUTABLE
         ctest
         DEPENDENCIES
-        ${CONCURRENCY_TESTS}
+        concurrencyTests
+        libguarded_test
     )
 endif()
