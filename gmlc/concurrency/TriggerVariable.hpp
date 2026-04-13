@@ -103,8 +103,12 @@ trigger to occur and then be reset
         if (activated.load()) {
             while (!triggered.load(std::memory_order_acquire)) {
                 lk.unlock();
-                trigger();
-                lk.lock();
+                if (trigger()) {
+                    lk.lock();
+                }
+                else {
+                    break;
+                }
             }
             activated.store(false);
         }
