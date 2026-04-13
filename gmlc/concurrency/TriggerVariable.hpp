@@ -105,8 +105,7 @@ trigger to occur and then be reset
                 lk.unlock();
                 if (trigger()) {
                     lk.lock();
-                }
-                else {
+                } else {
                     break;
                 }
             }
