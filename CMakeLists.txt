@@ -43,6 +43,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/"
 )
 include(extraMacros)
 include(CMakeDependentOption)
+include(CTest)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -84,6 +85,11 @@ set(GMLC_CONCURRENCY_CLANG_TIDY_OPTIONS ""
 
 mark_as_advanced(GMLC_CONCURRENCY_CLANG_TIDY_OPTIONS)
 mark_as_advanced(GMLC_CONCURRENCY_CLANG_TIDY)
+
+# Setup coverage compilation flags
+if(CMAKE_BUILD_TYPE STREQUAL Coverage)
+    include(CodeCoverage)
+endif()
 
 # Prepare Clang-Tidy
 if(GMLC_CONCURRENCY_CLANG_TIDY)
