@@ -32,16 +32,3 @@ if(GMLC_CONCURRENCY_CLANG_TIDY)
 endif()
 
 add_subdirectory(libguarded)
-
-if(CMAKE_BUILD_TYPE STREQUAL Coverage)
-    include(CodeCoverage)
-    setup_target_for_coverage(
-        NAME
-        CONCURRENCY_coverage
-        EXECUTABLE
-        ctest
-        DEPENDENCIES
-        concurrencyTests
-        libguarded_test
-    )
-endif()
