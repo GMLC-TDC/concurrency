@@ -9,11 +9,7 @@
 
 cmake_minimum_required(VERSION 3.22...4.2)
 
-project(
-    GMLC_CONCURRENCY
-    LANGUAGES CXX
-    VERSION 0.6.0
-)
+project(GMLC_CONCURRENCY LANGUAGES CXX VERSION 0.6.0)
 
 # -----------------------------------------------------------------------------
 # GMLC CONCURRENCY library Version number

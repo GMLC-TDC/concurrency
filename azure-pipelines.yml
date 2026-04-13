@@ -19,7 +19,7 @@ variables:
 jobs:
   - job: ClangTidy
     variables:
-      CXX_FLAGS: '-Werror -Wcast-align -Wfloat-equal -Wimplicit-atomic-properties -Wmissing-declarations -Woverlength-strings -Wshadow -Wstrict-selector-match -Wundeclared-selector -Wunreachable-code -std=c++20'
+      CXX_FLAGS: "-Werror -Wcast-align -Wfloat-equal -Wimplicit-atomic-properties -Wmissing-declarations -Woverlength-strings -Wshadow -Wstrict-selector-match -Wundeclared-selector -Wunreachable-code -std=c++20"
       concurrency.options: -DGMLC_CONCURRENCY_CLANG_TIDY=ON -DGMLC_CONCURRENCY_CLANG_TIDY_OPTIONS="-fix"
       concurrency.std: 20
       CMAKE_BUILD_PARALLEL_LEVEL: 1
