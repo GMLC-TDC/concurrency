@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2026, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -32,15 +32,3 @@ if(GMLC_CONCURRENCY_CLANG_TIDY)
 endif()
 
 add_subdirectory(libguarded)
-
-if(CMAKE_BUILD_TYPE STREQUAL Coverage)
-    include(CodeCoverage)
-    setup_target_for_coverage(
-        NAME
-        CONCURRENCY_coverage
-        EXECUTABLE
-        ctest
-        DEPENDENCIES
-        ${CONCURRENCY_TESTS}
-    )
-endif()

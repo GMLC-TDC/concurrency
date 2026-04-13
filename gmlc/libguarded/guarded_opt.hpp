@@ -11,7 +11,7 @@
  ***********************************************************************/
 
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2026,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
@@ -64,7 +64,7 @@ class guarded_opt {
  thread. The lock will be automatically released when the handle
  is destroyed.
 */
-    handle lock();
+    [[nodiscard]] handle lock();
 
     /**
  Attempt to acquire a handle to the protected object. Returns a
@@ -73,7 +73,7 @@ class guarded_opt {
  thread. The lock will be automatically released when the handle
  is destroyed.
 */
-    handle try_lock();
+    [[nodiscard]] handle try_lock();
 
     /**
  Attempt to acquire a handle to the protected object. As a side
@@ -90,7 +90,7 @@ class guarded_opt {
  default std::mutex.
 */
     template<class Duration>
-    handle try_lock_for(const Duration& duration);
+    [[nodiscard]] handle try_lock_for(const Duration& duration);
 
     /**
  Attempt to acquire a handle to the protected object.  As a side

@@ -11,21 +11,21 @@ pr:
   - main
 
 variables:
-  concurrency.std: 17
+  concurrency.std: 20
   concurrency.build_type: Debug
-  concurrency.options: -DGMLC_CONCURRENCY_ENABLE_TESTS=ON -DMLC_CONCURRENCY_ENABLE_ERROR_ON_WARNINGS=ON
+  concurrency.options: -DGMLC_CONCURRENCY_TEST=ON -DGMLC_CONCURRENCY_ENABLE_ERROR_ON_WARNINGS=ON
   CMAKE_BUILD_PARALLEL_LEVEL: 4
 
 jobs:
   - job: ClangTidy
     variables:
-      CXX_FLAGS: "-Werror -Wcast-align -Wfloat-equal -Wimplicit-atomic-properties -Wmissing-declarations -Woverlength-strings -Wshadow -Wstrict-selector-match -Wundeclared-selector -Wunreachable-code -std=c++17"
+      CXX_FLAGS: "-Werror -Wcast-align -Wfloat-equal -Wimplicit-atomic-properties -Wmissing-declarations -Woverlength-strings -Wshadow -Wstrict-selector-match -Wundeclared-selector -Wunreachable-code -std=c++20"
       concurrency.options: -DGMLC_CONCURRENCY_CLANG_TIDY=ON -DGMLC_CONCURRENCY_CLANG_TIDY_OPTIONS="-fix"
-      concurrency.std: 17
+      concurrency.std: 20
       CMAKE_BUILD_PARALLEL_LEVEL: 1
     pool:
       vmImage: "ubuntu-latest"
-    container: helics/buildenv:clang14-builder
+    container: helics/buildenv:clang19-builder
     steps:
       - template: .ci/azure-build.yml
       - script: git diff --exit-code --color
@@ -44,21 +44,14 @@ jobs:
   - job: Native
     strategy:
       matrix:
-        Linux14:
+        Linux20:
           vmImage: "ubuntu-latest"
-        macOS17:
+        macOS-latest:
           vmImage: "macOS-latest"
-          concurrency.std: 17
-        macOS11:
-          vmImage: "macOS-latest"
-        Windows17:
-          vmImage: "windows-2019"
-          concurrency.std: 20
-        Windows11:
-          vmImage: "windows-2019"
+          concurrency.std: 23
         Windowslatest:
-          vmImage: "windows-2022"
-          concurrency.std: 17
+          vmImage: "windows-latest"
+          concurrency.std: 20
     pool:
       vmImage: $(vmImage)
     steps:
@@ -70,15 +63,19 @@ jobs:
       vmImage: "ubuntu-latest"
     strategy:
       matrix:
-        gcc11:
-          containerImage: helics/buildenv:gcc11-builder
-          concurrency.std: 17
-          concurrency.options: -DCMAKE_CXX_FLAGS="-Wstrict-overflow=5"
-        gcc13:
-          containerImage: helics/buildenv:gcc13-builder
-          concurrency.std: 20
-        clang18:
-          containerImage: helics/buildenv:clang18-builder
+        gcc14:
+          containerImage: helics/buildenv:gcc14-builder
+        gcc15:
+          containerImage: helics/buildenv:gcc15-builder
+          concurrency.std: 26
+        gcc12:
+          containerImage: helics/buildenv:gcc12-builder
+          concurrency.std: 23
+        clang19:
+          containerImage: helics/buildenv:clang19-builder
+        clang22:
+          containerImage: helics/buildenv:clang22-builder
+          concurrency.std: 26
     container: $[ variables['containerImage'] ]
     steps:
       - template: .ci/azure-build.yml

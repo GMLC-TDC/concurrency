@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2026,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
@@ -94,7 +94,7 @@ class SearchableObjectHolder {
 @details this is really only useful if there is only one thread adding
 object otherwise the results are not totally reliable upon return
 */
-    bool empty()
+    [[nodiscard]] bool empty()
     {
         std::lock_guard<std::mutex> lock(mapLock);
         return objectMap.empty();

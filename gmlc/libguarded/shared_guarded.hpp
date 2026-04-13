@@ -11,7 +11,7 @@
  ***********************************************************************/
 
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2026,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
@@ -59,25 +59,27 @@ class shared_guarded
     explicit shared_guarded(Us&&... data);
 
     // exclusive access
-    handle lock();
-    shared_handle lock() const;
-    handle try_lock();
+    [[nodiscard]] handle lock();
+    [[nodiscard]] shared_handle lock() const;
+    [[nodiscard]] handle try_lock();
 
     template<class Duration>
-    handle try_lock_for(const Duration& duration);
+    [[nodiscard]] handle try_lock_for(const Duration& duration);
 
     template<class TimePoint>
-    handle try_lock_until(const TimePoint& timepoint);
+    [[nodiscard]] handle try_lock_until(const TimePoint& timepoint);
 
     // shared access, note "shared" in method names
-    shared_handle lock_shared() const;
-    shared_handle try_lock_shared() const;
+    [[nodiscard]] shared_handle lock_shared() const;
+    [[nodiscard]] shared_handle try_lock_shared() const;
 
     template<class Duration>
-    shared_handle try_lock_shared_for(const Duration& duration) const;
+    [[nodiscard]] shared_handle
+        try_lock_shared_for(const Duration& duration) const;
 
     template<class TimePoint>
-    shared_handle try_lock_shared_until(const TimePoint& timepoint) const;
+    [[nodiscard]] shared_handle
+        try_lock_shared_until(const TimePoint& timepoint) const;
 
   private:
     T m_obj;

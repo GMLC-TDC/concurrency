@@ -1,0 +1,83 @@
+name: Tests
+on:
+  push:
+    branches:
+      - main
+      - v*
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  cmake-config:
+    name: CMake config check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        submodules: true
+    - name: CMake 3.22
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 3.22.0
+    - name: CMake 3.23
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 3.23.0
+        args: -DGMLC_CONCURRENCY_TEST=OFF
+      if: success() || failure()
+    - name: CMake 3.24
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 3.24.0
+      if: success() || failure()
+    - name: CMake 3.25
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 3.25.0
+      if: success() || failure()
+    - name: CMake 3.26
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 3.26.0
+      if: success() || failure()
+    - name: CMake 3.27
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 3.27.0
+      if: success() || failure()
+    - name: CMake 3.28
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 3.28.0
+      if: success() || failure()
+    - name: CMake 3.29
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 3.29.0
+      if: success() || failure()
+    - name: CMake 3.30
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 3.30.0
+      if: success() || failure()
+    - name: CMake 3.31
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 3.31.0
+      if: success() || failure()
+    - name: CMake 4.0
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 4.0.0
+      if: success() || failure()
+    - name: CMake 4.1
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 4.1.0
+      if: success() || failure()
+    - name: CMake 4.2
+      uses: ./.github/actions/quick_cmake
+      with:
+        cmake-version: 4.2.0
+      if: success() || failure()

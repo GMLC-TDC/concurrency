@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2026, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -7,15 +7,15 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.22...3.30)
+cmake_minimum_required(VERSION 3.22...4.2)
 
-project(GMLC_CONCURRENCY VERSION 0.5.0)
+project(GMLC_CONCURRENCY LANGUAGES CXX VERSION 0.6.0)
 
 # -----------------------------------------------------------------------------
 # GMLC CONCURRENCY library Version number
 # -----------------------------------------------------------------------------
 set(GMLC_CONCURRENCY_VERSION_BUILD)
-set(GMLC_CONCURRENCY_DATE "2024-09-30")
+set(GMLC_CONCURRENCY_DATE "2026-04-13")
 
 set(GMLC_CONCURRENCY_VERSION_STRING
     "${GMLC_CONCURRENCY_VERSION} (${GMLC_CONCURRENCY_DATE})"
@@ -23,7 +23,7 @@ set(GMLC_CONCURRENCY_VERSION_STRING
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # User settable
-    set(GMLC_CONCURRENCY_CXX_STD "17" CACHE STRING "The CMake standard to require")
+    set(GMLC_CONCURRENCY_CXX_STD "20" CACHE STRING "The CMake standard to require")
 
     # set(CUR_PROJ ON)
     set(CMAKE_CXX_STANDARD ${GMLC_CONCURRENCY_CXX_STD})
@@ -32,7 +32,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
 if(NOT CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD 20)
 endif()
 # -----------------------------------------------------------------------------
 # set the module path and include some common macros
@@ -43,6 +43,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/"
 )
 include(extraMacros)
 include(CMakeDependentOption)
+include(CTest)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -55,6 +56,7 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
 endif()
 
 add_library(concurrency_base INTERFACE)
+target_compile_features(concurrency_base INTERFACE cxx_std_20)
 
 include(compiler_flags)
 target_link_libraries(concurrency_base INTERFACE compile_flags_target)
@@ -83,6 +85,11 @@ set(GMLC_CONCURRENCY_CLANG_TIDY_OPTIONS ""
 
 mark_as_advanced(GMLC_CONCURRENCY_CLANG_TIDY_OPTIONS)
 mark_as_advanced(GMLC_CONCURRENCY_CLANG_TIDY)
+
+# Setup coverage compilation flags
+if(CMAKE_BUILD_TYPE STREQUAL Coverage)
+    include(CodeCoverage)
+endif()
 
 # Prepare Clang-Tidy
 if(GMLC_CONCURRENCY_CLANG_TIDY)

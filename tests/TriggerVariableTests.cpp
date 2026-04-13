@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2026,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
@@ -58,7 +58,7 @@ TEST(triggervariable, waitActivation)
     }
     EXPECT_TRUE(started.load());
     EXPECT_FALSE(completed.load());
-    trigger.activate();
+    EXPECT_TRUE(trigger.activate());
     std::this_thread::yield();
     if (!completed.load()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -70,13 +70,12 @@ TEST(triggervariable, waitActivation)
 TEST(triggervariable, waitTrigger)
 {
     TriggerVariable trigger;
-    trigger.activate();
+    ASSERT_TRUE(trigger.activate());
     std::atomic<bool> started{false};
     std::atomic<bool> completed{false};
     auto fut = std::async(std::launch::async, [&]() {
         started = true;
-        trigger.wait();
-        completed = true;
+        completed = trigger.wait();
     });
 
     std::this_thread::yield();
@@ -86,7 +85,7 @@ TEST(triggervariable, waitTrigger)
     EXPECT_TRUE(started.load());
 
     EXPECT_FALSE(completed.load());
-    trigger.trigger();
+    EXPECT_TRUE(trigger.trigger());
     std::this_thread::yield();
     if (!completed.load()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

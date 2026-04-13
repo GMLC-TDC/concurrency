@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2026,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
@@ -75,7 +75,7 @@ class TripWireDetector {
     {
     }
     /** check if the line was tripped*/
-    bool isTripped() const noexcept
+    [[nodiscard]] bool isTripped() const noexcept
     {
         return lineDetector->load(std::memory_order_acquire);
     }
