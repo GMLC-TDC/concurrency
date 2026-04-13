@@ -66,7 +66,8 @@ template<typename T, typename M>
 }
 
 template<typename T, typename M, typename Duration>
-[[nodiscard]] lock_handle<T, M> try_lock_handle_for(T* obj, M& gmutex, const Duration& d)
+[[nodiscard]] lock_handle<T, M>
+    try_lock_handle_for(T* obj, M& gmutex, const Duration& d)
 {
     typename lock_handle<T, M>::lock_type glock(gmutex, d);
     if (glock.owns_lock()) {
@@ -77,7 +78,8 @@ template<typename T, typename M, typename Duration>
 }
 
 template<typename T, typename M, typename TimePoint>
-[[nodiscard]] lock_handle<T, M> try_lock_handle_until(T* obj, M& gmutex, const TimePoint& tp)
+[[nodiscard]] lock_handle<T, M>
+    try_lock_handle_until(T* obj, M& gmutex, const TimePoint& tp)
 {
     typename lock_handle<T, M>::lock_type glock(gmutex, tp);
     if (glock.owns_lock()) {

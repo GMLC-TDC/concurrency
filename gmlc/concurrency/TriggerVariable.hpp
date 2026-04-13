@@ -82,7 +82,8 @@ been activated yet*/
         }
     }
     /** wait for a period of time for the value to trigger*/
-    [[nodiscard]] bool wait_forActivation(const std::chrono::milliseconds& duration) const
+    [[nodiscard]] bool
+        wait_forActivation(const std::chrono::milliseconds& duration) const
     {
         std::unique_lock<std::mutex> lk(activeLock);
         if (!activated) {
